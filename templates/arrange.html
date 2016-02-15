@@ -2,8 +2,35 @@
 {% block content %}
 
 <!-- This should take in information about which wall! -->
-<p> Woah we're gunna make a wall soon! </p>
+<h2> Woah we're gunna make a wall soon! </h2>
 
 
+{% if gallery_id is not none %}
+<!-- The user has permission to access the gallery, show it and options -->
+<p> Gallery {{ gallery_id }} Display: </p>
+<hr>
+<div class='gallery-display' 
+         data-galleryid='{{gallery_id}}' 
+         id='gallery{{gallery_id}}'>
+    <canvas id='canvas{{ gallery_id }}' height='300' width='900'> 
+        If you dont have HTML5 canvas, you're gonna have a bad time.
+    </canvas>
+</div>
+<hr>
+<h2>Lots of cool parameters for gallery arrangment!</h2>
+<form action='/arrange-o-matic' method='POST'>
+    <input type='text' name='dummy_param' placeholder='fake temporary option'>
+    <input type='hidden' name='gallery_id' value='{{ gallery_id }}'>
+    <input type='submit' value='Submit Gallery for Arrangement'>
+</form>
+<hr>
+
+{% else %}
+<!-- The gallery cannot be displayed (probably user lacks permissions) -->
+<p> I'm sorry Dave, I'm afraid I can't let you do that.</p>
+
+{% endif %}
+
+<script src="/static/js/wall.js"></script>
 
 {% endblock %}

@@ -19,6 +19,7 @@ app.jinja_env.undefined = StrictUndefined
 
 DEFAULT_USER_ID = 1
 
+
 @app.route('/')
 def index():
     """Homepage."""
@@ -115,14 +116,35 @@ def show_galleries():
     gallery_ids = [g.gallery_id for g in galleries]
 
     return render_template("galleries.html",
-                            gallery_ids=gallery_ids)
+                           gallery_ids=gallery_ids)
 
 
-@app.route('/arrange')
+@app.route('/arrange', methods=["GET"])
 def prompt_arrangment():
     """Allow a user to input parameters about wall generation from gallery."""
 
-    return render_template("arrange.html")
+    gallery_id = request.args.get('gallery_id')
+    curator_id = Gallery.query.get(gallery_id).curator_id
+
+    # This is a get request because it does not have side effects, but check
+    # they are the curator of this gallery or that it is site sample.
+    if curator_id not in [session.get('user_id'), DEFAULT_USER_ID]:
+        gallery_id = None
+
+    return render_template("arrange.html",
+                           gallery_id=gallery_id)
+
+
+@app.route('/arrange-o-matic', methods=["POST"])
+def process_arrangment():
+    """Process the arrangement."""
+
+    gallery_id = request.form.get('gallery_id')
+
+    print "I'M THE ARRANGE-O-MATIC!!!!!"
+
+    return render_template("arrange-temp-working.html",
+                            gallery_id=gallery_id)
 
 
 @app.route('/walls')
