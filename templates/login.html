@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Login for registered users -->
+
+<form action='/login-process' method='POST'>
+    <label>Username (not case sensitive): <input type='text' name='username'></label>
+    <label>Password: <input type="password" name="password"></label>
+    <input type="submit">
+</form>
+
+<hr>
+
+<!-- Signup for new users -->
+
+<h2>Sign up for users not yet registered:</h2>
+<p>This username and password are for conveneince and not security. 
+    Please do not use a password you have used on another website.</p>
+<form action='/signup-process' method='POST'>
+    <label>Username (not case sensitive): <input type='text' name='username'></label>
+    <label>Email: <input type='text' name='email'></label>
+    <label>Password: <input type="password" name="password"></label>
+    <input type="submit">
+</form>
+
+{% endblock %}

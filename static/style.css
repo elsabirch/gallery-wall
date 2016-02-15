@@ -1,0 +1,9 @@
+p {
+    font-family: sans-serif;
+}
+
+canvas {
+/*    width: 900px; 
+    height: 300px;*/
+    border: 1px solid #d3d3d3;
+}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Template For Content -->
+<p>A shiney new wall just for you!</p>
+
+<div class='wall-display' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
+    <p> Wall {{wall_id}} Display: </p>
+    <canvas id='canvas{{wall_id}}' height='300' width='900'> 
+        If you dont have HTML5 canvas, you're gonna have a bad time.
+    </canvas>
+</div>
+
+<script src="/static/js/wall.js"></script>
+
+{% endblock %}

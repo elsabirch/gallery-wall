@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Template For Content -->
+<p> Step right up! Pick a gallery! </p>
+
+{% for gallery_id in gallery_ids %}
+    <div class='gallery-display' 
+         data-galleryid='{{gallery_id}}' 
+         id='gallery{{gallery_id}}'>
+        <p> Gallery {{gallery_id}} Display: </p>
+        <canvas id='canvas{{gallery_id}}' height='300' width='900'> 
+            If you dont have HTML5 canvas, you're gonna have a bad time.
+        </canvas>
+        <a href="/arrange"> Arrange this gallery</a>
+        <!-- TODO: this should be a form -->
+    </div> 
+    <hr>
+{% endfor %}
+
+<script src="/static/js/wall.js"></script>
+
+{% endblock %}

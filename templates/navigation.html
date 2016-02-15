@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Template For Content -->
+
+<p> <a href="/galleries"> Galleries </a> (pick one to be arranged on a wall) </p>
+<p> <a href="/walls"> Walls </a> (see arranged galleries) </p>
+
+{% if 'user_id' in session %}
+<p> <a href="/curate"> Curate </a> (pick pictures for wall - not yet up) </p>
+<p> <a href="/upload"> Upload </a> (your very own pictures can be used - not yet up) </p>
+{% else %}
+<p> If you log in you can upload some pictures and stuff! </p>
+{% endif %}
+
+{% endblock %}
