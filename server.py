@@ -7,6 +7,8 @@ from jinja2 import StrictUndefined
 from model import User, Picture, Gallery, Wall, Placement
 from model import connect_to_db, db
 
+from arrange import arrange_gallery_1
+
 # from flask_debugtoolbar import DebugToolbarExtension
 
 app = Flask(__name__)
@@ -142,9 +144,29 @@ def process_arrangment():
     gallery_id = request.form.get('gallery_id')
 
     print "I'M THE ARRANGE-O-MATIC!!!!!"
+    placements, width, height = arrange_gallery_1(gallery_id, {})
 
-    return render_template("arrange-temp-working.html",
-                            gallery_id=gallery_id)
+    wall = Wall(gallery_id=gallery_id,
+                wall_width=width,
+                wall_height=height,
+                )
+    db.session.add(wall)
+    db.session.commit()
+    wall_id = wall.wall_id
+
+    for picture_id in placements:
+        placement = Placement(wall_id=wall_id,
+                              picture_id=picture_id,
+                              x_coord=placements[picture_id]['x'],
+                              y_coord=placements[picture_id]['y'])
+
+        db.session.add(placement)
+    db.session.commit()
+
+    # TODO: change to redirect
+    return render_template("new-wall.html",
+                           wall_id=wall_id,
+                           )
 
 
 @app.route('/walls')
