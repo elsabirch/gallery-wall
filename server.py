@@ -1,5 +1,5 @@
 
-from flask import (Flask, render_template, jsonify,
+from flask import (Flask, render_template, jsonify, url_for,
                    request, redirect, flash, session)
 
 from jinja2 import StrictUndefined
@@ -143,9 +143,9 @@ def process_arrangment():
 
     gallery_id = request.form.get('gallery_id')
 
-    print "I'M THE ARRANGE-O-MATIC!!!!!"
     placements, width, height = arrange_gallery_1(gallery_id, {})
 
+    # Store wall in database
     wall = Wall(gallery_id=gallery_id,
                 wall_width=width,
                 wall_height=height,
@@ -154,6 +154,7 @@ def process_arrangment():
     db.session.commit()
     wall_id = wall.wall_id
 
+    # Store placements in database
     for picture_id in placements:
         placement = Placement(wall_id=wall_id,
                               picture_id=picture_id,
@@ -163,10 +164,7 @@ def process_arrangment():
         db.session.add(placement)
     db.session.commit()
 
-    # TODO: change to redirect
-    return render_template("new-wall.html",
-                           wall_id=wall_id,
-                           )
+    return redirect(url_for('show_new_wall', wall_id=wall_id))
 
 
 @app.route('/walls')
@@ -183,11 +181,11 @@ def show_walls():
                            )
 
 
-@app.route('/new-wall')
+@app.route('/new-wall', methods=['GET'])
 def show_new_wall():
     """Show a user wall that has just been arranged."""
 
-    wall_id = 1
+    wall_id = request.args.get('wall_id')
 
     return render_template("new-wall.html",
                            wall_id=wall_id,

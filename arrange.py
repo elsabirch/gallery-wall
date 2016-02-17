@@ -40,9 +40,6 @@ class Workspace(object):
             self.pics[pic]['width_mar'] = int(math.ceil(picture.width)) + self.margin
             self.pics[pic]['height_mar'] = int(math.ceil(picture.height)) + self.margin
 
-            # self.xs.append([None, None, pic])
-            # self.ys.append([None, None, pic])
-
     def get_area_queue(self):
         """Returns a list of margin padded picture areas, as tuples with id."""
 
@@ -73,7 +70,7 @@ class Workspace(object):
 
             self.xs.append([x1, x2, pic])
             self.ys.append([y1, y2, pic])
-            row_width = x2  #  + 1
+            row_width = x2
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
@@ -110,48 +107,28 @@ class Workspace(object):
         for pic in pic_x1s:
             picture = Picture.query.get(pic)
             self.placements[pic] = {}
-            # self.placements[pic]['x'] = (pic_x1s[pic] + self.margin/2 +
-            #                              (1.0 - (picture.width % 1)) / 2)
-            # self.placements[pic]['y'] = (pic_y1s[pic] + self.margin/2 +
-            #                              (1.0 - (picture.height % 1)) / 2)
-            self.placements[pic]['x'] = (pic_x1s[pic] + self.margin/2 +
-                                         ((1.0 - (picture.width % 1) / 2) if (picture.width % 1) else 0))
-            self.placements[pic]['y'] = (pic_y1s[pic] + self.margin/2 +
-                                         ((1.0 - (picture.height % 1) / 2) if (picture.height % 1) else 0))
-    
-    # def add_wall_to_db(self):
-    #     """Add the wall to the database, and get wall_id for placment saving."""
+            width_fine = (math.ceil(picture.width) - picture.width) / 2
+            height_fine = (math.ceil(picture.height) - picture.height) / 2
+            self.placements[pic]['x'] = pic_x1s[pic] + self.margin/2 + width_fine
+            self.placements[pic]['y'] = pic_y1s[pic] + self.margin/2 + height_fine
 
-    #     wall = Wall(gallery_id=self.gallery_id,
-    #                 wall_width=self.width,
-    #                 wall_height=self.height,
-    #                 )
-    #     db.session.add(wall)
-    #     db.session.commit()
-
-    #     self.wall_id = wall.wall_id
-
-    # def add_placements_to_db(self):
-    #     pass
 
 # Functions
 
 def arrange_gallery_1(gallery_id, arrange_options):
     """Calls methods in order for arrangment steps - shakedown testing. """
 
-    print "Arrangement call for gallery {}".format(gallery_id)
+    # Instantiates object for working on the arrangment
+    wkspc = Workspace(gallery_id, arrange_options)
 
-    wkspc = Workspace(gallery_id, {'margin': 2})
-
+    # This call creates the arrangment itself, will eventually have various
+    # functions availible passed in options
     wkspc.arrange_linear()
+
+    # These calls readjust the workspace to the origin, calculate precise
+    # placments for wall hanging, and save other information for display
     wkspc.realign_to_origin()
     wkspc.get_wall_size()
-
-    print wkspc.width
-    print wkspc.height
-    print wkspc.xs
-    print wkspc.ys
-
     wkspc.produce_placements()
 
     return [wkspc.placements, wkspc.width, wkspc.height]
