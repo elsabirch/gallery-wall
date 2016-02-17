@@ -45,6 +45,56 @@ class Workspace(object):
         return [(self.pics[p]['width_mar'] * self.pics[p]['height_mar'], p)
                 for p in self.pics]
 
+    def arrange_grid(self):
+        """Arrangment via an initial placement in a grid."""
+
+        pics_in_grid = self.random_place_in_grid()
+
+        self.expand_grid_to_arrangment(pics_in_grid)
+
+    def expand_grid_to_arrangment(self, pics_in_grid):
+        """From a set of grid indicies produce geometrically valid placements.
+
+        (grid = relative psuedo locations without geometry)"""
+        # print '*'*80
+        grid_ordered = sorted(pics_in_grid.keys())
+        cols, rows = zip(*grid_ordered)
+        max_i = max(cols)
+
+        # for column # start in the middle
+            # for i in range(0)
+            # for row # start in the middle
+
+            #  if at the center just place it (consider detect even number)
+
+            # if grid neighbor above/below place at that vertical level
+
+            # if can move towards center do that
+
+
+
+
+    def random_place_in_grid(self):
+        """Place pics in random grid indicies.
+
+        Returns a dict of tuple keys of grid indicies with pic id values
+        {(i,j): pic}
+        """
+
+        n_pics = len(self.pics)
+        n_grid = int(math.ceil(math.sqrt(n_pics)))
+        min_grid = -n_grid/2
+        max_grid = min_grid + n_grid
+
+        grid_pairs = [(i, j) for i in range(min_grid, max_grid) 
+                             for j in range(min_grid, max_grid)]
+
+        grid_sample = random.sample(grid_pairs, n_pics)
+
+        grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.pics.keys())}
+
+        return grid_pics
+
     def arrange_linear(self):
         """Arrange gallery pictures in horizontal line, vertically centered."""
 
@@ -78,11 +128,17 @@ class Workspace(object):
         x_shift = -min(x1s)
         y_shift = -min(y1s)
 
-        for i in range(len(pics)):
-            self.xsys[i][0] += x_shift
-            self.xsys[i][1] += x_shift
-            self.xsys[i][2] += y_shift
-            self.xsys[i][3] += y_shift
+        self.xsys = [[x1s[i] + x_shift,
+                      x2s[i] + x_shift,
+                      y1s[i] + y_shift,
+                      y2s[i] + y_shift,
+                      pics[i]] for i in range(len(pics))]
+
+        # for i in range(len(pics)):
+        #     self.xsys[i][0] += x_shift
+        #     self.xsys[i][1] += x_shift
+        #     self.xsys[i][2] += y_shift
+        #     self.xsys[i][3] += y_shift
 
     def get_wall_size(self):
         """Assgins as attributes the total wall height and width."""
@@ -119,6 +175,7 @@ def arrange_gallery_1(gallery_id, arrange_options):
     # This call creates the arrangment itself, will eventually have various
     # functions availible passed in options
     wkspc.arrange_linear()
+    # wkspc.arrange_grid()
 
     # These calls readjust the workspace to the origin, calculate precise
     # placments for wall hanging, and save other information for display

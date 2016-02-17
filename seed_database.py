@@ -79,7 +79,7 @@ def load_pictures():
 
         db.session.commit()
 
-    # Reset counter
+    # Reset seq/counter
     result = db.session.query(func.max(Picture.picture_id)).one()
     max_id = int(result[0])
     query = "ALTER SEQUENCE pictures_picture_id_seq RESTART WITH :next_id"
@@ -137,20 +137,22 @@ def load_walls():
     """Add sample walls to database from text file.
 
     Data file is pipe seperated:
-    gallery_id | wall_width | wall_height | Saved
+    wall_id | gallery_id | wall_width | wall_height | saved
     """
 
     with open("seed/seed_walls.txt") as seed_file:
         for line in seed_file:
-            gallery_id, wall_width, wall_height, saved = line.rstrip().split("|")
+            wall_id, gallery_id, wall_width, wall_height, saved = line.rstrip().split("|")
 
             # Currently gallery_id is discarded
+            wall_id = int(wall_id)
             gallery_id = int(gallery_id)
             wall_width = int(wall_width)
             wall_height = int(wall_height)
             saved = saved.strip().lower() == 'saved'
 
-            wall = Wall(gallery_id=gallery_id,
+            wall = Wall(wall_id=wall_id,
+                        gallery_id=gallery_id,
                         wall_width=wall_width,
                         wall_height=wall_height,
                         saved=saved)
@@ -159,6 +161,12 @@ def load_walls():
 
         db.session.commit()
 
+    # Reset counter
+    result = db.session.query(func.max(Wall.wall_id)).one()
+    max_id = int(result[0])
+    query = "ALTER SEQUENCE walls_wall_id_seq RESTART WITH :next_id"
+    db.session.execute(query, {'next_id': max_id+1})
+    db.session.commit()
 
 def load_placements():
     """Add sample walls to database from text file.
@@ -174,8 +182,8 @@ def load_placements():
             # Currently gallery_id is discarded
             wall_id = int(wall_id)
             picture_id = int(picture_id)
-            x_coord = int(x_coord)
-            y_coord = int(y_coord)
+            x_coord = float(x_coord)
+            y_coord = float(y_coord)
 
             placement = Placement(wall_id=wall_id,
                                   picture_id=picture_id,

@@ -183,6 +183,29 @@ class Wall(db.Model):
 
         return hanging_info
 
+    def print_seed(self):
+        """Print the seed format of a wall to save as a sample."""
+
+        print '-'*20 + 'Wall Entry' + '-'*20
+
+        # wall_id | gallery_id | wall_width | wall_height | saved
+        print ' | '.join(['{:d}'.format(self.wall_id),
+                          '{:d}'.format(self.gallery.gallery_id),
+                          '{:0.2f}'.format(self.wall_width),
+                          '{:0.2f}'.format(self.wall_height),
+                          'True',
+                          ])
+
+        print '-'*20 + 'Placement Entries' + '-'*20
+
+        for placement in self.placements:
+            # wall_id | picture_id | x | y
+            print ' | '.join(['{:d}'.format(self.wall_id),
+                              '{:d}'.format(placement.picture_id),
+                              '{:0.2f}'.format(placement.x_coord),
+                              '{:0.2f}'.format(placement.y_coord),
+                              ])
+
     def __repr__(self):
         """Representation format for output."""
 

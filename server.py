@@ -8,6 +8,7 @@ from model import User, Picture, Gallery, Wall, Placement
 from model import connect_to_db, db
 
 from arrange import arrange_gallery_1
+import arrange
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -185,6 +186,8 @@ def show_new_wall():
     """Show a user wall that has just been arranged."""
 
     wall_id = request.args.get('wall_id')
+
+    Wall.query.get(int(wall_id)).print_seed()
 
     return render_template("new-wall.html", wall_id=wall_id)
 
