@@ -16,9 +16,8 @@ class Workspace(object):
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
 
-        self.xs = []
-        self.ys = []
         self.pics = {}
+        self.xsys = []
 
         for picture in pictures:
             pic = picture.picture_id
@@ -68,27 +67,27 @@ class Workspace(object):
             y1 = -self.pics[pic]['height_mar']/2
             y2 = self.pics[pic]['height_mar']-self.pics[pic]['height_mar']/2
 
-            self.xs.append([x1, x2, pic])
-            self.ys.append([y1, y2, pic])
+            self.xsys.append([x1, x2, y1, y2, pic])
             row_width = x2
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
 
-        x1s, x2s, pics = zip(*self.xs)
-        y1s, y2s, pics = zip(*self.ys)
+        x1s, x2s, y1s, y2s, pics = zip(*self.xsys)
 
         x_shift = -min(x1s)
         y_shift = -min(y1s)
 
-        self.xs = [[(z[0] + x_shift), (z[1] + x_shift), z[2]] for z in self.xs]
-        self.ys = [[(z[0] + y_shift), (z[1] + y_shift), z[2]] for z in self.ys]
+        for i in range(len(pics)):
+            self.xsys[i][0] += x_shift
+            self.xsys[i][1] += x_shift
+            self.xsys[i][2] += y_shift
+            self.xsys[i][3] += y_shift
 
     def get_wall_size(self):
         """Assgins as attributes the total wall height and width."""
 
-        x1s, x2s, pics = zip(*self.xs)
-        y1s, y2s, pics = zip(*self.ys)
+        x1s, x2s, y1s, y2s, pics = zip(*self.xsys)
 
         # If already adjusted to origin the second term of each expression is unnecesary
         self.width = max(x2s) - min(x1s)
@@ -99,18 +98,14 @@ class Workspace(object):
 
         self.placements = {}
 
-        # Note that the coordinate lists may NOT be in the same order, thus
-        # convert to dicts so the pair for each can easily be retrieved
-        pic_x1s = {z[2]: z[0] for z in self.xs}
-        pic_y1s = {z[2]: z[0] for z in self.ys}
-
-        for pic in pic_x1s:
+        for xsys in self.xsys:
+            pic = xsys[4]
             picture = Picture.query.get(pic)
             self.placements[pic] = {}
             width_fine = (math.ceil(picture.width) - picture.width) / 2
             height_fine = (math.ceil(picture.height) - picture.height) / 2
-            self.placements[pic]['x'] = pic_x1s[pic] + self.margin/2 + width_fine
-            self.placements[pic]['y'] = pic_y1s[pic] + self.margin/2 + height_fine
+            self.placements[pic]['x'] = xsys[0] + self.margin/2 + width_fine
+            self.placements[pic]['y'] = xsys[2] + self.margin/2 + height_fine
 
 
 # Functions
