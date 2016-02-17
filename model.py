@@ -152,6 +152,14 @@ class Wall(db.Model):
     gallery = db.relationship("Gallery")
     placements = db.relationship("Placement")
 
+    def save(self):
+        """Sets wall state to saved."""
+
+        self.saved = True
+
+        db.session.commit()
+
+
     def get_hanging_info(self):
         """Returns a dictionary containing the needed information for display."""
 

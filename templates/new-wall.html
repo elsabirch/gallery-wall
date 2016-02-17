@@ -9,6 +9,22 @@
     <canvas id='canvas{{wall_id}}' height='300' width='900'> 
         If you dont have HTML5 canvas, you're gonna have a bad time.
     </canvas>
+
+    {% if 'user_id' in session %}
+
+    <form action='/save-wall' method='POST'>
+    <input type='hidden' name='wall_id' value='{{ wall_id }}'>
+    <input type='submit' value='Save this wall!'>
+    </form>
+
+    {% else %}
+
+    <p> 
+    You are currently a guest on the site - so you cannot save this wall.
+    Please be aware this page displaying it may not be availible later. 
+    </p>
+
+    {% endif %}
 </div>
 
 <script src="/static/js/wall.js"></script>

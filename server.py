@@ -174,11 +174,10 @@ def show_walls():
     user_id = session.get('user_id', DEFAULT_USER_ID)
 
     walls = User.query.get(user_id).walls
-    wall_ids = [w.wall_id for w in walls]
+    wall_ids = [w.wall_id for w in walls if w.saved]
+    wall_ids.sort(reverse=True)
 
-    return render_template("walls.html",
-                           wall_ids=wall_ids,
-                           )
+    return render_template("walls.html", wall_ids=wall_ids)
 
 
 @app.route('/new-wall', methods=['GET'])
@@ -187,10 +186,21 @@ def show_new_wall():
 
     wall_id = request.args.get('wall_id')
 
-    return render_template("new-wall.html",
-                           wall_id=wall_id,
-                           )
+    return render_template("new-wall.html", wall_id=wall_id)
 
+
+@app.route('/save-wall', methods=["POST"])
+def save_wall():
+    """Changes the state of the wall in the database to saved."""
+
+    print 'lets save this wall'
+
+    wall_id = int(request.form.get('wall_id'))
+    Wall.query.get(wall_id).save()
+
+    return redirect('/walls')
+
+# Routes returning json data
 
 @app.route('/getwall.json')
 def get_wall_data():

@@ -8,12 +8,15 @@
 </head>
 
 <body>  
-    <img src="/static/img/LogoFramesSketch.jpg" height="100">
+    
+    <a href='/navigation'><img id="navlogo" src="/static/img/LogoFramesSketch.jpg" height="70"></a>
+    (<a href='/galleries'>Galleries</a>)
+    (<a href='/walls'>Walls</a>)
     
     {% if 'user_id' in session %}
-    <p> You are logged in as {{session.username}}! (<a href='/logout-process'>Log out</a>) </p>
+    You are logged in as {{session.username}}! (<a href='/logout-process'>Log out</a>)
     {% else %}
-    <p> You are currently a guest on the site - <a href="/login"> Log in</a> for more fun! </p>
+    You are currently a guest on the site - <a href="/login"> Log in</a> for more fun!
     {% endif %}
 
     {% with messages = get_flashed_messages() %}
