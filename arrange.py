@@ -15,35 +15,25 @@ class Workspace(object):
 
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
+        self.n = len(pictures)
 
         self.pics = {}
-        self.xsys = []
 
         for picture in pictures:
-            pic = picture.picture_id
-            self.pics[pic] = {}
-            # Note, each side of each picture carries half the margin
-            #
-            #        w+m
-            #     <------->
-            #          w   m
-            #       <----><->
-            #     +--------+---------+
-            #     | +----+ | +-----+ |
-            #     | |    | | |     | |
-            #     | +----+ | +-----+ |
-            #     +--------+---------+
-            #
-            # Rounding here serves to avoid unnesesary treatment of fractional
-            # gaps, and should simplify logic some.
-            self.pics[pic]['width_mar'] = int(math.ceil(picture.width)) + self.margin
-            self.pics[pic]['height_mar'] = int(math.ceil(picture.height)) + self.margin
 
-    def get_area_queue(self):
-        """Returns a list of margin padded picture areas, as tuples with id."""
+            self.pics[picture.picture_id] = Pic(picture=picture,
+                                                margin=self.margin)
 
-        return [(self.pics[p]['width_mar'] * self.pics[p]['height_mar'], p)
-                for p in self.pics]
+
+        # Because it is common to need the largest, tallest, smallest, etc,
+        # prepare these ahead fo time for the workspace
+        self.area_sort = sorted([self.pics[p].id for p in self.pics],
+                                key=lambda x: self.pics[x].a)
+        self.width_sort = sorted([self.pics[p].id for p in self.pics],
+                                key=lambda x: self.pics[x].w)
+        self.height_sort = sorted([self.pics[p].id for p in self.pics],
+                                key=lambda x: self.pics[x].h)
+
 
     def arrange_grid(self):
         """Arrangment via an initial placement in a grid."""
@@ -117,7 +107,6 @@ class Workspace(object):
         #           'pics': {tallest: [0, 0]}
         #           }]
 
-
     def random_place_in_grid(self):
         """Place pics in random grid indicies.
 
@@ -142,56 +131,45 @@ class Workspace(object):
     def arrange_linear(self):
         """Arrange gallery pictures in horizontal line, vertically centered."""
 
-        # Use areas as a rough approximation for size to create alternating
-        # small large pattern
-        areas_with_id = sorted(self.get_area_queue())
-
-        areas, pics = zip(*areas_with_id)
-        pics = list(pics)
-
-        mid_index = len(pics) / 2
-        smaller_pics = pics[:mid_index]
-        larger_pics = pics[mid_index:]
+        mid_index = self.n / 2
+        smaller_pics = self.area_sort[:mid_index]
+        larger_pics = self.area_sort[mid_index:]
         random.shuffle(smaller_pics)
         random.shuffle(larger_pics)
 
         row_width = 0
 
-        for i in range(len(pics)):
-            pic = smaller_pics.pop() if (i % 2 == 0) else larger_pics.pop()
-            x1 = row_width
-            x2 = row_width+self.pics[pic]['width_mar']
-            y1 = -self.pics[pic]['height_mar']/2
-            y2 = self.pics[pic]['height_mar']-self.pics[pic]['height_mar']/2
+        for i in range(len(self.pics)):
+            p = smaller_pics.pop() if (i % 2 == 0) else larger_pics.pop()
+            self.pics[p].x1 = row_width
+            self.pics[p].x2 = row_width + self.pics[p].w
+            self.pics[p].y1 = -self.pics[p].h / 2.0
+            self.pics[p].y2 = self.pics[p].h + self.pics[p].y1
 
-            self.xsys.append([x1, x2, y1, y2, pic])
-            row_width = x2
-
+            row_width = self.pics[p].x2
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
 
-        x1s, x2s, y1s, y2s, pics = zip(*self.xsys)
+        x1s = [self.pics[p].x1 for p in self.pics]
+        y1s = [self.pics[p].y1 for p in self.pics]
 
         x_shift = -min(x1s)
         y_shift = -min(y1s)
 
-        self.xsys = [[x1s[i] + x_shift,
-                      x2s[i] + x_shift,
-                      y1s[i] + y_shift,
-                      y2s[i] + y_shift,
-                      pics[i]] for i in range(len(pics))]
-
-        # for i in range(len(pics)):
-        #     self.xsys[i][0] += x_shift
-        #     self.xsys[i][1] += x_shift
-        #     self.xsys[i][2] += y_shift
-        #     self.xsys[i][3] += y_shift
+        for pic in self.pics:
+            self.pics[pic].x1 += x_shift
+            self.pics[pic].x2 += x_shift
+            self.pics[pic].y1 += y_shift
+            self.pics[pic].y2 += y_shift
 
     def get_wall_size(self):
         """Assgins as attributes the total wall height and width."""
 
-        x1s, x2s, y1s, y2s, pics = zip(*self.xsys)
+        x1s = [self.pics[p].x1 for p in self.pics]
+        x2s = [self.pics[p].x2 for p in self.pics]
+        y1s = [self.pics[p].y1 for p in self.pics]
+        y2s = [self.pics[p].y2 for p in self.pics]
 
         # If already adjusted to origin the second term of each expression is unnecesary
         self.width = max(x2s) - min(x1s)
@@ -202,15 +180,51 @@ class Workspace(object):
 
         self.placements = {}
 
-        for xsys in self.xsys:
-            pic = xsys[4]
-            picture = Picture.query.get(pic)
-            self.placements[pic] = {}
-            width_fine = (math.ceil(picture.width) - picture.width) / 2
-            height_fine = (math.ceil(picture.height) - picture.height) / 2
-            self.placements[pic]['x'] = xsys[0] + self.margin/2 + width_fine
-            self.placements[pic]['y'] = xsys[2] + self.margin/2 + height_fine
+        for p in self.pics:
+            self.pics[p].picture
+            self.placements[p] = {}
+            width_fine = (math.ceil(self.pics[p].picture.width) - self.pics[p].picture.width) / 2
+            height_fine = (math.ceil(self.pics[p].picture.height) - self.pics[p].picture.height) / 2
+            self.placements[p]['x'] = self.pics[p].x1 + self.margin/2 + width_fine
+            self.placements[p]['y'] = self.pics[p].y1 + self.margin/2 + height_fine
 
+
+class Pic(object):
+    """Pics are a data transfer object for placement genertion for pictures.
+
+    Pics provide easy access and manuipulation durring arrangment to a
+    subset and modification of pictures."""
+
+    def __init__(self, picture, margin):
+        """Initialize a pic with information from the picture and workspace."""
+
+        self.id = picture.picture_id
+        self.picture = picture
+
+        # Note, each side of each picture carries half the margin
+        #
+        #        w+m
+        #     <------->
+        #          w   m
+        #       <----><->
+        #     +--------+---------+
+        #     | +----+ | +-----+ |
+        #     | |    | | |     | |
+        #     | +----+ | +-----+ |
+        #     +--------+---------+
+        #
+        # Rounding here serves to avoid unnesesary treatment of fractional
+        # gaps, and should simplify logic some.
+
+        self.w = int(math.ceil(picture.width)) + margin
+        self.h = int(math.ceil(picture.height)) + margin
+
+        self.x1 = None
+        self.x2 = None
+        self.y1 = None
+        self.y2 = None
+
+        self.a = self.w * self.h
 
 # Functions
 
