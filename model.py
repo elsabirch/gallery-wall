@@ -152,6 +152,10 @@ class Wall(db.Model):
     gallery = db.relationship("Gallery")
     placements = db.relationship("Placement")
 
+    @classmethod
+    def init_with_placements(cls, ):
+        pass
+
     def save(self):
         """Sets wall state to saved."""
 
@@ -182,6 +186,7 @@ class Wall(db.Model):
                         }
 
         return hanging_info
+
 
     def print_seed(self):
         """Print the seed format of a wall to save as a sample."""

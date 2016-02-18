@@ -71,7 +71,51 @@ class Workspace(object):
 
             # if can move towards center do that
 
+    def arrange_column_heuristic(self):
+        """Arrange in columns by a few rules."""
 
+        # column = {'type': None,
+        #             'width': 0,
+        #             'height': 0,
+        #             'pics': {}
+        # }
+
+        pics_remaining = set(self.pics.keys())
+
+        # Create a column with the single tallest picture
+        tallest = sorted([(self.pics[p]['height_mar'], p) for p in pics_remaining])[-1][1]
+        # print(Picture.query.get(tallest))
+        columns.append[ {'type': 'tall',
+                  'width': self.pics[tallest]['width_mar'],
+                  'height': self.pics[tallest]['height_mar'],
+                  'pics': {tallest: [0, 0]}
+                  }]
+        pics_remaining.remove(tallest)
+       
+        # Create a column with wide pic and two skinny ones
+        sorted_by_width = sorted([(self.pics[p]['width_mar'], p) for p in pics_remaining])
+
+        widest = sorted_by_width[-1][1]
+        # Consider getting these not as the skinniest but in general low end of dist
+        skinny1 = sorted_by_width[0][1]
+        skinny2 = sorted_by_width[1][1]
+
+        pair_width = (self.pics[skinny1]['width_mar'] +
+                      self.pics[skinny2]['width_mar'])
+        single_width = self.pics[widest]['width_mar']
+
+        # if pair_width => single_width:
+        #     # pair is wider
+
+        # else:
+        #     pass
+
+        # print(Picture.query.get(tallest))
+        # columns.append[ {'type': 'nested',
+        #           'width': self.pics[widest]['width_mar'],
+        #           'height': self.pics[tallest]['height_mar'],
+        #           'pics': {tallest: [0, 0]}
+        #           }]
 
 
     def random_place_in_grid(self):
@@ -98,20 +142,23 @@ class Workspace(object):
     def arrange_linear(self):
         """Arrange gallery pictures in horizontal line, vertically centered."""
 
-        # Use areas as a rough approximation for size to create alternating wall
+        # Use areas as a rough approximation for size to create alternating
+        # small large pattern
         areas_with_id = sorted(self.get_area_queue())
 
+        areas, pics = zip(*areas_with_id)
+        pics = list(pics)
+
+        mid_index = len(pics) / 2
+        smaller_pics = pics[:mid_index]
+        larger_pics = pics[mid_index:]
+        random.shuffle(smaller_pics)
+        random.shuffle(larger_pics)
+
         row_width = 0
-        end_select = True
 
-        while len(areas_with_id) > 0:
-            # Use random integer to select an indiex from one or the other end
-            # of the list
-            i = random.randint(0, len(areas_with_id) / 2)
-            index = i if end_select else (-(i + 1))
-
-            pic = areas_with_id.pop(index)[1]
-
+        for i in range(len(pics)):
+            pic = smaller_pics.pop() if (i % 2 == 0) else larger_pics.pop()
             x1 = row_width
             x2 = row_width+self.pics[pic]['width_mar']
             y1 = -self.pics[pic]['height_mar']/2
@@ -119,6 +166,7 @@ class Workspace(object):
 
             self.xsys.append([x1, x2, y1, y2, pic])
             row_width = x2
+
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
@@ -176,6 +224,7 @@ def arrange_gallery_1(gallery_id, arrange_options):
     # functions availible passed in options
     wkspc.arrange_linear()
     # wkspc.arrange_grid()
+    # wkspc.arrange_column_heuristic()
 
     # These calls readjust the workspace to the origin, calculate precise
     # placments for wall hanging, and save other information for display
