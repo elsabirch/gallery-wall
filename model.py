@@ -33,18 +33,21 @@ class Picture(db.Model):
                                 order_by="Gallery.gallery_id")
     user = db.relationship("User")
 
-    # TODO: Create a dynamic property using decorators to give display name of name and id if not
+    @property
+    def display_name(self):
+        """Property to provide the name if it exists and Id as a string if not."""
+
+        if self.picture_name:
+            return self.picture_name
+        else:
+            return "<Id {:d}".format(self.picture_id)
 
     def __repr__(self):
         """Representation format for output."""
-        if self.picture_name:
-            return "<{}: {:f} x {:f}>".format(self.picture_name,
-                                              self.width,
-                                              self.height)
-        else:
-            return "<Picture {:d}: {:f} x {:f}>".format(self.picture_id,
-                                                        self.width,
-                                                        self.height)
+
+        return "<{}: {:f} x {:f}>".format(self.display_name,
+                                          self.width,
+                                          self.height)
 
 
 class GalleryMembership(db.Model):

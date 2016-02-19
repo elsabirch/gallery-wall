@@ -129,10 +129,10 @@ class Workspace(object):
 
         wall_width = 0
         for column in columns:
-            # print "*"*20
-            # print column
-            # for p in column:
-            #     print(self.pics[p])
+            print "*"*20
+            print column
+            for p in column:
+                print(self.pics[p])
             col_width = max([self.pics[p].x2 for p in column])
             col_height_shift = max([self.pics[p].y2 for p in column]) / 2.0
 
@@ -268,11 +268,12 @@ class Pic(object):
     def __repr__(self):
         """Representation format for output."""
 
-        return "<id: {}, x1: {} x2: {} y1: {} y2: {}>".format(self.id,
-                                                              self.x1,
-                                                              self.x2,
-                                                              self.y1,
-                                                              self.y2)
+        return "<{:s}, x1: {:.1f} x2: {:.1f} y1: {:.1f} y2: {:.1f}>".format(
+            self.picture.display_name,
+            self.x1,
+            self.x2,
+            self.y1,
+            self.y2)
 
     def remove_margin(self):
         """Adjusts placement to that used for actual picture without margin.
