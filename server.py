@@ -7,8 +7,8 @@ from jinja2 import StrictUndefined
 from model import User, Picture, Gallery, Wall, Placement
 from model import connect_to_db, db
 
-from arrange import arrange_gallery_1
-import arrange
+from arrange import Workspace
+# import arrange
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -144,26 +144,20 @@ def process_arrangment():
 
     gallery_id = request.form.get('gallery_id')
 
-    placements, width, height = arrange_gallery_1(gallery_id, {})
+    arrange_options = {}
 
-    # Store wall in database
-    wall = Wall(gallery_id=gallery_id,
-                wall_width=width,
-                wall_height=height,
-                )
-    db.session.add(wall)
-    db.session.commit()
-    wall_id = wall.wall_id
+    wkspc = Workspace(gallery_id, arrange_options)
 
-    # Store placements in database
-    for picture_id in placements:
-        placement = Placement(wall_id=wall_id,
-                              picture_id=picture_id,
-                              x_coord=placements[picture_id]['x'],
-                              y_coord=placements[picture_id]['y'])
+    # Arrangement method (Eventually call a single function that will decide
+    # based on the options passed )
+    wkspc.arrange_linear()
+    # wkspc.arrange_grid()
+    # wkspc.arrange_column_heuristic()
 
-        db.session.add(placement)
-    db.session.commit()
+    # Readjust for the wall
+    wkspc.readjust_for_wall()
+
+    wall_id = Wall.init_from_workspace(wkspc)
 
     return redirect(url_for('show_new_wall', wall_id=wall_id))
 
@@ -187,7 +181,7 @@ def show_new_wall():
 
     wall_id = request.args.get('wall_id')
 
-    Wall.query.get(int(wall_id)).print_seed()
+    # Wall.query.get(int(wall_id)).print_seed()
 
     return render_template("new-wall.html", wall_id=wall_id)
 

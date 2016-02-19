@@ -153,8 +153,29 @@ class Wall(db.Model):
     placements = db.relationship("Placement")
 
     @classmethod
-    def init_with_placements(cls, ):
-        pass
+    def init_from_workspace(cls, workspace):
+        """Initialize a wall and the related placements from a workspace."""
+
+        wall = cls(gallery_id=workspace.gallery_id,
+                   wall_width=workspace.width,
+                   wall_height=workspace.height,
+                   )
+        db.session.add(wall)
+        db.session.commit()
+
+        wall_id = wall.wall_id
+
+        # Store placements in database
+        for pic_id in workspace.pics:
+            placement = Placement(wall_id=wall_id,
+                                  picture_id=pic_id,
+                                  x_coord=workspace.pics[pic_id].x1,
+                                  y_coord=workspace.pics[pic_id].y1)
+
+            db.session.add(placement)
+        db.session.commit()
+
+        return wall_id
 
     def save(self):
         """Sets wall state to saved."""

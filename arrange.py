@@ -140,13 +140,22 @@ class Workspace(object):
         row_width = 0
 
         for i in range(len(self.pics)):
-            p = smaller_pics.pop() if (i % 2 == 0) else larger_pics.pop()
+            p = larger_pics.pop() if (i % 2 == 0) else smaller_pics.pop()
             self.pics[p].x1 = row_width
             self.pics[p].x2 = row_width + self.pics[p].w
             self.pics[p].y1 = -self.pics[p].h / 2.0
             self.pics[p].y2 = self.pics[p].h + self.pics[p].y1
 
             row_width = self.pics[p].x2
+
+    def readjust_for_wall(self):
+        """Readjust coordinates to + quadrant, and remove margins from pictures."""
+
+        # These calls readjust the workspace to the origin, calculate precise
+        # placments for wall hanging, and save other information for display
+        self.realign_to_origin()
+        self.get_wall_size()
+        self.produce_placements()
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
@@ -178,15 +187,8 @@ class Workspace(object):
     def produce_placements(self):
         """Convert coordinates: remove rounding and margins used for placement."""
 
-        self.placements = {}
-
         for p in self.pics:
-            self.pics[p].picture
-            self.placements[p] = {}
-            width_fine = (math.ceil(self.pics[p].picture.width) - self.pics[p].picture.width) / 2
-            height_fine = (math.ceil(self.pics[p].picture.height) - self.pics[p].picture.height) / 2
-            self.placements[p]['x'] = self.pics[p].x1 + self.margin/2 + width_fine
-            self.placements[p]['y'] = self.pics[p].y1 + self.margin/2 + height_fine
+            self.pics[p].remove_margin()
 
 
 class Pic(object):
@@ -226,24 +228,33 @@ class Pic(object):
 
         self.a = self.w * self.h
 
-# Functions
+    def remove_margin(self):
+        """Adjusts placement to that used for actual picture without margin.
 
-def arrange_gallery_1(gallery_id, arrange_options):
-    """Calls methods in order for arrangment steps - shakedown testing. """
+        Also removes the rounding applied for arrangment.
+        """
 
-    # Instantiates object for working on the arrangment
-    wkspc = Workspace(gallery_id, arrange_options)
+        # Durring arrangment * = (x1, y1):
+        #     *--------+
+        #     | +----+ |
+        #     | |    | |
+        #     | +----+ |
+        #     +--------+
+        #
+        # For placement after removing margin * = (x1, y1):
+        #     +        +
+        #       *----+
+        #       |    |
+        #       +----+
+        #     +        +
 
-    # This call creates the arrangment itself, will eventually have various
-    # functions availible passed in options
-    wkspc.arrange_linear()
-    # wkspc.arrange_grid()
-    # wkspc.arrange_column_heuristic()
+        width_padding = (self.w - self.picture.width) / 2.0
+        height_padding = (self.h - self.picture.height) / 2.0
 
-    # These calls readjust the workspace to the origin, calculate precise
-    # placments for wall hanging, and save other information for display
-    wkspc.realign_to_origin()
-    wkspc.get_wall_size()
-    wkspc.produce_placements()
+        self.x1 += width_padding
+        self.y1 += height_padding
+        # Only the upper left (x1, y1) is needed for placement, for consistincy
+        # also adjust the values of x2 and y2 (Could also adjust width/height here)
+        self.x2 += - width_padding
+        self.y2 += - height_padding
 
-    return [wkspc.placements, wkspc.width, wkspc.height]
