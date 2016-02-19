@@ -34,6 +34,9 @@ class Workspace(object):
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
                                 key=lambda x: self.pics[x].h)
 
+        # print self.area_sort
+        # print self.width_sort
+        # print self.height_sort
 
     def arrange_grid(self):
         """Arrangment via an initial placement in a grid."""
@@ -64,48 +67,82 @@ class Workspace(object):
     def arrange_column_heuristic(self):
         """Arrange in columns by a few rules."""
 
-        # column = {'type': None,
-        #             'width': 0,
-        #             'height': 0,
-        #             'pics': {}
-        # }
-
         pics_remaining = set(self.pics.keys())
+        columns = []
 
         # Create a column with the single tallest picture
-        tallest = sorted([(self.pics[p]['height_mar'], p) for p in pics_remaining])[-1][1]
-        # print(Picture.query.get(tallest))
-        columns.append[ {'type': 'tall',
-                  'width': self.pics[tallest]['width_mar'],
-                  'height': self.pics[tallest]['height_mar'],
-                  'pics': {tallest: [0, 0]}
-                  }]
+        # - - - - - - - - - - - - - - - - - - - - - - - -
+        tallest = self.height_sort[-1]
+        columns.append([tallest])
         pics_remaining.remove(tallest)
-       
+        self.pics[tallest].x1 = 0
+        self.pics[tallest].x2 = self.pics[tallest].w
+        self.pics[tallest].y1 = 0
+        self.pics[tallest].y2 = self.pics[tallest].h
+        # - - - - - - - - - - - - - - - - - - - - - - - -
+
         # Create a column with wide pic and two skinny ones
-        sorted_by_width = sorted([(self.pics[p]['width_mar'], p) for p in pics_remaining])
-
-        widest = sorted_by_width[-1][1]
+        # - - - - - - - - - - - - - - - - - - - - - - - -
+        # print(pics_remaining)
+        widest = self.width_sort[-1] if (self.width_sort[-1] in pics_remaining) else self.width_sort[-2]
         # Consider getting these not as the skinniest but in general low end of dist
-        skinny1 = sorted_by_width[0][1]
-        skinny2 = sorted_by_width[1][1]
+        skinny1 = self.width_sort[0]
+        skinny2 = self.width_sort[1]
+        columns.append([widest, skinny1, skinny2])
 
-        pair_width = (self.pics[skinny1]['width_mar'] +
-                      self.pics[skinny2]['width_mar'])
-        single_width = self.pics[widest]['width_mar']
+        pics_remaining.remove(widest)
+        pics_remaining.remove(skinny2)
+        pics_remaining.remove(skinny1)
 
-        # if pair_width => single_width:
-        #     # pair is wider
+        pair_width = self.pics[skinny1].w + self.pics[skinny2].w
+        single_width = self.pics[widest].w
 
-        # else:
-        #     pass
+        col_width = max(pair_width, single_width)
 
-        # print(Picture.query.get(tallest))
-        # columns.append[ {'type': 'nested',
-        #           'width': self.pics[widest]['width_mar'],
-        #           'height': self.pics[tallest]['height_mar'],
-        #           'pics': {tallest: [0, 0]}
-        #           }]
+        self.pics[widest].x1 = (col_width - single_width) / 2.0
+        self.pics[widest].x2 = self.pics[widest].x1 + self.pics[widest].w
+        self.pics[widest].y1 = 0
+        self.pics[widest].y2 = self.pics[widest].h
+
+        pair_margin = (col_width - pair_width) / 3.0
+
+        self.pics[skinny1].x1 = pair_margin
+        self.pics[skinny1].x2 = pair_margin + self.pics[skinny1].w
+        self.pics[skinny1].y1 = self.pics[widest].y2
+        self.pics[skinny1].y2 = self.pics[skinny1].y1 + self.pics[skinny1].h
+
+        self.pics[skinny2].x1 = self.pics[skinny1].x2 + pair_margin
+        self.pics[skinny2].x2 = self.pics[skinny2].x1 + self.pics[skinny2].w
+        self.pics[skinny2].y1 = self.pics[widest].y2
+        self.pics[skinny2].y2 = self.pics[skinny2].y1 + self.pics[skinny2].h
+        # - - - - - - - - - - - - - - - - - - - - - - - -
+
+        # Create single columns for the rest of the pictures while testing functionality
+        for p in pics_remaining:
+            columns.append([p])
+            self.pics[p].x1 = 0
+            self.pics[p].x2 = self.pics[p].w
+            self.pics[p].y1 = 0
+            self.pics[p].y2 = self.pics[p].h
+
+        random.shuffle(columns)
+
+        wall_width = 0
+        for column in columns:
+            # print "*"*20
+            # print column
+            # for p in column:
+            #     print(self.pics[p])
+            col_width = max([self.pics[p].x2 for p in column])
+            col_height_shift = max([self.pics[p].y2 for p in column]) / 2.0
+
+            for p in column:
+                self.pics[p].x1 += wall_width
+                self.pics[p].x2 += wall_width
+                self.pics[p].y1 += - col_height_shift
+                self.pics[p].y2 += - col_height_shift
+
+            wall_width += col_width
 
     def random_place_in_grid(self):
         """Place pics in random grid indicies.
@@ -227,6 +264,15 @@ class Pic(object):
         self.y2 = None
 
         self.a = self.w * self.h
+
+    def __repr__(self):
+        """Representation format for output."""
+
+        return "<id: {}, x1: {} x2: {} y1: {} y2: {}>".format(self.id,
+                                                              self.x1,
+                                                              self.x2,
+                                                              self.y1,
+                                                              self.y2)
 
     def remove_margin(self):
         """Adjusts placement to that used for actual picture without margin.

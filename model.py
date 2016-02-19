@@ -33,6 +33,8 @@ class Picture(db.Model):
                                 order_by="Gallery.gallery_id")
     user = db.relationship("User")
 
+    # TODO: Create a dynamic property using decorators to give display name of name and id if not
+
     def __repr__(self):
         """Representation format for output."""
         if self.picture_name:
@@ -248,7 +250,6 @@ class Placement(db.Model):
     wall_id = db.Column(db.Integer, db.ForeignKey('walls.wall_id'))
     picture_id = db.Column(db.Integer, db.ForeignKey('pictures.picture_id'))
 
-    # TODO: discuss numeric here? and UNITS!
     x_coord = db.Column(db.Float(), nullable=False)
     y_coord = db.Column(db.Float(), nullable=False)
 
