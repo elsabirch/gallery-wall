@@ -1,6 +1,6 @@
 
 from flask import (Flask, render_template, jsonify, url_for,
-                   request, redirect, flash, session)
+                   request, redirect, flash, session) 
 
 from jinja2 import StrictUndefined
 
@@ -8,7 +8,8 @@ from model import User, Picture, Gallery, Wall, Placement
 from model import connect_to_db, db
 
 from arrange import Workspace
-# import arrange
+
+import settings
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -248,7 +249,6 @@ if __name__ == "__main__":
 
     connect_to_db(app)
 
-    # # Use the DebugToolbar
-    # DebugToolbarExtension(app)
+    app.config['JQUERY_PATH'] = settings.jquery_path
 
     app.run()
