@@ -27,7 +27,10 @@ DEFAULT_USER_ID = 1
 def index():
     """Homepage."""
 
-    return render_template("homepage.html")
+    if 'user_id' in session:
+        return redirect('/navigation')
+    else:
+        return render_template("homepage.html")
 
 
 @app.route('/navigation')
@@ -103,6 +106,7 @@ def process_logout():
     """Handle form submission for logout process."""
 
     session.pop('user_id', None)
+    session.pop('username', None)
 
     # flash message: logout successs
     flash("Successful log out. Goodbye!")
