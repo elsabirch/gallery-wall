@@ -64,86 +64,6 @@ class Workspace(object):
 
             # if can move towards center do that
 
-    def arrange_column_heuristic(self):
-        """Arrange in columns by a few rules."""
-
-        pics_remaining = set(self.pics.keys())
-        columns = []
-
-        # Create a column with the single tallest picture
-        # - - - - - - - - - - - - - - - - - - - - - - - -
-        tallest = self.height_sort[-1]
-        columns.append([tallest])
-        pics_remaining.remove(tallest)
-        self.pics[tallest].x1 = 0
-        self.pics[tallest].x2 = self.pics[tallest].w
-        self.pics[tallest].y1 = 0
-        self.pics[tallest].y2 = self.pics[tallest].h
-        # - - - - - - - - - - - - - - - - - - - - - - - -
-
-        # Create a column with wide pic and two skinny ones
-        # - - - - - - - - - - - - - - - - - - - - - - - -
-        # print(pics_remaining)
-        widest = self.width_sort[-1] if (self.width_sort[-1] in pics_remaining) else self.width_sort[-2]
-        # Consider getting these not as the skinniest but in general low end of dist
-        skinny1 = self.width_sort[0]
-        skinny2 = self.width_sort[1]
-        columns.append([widest, skinny1, skinny2])
-
-        pics_remaining.remove(widest)
-        pics_remaining.remove(skinny2)
-        pics_remaining.remove(skinny1)
-
-        pair_width = self.pics[skinny1].w + self.pics[skinny2].w
-        single_width = self.pics[widest].w
-
-        col_width = max(pair_width, single_width)
-
-        self.pics[widest].x1 = (col_width - single_width) / 2.0
-        self.pics[widest].x2 = self.pics[widest].x1 + self.pics[widest].w
-        self.pics[widest].y1 = 0
-        self.pics[widest].y2 = self.pics[widest].h
-
-        pair_margin = (col_width - pair_width) / 3.0
-
-        self.pics[skinny1].x1 = pair_margin
-        self.pics[skinny1].x2 = pair_margin + self.pics[skinny1].w
-        self.pics[skinny1].y1 = self.pics[widest].y2
-        self.pics[skinny1].y2 = self.pics[skinny1].y1 + self.pics[skinny1].h
-
-        self.pics[skinny2].x1 = self.pics[skinny1].x2 + pair_margin
-        self.pics[skinny2].x2 = self.pics[skinny2].x1 + self.pics[skinny2].w
-        self.pics[skinny2].y1 = self.pics[widest].y2
-        self.pics[skinny2].y2 = self.pics[skinny2].y1 + self.pics[skinny2].h
-        # - - - - - - - - - - - - - - - - - - - - - - - -
-
-        # Create single columns for the rest of the pictures while testing functionality
-        for p in pics_remaining:
-            columns.append([p])
-            self.pics[p].x1 = 0
-            self.pics[p].x2 = self.pics[p].w
-            self.pics[p].y1 = 0
-            self.pics[p].y2 = self.pics[p].h
-
-        random.shuffle(columns)
-
-        wall_width = 0
-        for column in columns:
-            print "*"*20
-            print column
-            for p in column:
-                print(self.pics[p])
-            col_width = max([self.pics[p].x2 for p in column])
-            col_height_shift = max([self.pics[p].y2 for p in column]) / 2.0
-
-            for p in column:
-                self.pics[p].x1 += wall_width
-                self.pics[p].x2 += wall_width
-                self.pics[p].y1 += - col_height_shift
-                self.pics[p].y2 += - col_height_shift
-
-            wall_width += col_width
-
     def random_place_in_grid(self):
         """Place pics in random grid indicies.
 
@@ -164,6 +84,115 @@ class Workspace(object):
         grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.pics.keys())}
 
         return grid_pics
+
+    def arrange_column_heuristic(self):
+        """Arrange in columns by a few rules."""
+
+        self.pics_remaining = set(self.pics.keys())
+        self.columns = []
+
+        self.make_single_column()
+
+        self.make_nested_column()
+        self.make_nested_column()
+
+        # Create single columns for the rest of the pictures while testing functionality
+        while self.pics_remaining:
+            self.make_single_column()
+
+        self.combine_columns()
+
+    def combine_columns(self):
+        """Place columns together in a wall.
+
+        Currently uses a reandom order of the generated columns.
+        """
+
+        random.shuffle(self.columns)
+
+        wall_width = 0
+        for column in self.columns:
+            print "*"*20
+            print column
+            for p in column:
+                print(self.pics[p])
+            col_width = max([self.pics[p].x2 for p in column])
+            col_height_shift = max([self.pics[p].y2 for p in column]) / 2.0
+
+            for p in column:
+                self.pics[p].x1 += wall_width
+                self.pics[p].x2 += wall_width
+                self.pics[p].y1 += - col_height_shift
+                self.pics[p].y2 += - col_height_shift
+
+            wall_width += col_width
+
+    def make_single_column(self):
+        """Create a column with the single tallest picture remaining."""
+
+        i = -1
+        while self.height_sort[i] not in self.pics_remaining:
+            i += -1
+        tallest = self.height_sort[i]
+        self.pics_remaining.remove(tallest)
+
+        self.columns.append([tallest])
+        self.pics[tallest].x1 = 0
+        self.pics[tallest].x2 = self.pics[tallest].w
+        self.pics[tallest].y1 = 0
+        self.pics[tallest].y2 = self.pics[tallest].h
+
+    def make_nested_column(self):
+        """Create a column with wide pic and two skinny ones."""
+
+        # Get the widest remaining picture
+        i = -1
+        while self.width_sort[i] not in self.pics_remaining:
+            i += -1
+        single = self.width_sort[i]
+
+        # Get a pair from the skinny end of the gallery
+        pair = []
+        i = 0
+        while len(pair) < 2:
+            if (self.width_sort[i] in self.pics_remaining):
+                pair.append(self.width_sort[i])
+            i += 1
+
+        # print(pics_remaining)
+        pair1 = pair[0]
+        pair2 = pair[1]
+        self.columns.append([single, pair1, pair2])
+
+        self.pics_remaining.remove(single)
+        self.pics_remaining.remove(pair2)
+        self.pics_remaining.remove(pair1)
+
+        pair_width = self.pics[pair1].w + self.pics[pair2].w
+        single_width = self.pics[single].w
+
+        col_width = max(pair_width, single_width)
+
+        self.pics[single].x1 = (col_width - single_width) / 2.0
+        self.pics[single].x2 = self.pics[single].x1 + self.pics[single].w
+        self.pics[single].y1 = 0
+        self.pics[single].y2 = self.pics[single].h
+
+        pair_margin = (col_width - pair_width) / 3.0
+
+        self.pics[pair1].x1 = pair_margin
+        self.pics[pair1].x2 = pair_margin + self.pics[pair1].w
+        self.pics[pair1].y1 = self.pics[single].y2
+        self.pics[pair1].y2 = self.pics[pair1].y1 + self.pics[pair1].h
+
+        self.pics[pair2].x1 = self.pics[pair1].x2 + pair_margin
+        self.pics[pair2].x2 = self.pics[pair2].x1 + self.pics[pair2].w
+        self.pics[pair2].y1 = self.pics[single].y2
+        self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
+
+        # TODO: try setting horiz placement and then rolling dice for stacking
+
+        # - - -  - - - - - - - - - - - - - - - - - -
 
     def arrange_linear(self):
         """Arrange gallery pictures in horizontal line, vertically centered."""
