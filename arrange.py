@@ -158,12 +158,14 @@ class Workspace(object):
             if (self.width_sort[i] in self.pics_remaining):
                 pair.append(self.width_sort[i])
             i += 1
-
-        # print(pics_remaining)
+        # Vary which is placed on which side of the nesting
+        random.shuffle(pair)
         pair1 = pair[0]
         pair2 = pair[1]
+
         self.columns.append([single, pair1, pair2])
 
+        # Remove these from the pictures to be used
         self.pics_remaining.remove(single)
         self.pics_remaining.remove(pair2)
         self.pics_remaining.remove(pair1)
@@ -171,28 +173,40 @@ class Workspace(object):
         pair_width = self.pics[pair1].w + self.pics[pair2].w
         single_width = self.pics[single].w
 
+        # Handle the horizontal placements
         col_width = max(pair_width, single_width)
+        pair_margin = (col_width - pair_width) / 3.0
 
         self.pics[single].x1 = (col_width - single_width) / 2.0
         self.pics[single].x2 = self.pics[single].x1 + self.pics[single].w
-        self.pics[single].y1 = 0
-        self.pics[single].y2 = self.pics[single].h
-
-        pair_margin = (col_width - pair_width) / 3.0
 
         self.pics[pair1].x1 = pair_margin
         self.pics[pair1].x2 = pair_margin + self.pics[pair1].w
-        self.pics[pair1].y1 = self.pics[single].y2
-        self.pics[pair1].y2 = self.pics[pair1].y1 + self.pics[pair1].h
 
         self.pics[pair2].x1 = self.pics[pair1].x2 + pair_margin
         self.pics[pair2].x2 = self.pics[pair2].x1 + self.pics[pair2].w
-        self.pics[pair2].y1 = self.pics[single].y2
-        self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
 
-        # TODO: try setting horiz placement and then rolling dice for stacking
+        if random.random() > 0.5:
+            # Place single above
+            self.pics[single].y1 = 0
+            self.pics[single].y2 = self.pics[single].h
 
-        # - - -  - - - - - - - - - - - - - - - - - -
+            self.pics[pair1].y1 = self.pics[single].y2
+            self.pics[pair1].y2 = self.pics[pair1].y1 + self.pics[pair1].h
+
+            self.pics[pair2].y1 = self.pics[single].y2
+            self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
+        else:
+            pair_height = (self.pics[pair1].h + self.pics[pair2].h)
+
+            self.pics[single].y1 = pair_height
+            self.pics[single].y2 = pair_height + self.pics[single].h
+
+            self.pics[pair1].y1 = pair_height - self.pics[pair1].h
+            self.pics[pair1].y2 = self.pics[pair1].y1 + self.pics[pair1].h
+
+            self.pics[pair2].y1 = pair_height - self.pics[pair2].h
+            self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
 
     def arrange_linear(self):
         """Arrange gallery pictures in horizontal line, vertically centered."""
