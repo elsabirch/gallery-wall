@@ -186,7 +186,7 @@ def show_new_wall():
 
     wall_id = request.args.get('wall_id')
 
-    # Wall.query.get(int(wall_id)).print_seed()
+    Wall.query.get(int(wall_id)).print_seed()
 
     return render_template("new-wall.html", wall_id=wall_id)
 

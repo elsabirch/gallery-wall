@@ -3,7 +3,7 @@
 Example: Contains easy toggle for online/offline resource locations.
 """
 
-online = True
+online = False
 
 if online:
     jquery_path = "https://code.jquery.com/jquery.js"

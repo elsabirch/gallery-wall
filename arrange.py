@@ -91,10 +91,23 @@ class Workspace(object):
         self.pics_remaining = set(self.pics.keys())
         self.columns = []
 
+        # Use the largest picture alone
         self.make_single_column()
 
-        self.make_nested_column()
-        self.make_nested_column()
+        # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
+        # Written as while loop to tolertate small numbers
+        i = 0
+        while (i < (self.n / 7)) and (len(pics_remaining) > 5):
+            self.make_nested_column()
+            self.make_stacked_column(random.choice([2, 3]))
+            i += 1
+
+        # Then make stacks as long as possible
+        while len(self.pics_remaining) > 2:
+            self.make_stacked_column(random.choice([2, 3]))
+
+        while len(self.pics_remaining) > 1:
+            self.make_stacked_column(2)
 
         # Create single columns for the rest of the pictures while testing functionality
         while self.pics_remaining:
@@ -112,10 +125,10 @@ class Workspace(object):
 
         wall_width = 0
         for column in self.columns:
-            print "*"*20
-            print column
-            for p in column:
-                print(self.pics[p])
+            # print "*"*20
+            # print column
+            # for p in column:
+            #     print(self.pics[p])
             col_width = max([self.pics[p].x2 for p in column])
             col_height_shift = max([self.pics[p].y2 for p in column]) / 2.0
 
@@ -142,6 +155,25 @@ class Workspace(object):
         self.pics[tallest].y1 = 0
         self.pics[tallest].y2 = self.pics[tallest].h
 
+    def make_stacked_column(self, n):
+        """Create a column with two stacked pictures."""
+
+        stack = random.sample(self.pics_remaining, n)
+        self.columns.append(stack)
+
+        width_col = max([self.pics[p].w for p in stack])
+        height_col = 0
+
+        for p in stack:
+            self.pics_remaining.remove(p)
+
+            self.pics[p].x1 = (width_col - self.pics[p].w) / 2.0
+            self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
+            self.pics[p].y1 = height_col
+            self.pics[p].y2 = self.pics[p].y1 + self.pics[p].h
+
+            height_col = self.pics[p].y2
+
     def make_nested_column(self):
         """Create a column with wide pic and two skinny ones."""
 
@@ -152,6 +184,7 @@ class Workspace(object):
         single = self.width_sort[i]
 
         # Get a pair from the skinny end of the gallery
+        # TODO: add some variation in the small items slected
         pair = []
         i = 0
         while len(pair) < 2:
