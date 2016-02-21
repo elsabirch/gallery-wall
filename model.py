@@ -1,6 +1,7 @@
 """Models and database functions for Gallery Wall project."""
 
 from flask_sqlalchemy import SQLAlchemy
+import arrange
 
 db = SQLAlchemy()
 
@@ -86,6 +87,34 @@ class Gallery(db.Model):
                                secondary="gallery_memberships",
                                order_by="desc(Picture.height)")
     walls = db.relationship("Wall", order_by="Wall.wall_id")
+
+    @property
+    def display_wall_id(self):
+
+        wall_id = (db.session.query(Wall.wall_id)
+                             .join(Gallery)
+                             .filter(Gallery.gallery_id == self.gallery_id,
+                                     Wall.gallery_display == True)
+                             .first())
+
+        if not wall_id:
+
+            arrange_options = {}
+
+            wkspc = arrange.Workspace(self.gallery_id, arrange_options)
+            wkspc.arrange_gallery_display()
+            wkspc.readjust_for_wall()
+
+            wall_id = Wall.init_from_workspace(wkspc)
+
+            Wall.query.get(wall_id).set_gallery_display()
+
+        else:
+            # TODO: there should be a more graceful way to deal with that query
+            # returning either None or a tuple
+            wall_id = wall_id[0]
+
+        return wall_id
 
     def __repr__(self):
         """Representation format for output."""

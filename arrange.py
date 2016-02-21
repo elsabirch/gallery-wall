@@ -1,6 +1,8 @@
-from model import Picture, Gallery, Wall, Placement
 import math
 import random
+
+# Note: unable to import Gallery from model specifically because model imports arrange too
+import model
 
 DEFAULT_MARGIN = 2
 
@@ -11,7 +13,7 @@ class Workspace(object):
     def __init__(self, gallery_id, options):
         """Constructor from picture list."""
 
-        pictures = Gallery.query.get(gallery_id).pictures
+        pictures = model.Gallery.query.get(gallery_id).pictures
 
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
@@ -126,7 +128,7 @@ class Workspace(object):
         # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
         # Written as while loop to tolertate small numbers
         i = 0
-        while (i < (self.n / 7)) and (len(pics_remaining) > 5):
+        while (i < (self.n / 7)) and (len(self.pics_remaining) > 5):
             self.make_nested_column()
             self.make_stacked_column(random.choice([2, 3]))
             i += 1

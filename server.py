@@ -38,7 +38,7 @@ def index():
 def navigation():
     """Navigate to various functional pages after login/guest.
 
-    May be encorperated as navbar later.
+    May be incorperated as navbar later.
     """
 
     return render_template("navigation.html")
@@ -125,28 +125,7 @@ def show_galleries():
 
     for g in galleries:
 
-        wall_id = (db.session.query(Wall.wall_id)
-                             .join(Gallery)
-                             .filter(Gallery.gallery_id == g.gallery_id,
-                                     Wall.gallery_display == True)
-                             .first())
-
-        if not wall_id:
-
-            arrange_options = {}
-
-            wkspc = Workspace(g.gallery_id, arrange_options)
-            wkspc.arrange_gallery_display()
-            wkspc.readjust_for_wall()
-
-            wall_id = Wall.init_from_workspace(wkspc)
-
-            Wall.query.get(wall_id).set_gallery_display()
-
-        else:
-            # TODO: there should be a more graceful way to deal with that query
-            # returning either None or a tuple
-            wall_id = wall_id[0]
+        wall_id = g.display_wall_id
 
         display_ids.append((g.gallery_id, wall_id))
 
@@ -159,15 +138,19 @@ def prompt_arrangment():
     """Allow a user to input parameters about wall generation from gallery."""
 
     gallery_id = request.args.get('gallery_id')
-    curator_id = Gallery.query.get(gallery_id).curator_id
+    gallery = Gallery.query.get(gallery_id)
+    curator_id = gallery.curator_id
+    wall_id = gallery.display_wall_id
 
     # This is a get request because it does not have side effects, but check
     # they are the curator of this gallery or that it is site sample.
     if curator_id not in [session.get('user_id'), DEFAULT_USER_ID]:
         gallery_id = None
+        wall_id = None
 
     return render_template("arrange.html",
-                           gallery_id=gallery_id)
+                           gallery_id=gallery_id,
+                           wall_id=wall_id)
 
 
 @app.route('/arrange-o-matic', methods=["POST"])
