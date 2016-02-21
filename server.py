@@ -119,12 +119,39 @@ def show_galleries():
     """Show a user's galleries that they can choose to arrange."""
 
     user_id = session.get('user_id', DEFAULT_USER_ID)
-
     galleries = User.query.get(user_id).galleries
-    gallery_ids = [g.gallery_id for g in galleries]
+
+    display_ids = []
+
+    for g in galleries:
+
+        wall_id = (db.session.query(Wall.wall_id)
+                             .join(Gallery)
+                             .filter(Gallery.gallery_id == g.gallery_id,
+                                     Wall.gallery_display == True)
+                             .first())
+
+        if not wall_id:
+
+            arrange_options = {}
+
+            wkspc = Workspace(g.gallery_id, arrange_options)
+            wkspc.arrange_gallery_display()
+            wkspc.readjust_for_wall()
+
+            wall_id = Wall.init_from_workspace(wkspc)
+
+            Wall.query.get(wall_id).set_gallery_display()
+
+        else:
+            # TODO: there should be a more graceful way to deal with that query
+            # returning either None or a tuple
+            wall_id = wall_id[0]
+
+        display_ids.append((g.gallery_id, wall_id))
 
     return render_template("galleries.html",
-                           gallery_ids=gallery_ids)
+                           display_ids=display_ids)
 
 
 @app.route('/arrange', methods=["GET"])
@@ -194,8 +221,6 @@ def show_new_wall():
 @app.route('/save-wall', methods=["POST"])
 def save_wall():
     """Changes the state of the wall in the database to saved."""
-
-    print 'lets save this wall'
 
     wall_id = int(request.form.get('wall_id'))
     Wall.query.get(wall_id).save()

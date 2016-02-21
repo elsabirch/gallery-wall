@@ -87,52 +87,6 @@ class Gallery(db.Model):
                                order_by="desc(Picture.height)")
     walls = db.relationship("Wall", order_by="Wall.wall_id")
 
-    def get_display_info(self):
-        """Creates dictionary analogous to that for walls, for jsonification.
-
-        Pictures displayed by descending height.
-
-        NOTE: ASSUMES THAT PICTURES REALTIONSHIP OUTPUTS DESCENDING HEIGHT.
-        """
-
-        margin = 2
-
-        total_width = sum([p.width for p in self.pictures])
-        gallery_width = (total_width / 2.0) + (total_width / len(self.pictures))
-
-        gallery_height = margin + self.pictures[0].height
-        current_row_width = margin
-        current_row_top = margin
-
-        pictures_to_hang = {}
-
-        # Hang pictures in rows
-        for picture in self.pictures:
-            # Start a new row if this one is full
-            if (current_row_width + picture.width) > gallery_width:
-                current_row_top = gallery_height + margin
-                gallery_height += picture.height + margin
-                current_row_width = margin
-
-            pictures_to_hang[picture.picture_id] = {
-                'x': current_row_width,
-                'y': current_row_top,
-                'width': picture.width,
-                'height': picture.height,
-                'image': picture.image_file,
-                }
-
-            current_row_width += picture.width + margin
-
-        hanging_info = {
-                        'id': self.gallery_id,
-                        'height': gallery_height + margin,
-                        'width': gallery_width,
-                        'pictures_to_hang': pictures_to_hang,
-                        }
-
-        return hanging_info
-
     def __repr__(self):
         """Representation format for output."""
         if self.gallery_name:
@@ -152,6 +106,8 @@ class Wall(db.Model):
 
     wall_width = db.Column(db.Float(), nullable=False)
     wall_height = db.Column(db.Float(), nullable=False)
+
+    gallery_display = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships
     gallery = db.relationship("Gallery")
@@ -189,6 +145,12 @@ class Wall(db.Model):
 
         db.session.commit()
 
+    def set_gallery_display(self):
+        """Sets wall flag for gallery display."""
+
+        self.gallery_display = True
+
+        db.session.commit()
 
     def get_hanging_info(self):
         """Returns a dictionary containing the needed information for display."""
