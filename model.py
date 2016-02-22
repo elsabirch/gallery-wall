@@ -1,7 +1,12 @@
 """Models and database functions for Gallery Wall project."""
 
 from flask_sqlalchemy import SQLAlchemy
-import arrange
+# import arrange
+
+def lazy_load_of_workspace():
+    global Workspace
+    from arrange import Workspace as _Workspace
+    Workspace = _Workspace
 
 db = SQLAlchemy()
 
@@ -100,8 +105,9 @@ class Gallery(db.Model):
         if not wall_id:
 
             arrange_options = {}
-
-            wkspc = arrange.Workspace(self.gallery_id, arrange_options)
+            
+            lazy_load_of_workspace()
+            wkspc = Workspace(self.gallery_id, arrange_options)
             wkspc.arrange_gallery_display()
             wkspc.readjust_for_wall()
 
