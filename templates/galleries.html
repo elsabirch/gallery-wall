@@ -4,18 +4,20 @@
 <!-- Template For Content -->
 <p> Step right up! Pick a gallery! </p>
 
-{% for gallery_id, wall_id in display_ids %}
+{% for gallery in galleries %}
 
-<p>Look gallery {{gallery_id}} and wall {{wall_id}}</p>
+<p>Look gallery {{gallery.gallery_id}} and wall {{gallery.display_wall_id}}</p>
 
-    <div class='wall-display' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
-        <p> Wall {{wall_id}} Display: </p>
-        <canvas id='canvas{{wall_id}}' height='300' width='900'> 
+    <div class='wall-display' 
+         data-wallid='{{gallery.display_wall_id}}' 
+         id='wall{{gallery.display_wall_id}}'>
+        <p> Wall {{gallery.display_wall_id}} Display of Gallery {{gallery.gallery_id}}: </p>
+        <canvas id='canvas{{gallery.display_wall_id}}' height='300' width='900'> 
             If you dont have HTML5 canvas, you're gonna have a bad time.
         </canvas>
         
         <form action='/arrange' method='GET'>
-            <input type='hidden' name='gallery_id' value='{{ gallery_id }}'>
+            <input type='hidden' name='gallery_id' value='{{ gallery.gallery_id }}'>
             <input type='submit' value='Arrange Gallery'>
         </form> 
 

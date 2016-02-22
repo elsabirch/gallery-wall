@@ -121,16 +121,8 @@ def show_galleries():
     user_id = session.get('user_id', DEFAULT_USER_ID)
     galleries = User.query.get(user_id).galleries
 
-    display_ids = []
-
-    for g in galleries:
-
-        wall_id = g.display_wall_id
-
-        display_ids.append((g.gallery_id, wall_id))
-
     return render_template("galleries.html",
-                           display_ids=display_ids)
+                           galleries=galleries)
 
 
 @app.route('/arrange', methods=["GET"])
