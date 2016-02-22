@@ -38,7 +38,7 @@ def index():
 def navigation():
     """Navigate to various functional pages after login/guest.
 
-    May be encorperated as navbar later.
+    May be incorperated as navbar later.
     """
 
     return render_template("navigation.html")
@@ -119,12 +119,10 @@ def show_galleries():
     """Show a user's galleries that they can choose to arrange."""
 
     user_id = session.get('user_id', DEFAULT_USER_ID)
-
     galleries = User.query.get(user_id).galleries
-    gallery_ids = [g.gallery_id for g in galleries]
 
     return render_template("galleries.html",
-                           gallery_ids=gallery_ids)
+                           galleries=galleries)
 
 
 @app.route('/arrange', methods=["GET"])
@@ -132,15 +130,19 @@ def prompt_arrangment():
     """Allow a user to input parameters about wall generation from gallery."""
 
     gallery_id = request.args.get('gallery_id')
-    curator_id = Gallery.query.get(gallery_id).curator_id
+    gallery = Gallery.query.get(gallery_id)
+    curator_id = gallery.curator_id
+    wall_id = gallery.display_wall_id
 
     # This is a get request because it does not have side effects, but check
     # they are the curator of this gallery or that it is site sample.
     if curator_id not in [session.get('user_id'), DEFAULT_USER_ID]:
         gallery_id = None
+        wall_id = None
 
     return render_template("arrange.html",
-                           gallery_id=gallery_id)
+                           gallery_id=gallery_id,
+                           wall_id=wall_id)
 
 
 @app.route('/arrange-o-matic', methods=["POST"])
@@ -194,8 +196,6 @@ def show_new_wall():
 @app.route('/save-wall', methods=["POST"])
 def save_wall():
     """Changes the state of the wall in the database to saved."""
-
-    print 'lets save this wall'
 
     wall_id = int(request.form.get('wall_id'))
     Wall.query.get(wall_id).save()
