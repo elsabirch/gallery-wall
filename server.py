@@ -202,6 +202,12 @@ def save_wall():
 
     return redirect('/walls')
 
+@app.route('/time')
+def show_time():
+    """For display of time tracked durring project."""
+
+    return render_template('time.html')
+
 # Routes returning json data
 
 @app.route('/getwall.json')
@@ -242,6 +248,16 @@ def get_gallery_data():
 
     return jsonify(gallery_to_hang)
 
+
+@app.route('/gettime.json')
+def get_time_data():
+    """Get data from time tracking file."""
+
+    from timetrack.time_track import parse_time
+
+    data = parse_time()
+
+    return jsonify(data)
 
 if __name__ == "__main__":
     # Use debug mode

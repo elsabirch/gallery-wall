@@ -2,7 +2,7 @@
 
 .DS_Store
 local_copies_untracked/
-time/
+time.txt
 
 # The entries below are from:
 # https://github.com/github/gitignore/blob/master/Python.gitignore
