@@ -11,19 +11,11 @@ var wallIds = $('.wall-display').map( function(){
     return $(this).data('wallid');
 }
 );
-// Alternately get the gallery ids to display
-var galleryIds = $('.gallery-display').map( function(){
-    return $(this).data('galleryid');
-}
-);
 
 // For each wall_id that we found, make an ajax request to get the information 
 // need for plotting it up.
 for(var i=0; i < wallIds.length; i++){
     getWall(wallIds[i]);
-}
-for(var i=0; i < galleryIds.length; i++){
-    getGallery(galleryIds[i]);
 }
 
 // Functions to handle getting wall info from server, then plotting it in canvas
@@ -31,10 +23,6 @@ for(var i=0; i < galleryIds.length; i++){
 function getWall(wallId){
     // Make AJAX request for the wallId given
     $.get('getwall.json', {'wallid':wallId}, handleWall);
-}
-function getGallery(galleryId){
-    // Make AJAX request for the galleryId given
-    $.get('getgallery.json', {'galleryid':galleryId}, handleWall);
 }
 
 function handleWall(results){

@@ -1,6 +1,12 @@
 """Models and database functions for Gallery Wall project."""
 
 from flask_sqlalchemy import SQLAlchemy
+# import arrange
+
+def lazy_load_of_workspace():
+    global Workspace
+    from arrange import Workspace as _Workspace
+    Workspace = _Workspace
 
 db = SQLAlchemy()
 
@@ -87,51 +93,34 @@ class Gallery(db.Model):
                                order_by="desc(Picture.height)")
     walls = db.relationship("Wall", order_by="Wall.wall_id")
 
-    def get_display_info(self):
-        """Creates dictionary analogous to that for walls, for jsonification.
+    @property
+    def display_wall_id(self):
 
-        Pictures displayed by descending height.
+        wall_id = (db.session.query(Wall.wall_id)
+                             .join(Gallery)
+                             .filter(Gallery.gallery_id == self.gallery_id,
+                                     Wall.gallery_display == True)
+                             .first())
 
-        NOTE: ASSUMES THAT PICTURES REALTIONSHIP OUTPUTS DESCENDING HEIGHT.
-        """
+        if not wall_id:
 
-        margin = 2
+            arrange_options = {}
+            
+            lazy_load_of_workspace()
+            wkspc = Workspace(self.gallery_id, arrange_options)
+            wkspc.arrange_gallery_display()
+            wkspc.readjust_for_wall()
 
-        total_width = sum([p.width for p in self.pictures])
-        gallery_width = (total_width / 2.0) + (total_width / len(self.pictures))
+            wall_id = Wall.init_from_workspace(wkspc)
 
-        gallery_height = margin + self.pictures[0].height
-        current_row_width = margin
-        current_row_top = margin
+            Wall.query.get(wall_id).set_gallery_display()
 
-        pictures_to_hang = {}
+        else:
+            # TODO: there should be a more graceful way to deal with that query
+            # returning either None or a tuple
+            wall_id = wall_id[0]
 
-        # Hang pictures in rows
-        for picture in self.pictures:
-            # Start a new row if this one is full
-            if (current_row_width + picture.width) > gallery_width:
-                current_row_top = gallery_height + margin
-                gallery_height += picture.height + margin
-                current_row_width = margin
-
-            pictures_to_hang[picture.picture_id] = {
-                'x': current_row_width,
-                'y': current_row_top,
-                'width': picture.width,
-                'height': picture.height,
-                'image': picture.image_file,
-                }
-
-            current_row_width += picture.width + margin
-
-        hanging_info = {
-                        'id': self.gallery_id,
-                        'height': gallery_height + margin,
-                        'width': gallery_width,
-                        'pictures_to_hang': pictures_to_hang,
-                        }
-
-        return hanging_info
+        return wall_id
 
     def __repr__(self):
         """Representation format for output."""
@@ -152,6 +141,8 @@ class Wall(db.Model):
 
     wall_width = db.Column(db.Float(), nullable=False)
     wall_height = db.Column(db.Float(), nullable=False)
+
+    gallery_display = db.Column(db.Boolean(), nullable=False, default=False)
 
     # Relationships
     gallery = db.relationship("Gallery")
@@ -189,6 +180,12 @@ class Wall(db.Model):
 
         db.session.commit()
 
+    def set_gallery_display(self):
+        """Sets wall flag for gallery display."""
+
+        self.gallery_display = True
+
+        db.session.commit()
 
     def get_hanging_info(self):
         """Returns a dictionary containing the needed information for display."""

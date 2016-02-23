@@ -1,6 +1,8 @@
-from model import Picture, Gallery, Wall, Placement
 import math
 import random
+
+# Note: unable to import Gallery from model specifically because model imports arrange too
+import model
 
 DEFAULT_MARGIN = 2
 
@@ -11,7 +13,7 @@ class Workspace(object):
     def __init__(self, gallery_id, options):
         """Constructor from picture list."""
 
-        pictures = Gallery.query.get(gallery_id).pictures
+        pictures = model.Gallery.query.get(gallery_id).pictures
 
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
@@ -24,19 +26,48 @@ class Workspace(object):
             self.pics[picture.picture_id] = Pic(picture=picture,
                                                 margin=self.margin)
 
-
         # Because it is common to need the largest, tallest, smallest, etc,
         # prepare these ahead fo time for the workspace
         self.area_sort = sorted([self.pics[p].id for p in self.pics],
                                 key=lambda x: self.pics[x].a)
         self.width_sort = sorted([self.pics[p].id for p in self.pics],
-                                key=lambda x: self.pics[x].w)
+                                 key=lambda x: self.pics[x].w)
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
-                                key=lambda x: self.pics[x].h)
+                                  key=lambda x: self.pics[x].h)
 
-        # print self.area_sort
-        # print self.width_sort
-        # print self.height_sort
+    def arrange_gallery_display(self):
+        """Arranges display for galleries, in rows by descending height."""
+
+        total_width = sum([self.pics[p].w for p in self.pics])
+        gallery_width = (total_width / 2.0) + (total_width / self.n)
+
+        self.height_sort.reverse()
+
+        gallery_height = self.pics[self.height_sort[0]].h
+        current_row_width = 0
+        current_row_top = 0
+
+        # Hang pictures in rows
+        for p in self.height_sort:
+            # Start a new row if this one is full
+            if (current_row_width + self.pics[p].w) > gallery_width:
+                current_row_top = gallery_height
+                gallery_height += self.pics[p].h
+                current_row_width = 0
+
+            self.pics[p].x1 = current_row_width
+            self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
+            self.pics[p].y1 = current_row_top
+            self.pics[p].y2 = self.pics[p].y1 + self.pics[p].h
+
+            current_row_width += self.pics[p].w
+
+            # print self.pics[p].x1
+            # print self.pics[p].x2
+            # print self.pics[p].y1
+            # print self.pics[p].y2
+
+            # print( self.pics[p] )
 
     def arrange_grid(self):
         """Arrangment via an initial placement in a grid."""
@@ -97,7 +128,7 @@ class Workspace(object):
         # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
         # Written as while loop to tolertate small numbers
         i = 0
-        while (i < (self.n / 7)) and (len(pics_remaining) > 5):
+        while (i < (self.n / 7)) and (len(self.pics_remaining) > 5):
             self.make_nested_column()
             self.make_stacked_column(random.choice([2, 3]))
             i += 1
