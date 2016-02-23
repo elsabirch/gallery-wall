@@ -1,8 +1,10 @@
+import os
 
 from flask import (Flask, render_template, jsonify, url_for,
                    request, redirect, flash, session) 
-
 from jinja2 import StrictUndefined
+
+import boto3
 
 from model import User, Picture, Gallery, Wall, Placement
 from model import connect_to_db, db
@@ -113,6 +115,23 @@ def process_logout():
     flash("Successful log out. Goodbye!")
     return redirect('/')
 
+@app.route('/upload')
+def upload_shakedown():
+
+    # my_session = boto3.session.Session(
+    #                 aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+    #                 aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+    #                 region_name=os.environ['AWS_DEFAULT_REGION'])
+
+    # s = my_session.resource('')
+
+    # s3 = boto3.resource('s3')
+    # boto3_bucket = s3.Bucket('mybucket')
+
+    for bucket in boto3.resource('s3').buckets.all():
+        print(bucket.name)
+
+    return "nothing to see here"
 
 @app.route('/galleries')
 def show_galleries():

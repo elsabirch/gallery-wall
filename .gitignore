@@ -4,6 +4,7 @@
 local_copies_untracked/
 timetrack/
 secrets.sh
+.aws/
 
 # The entries below are from:
 # https://github.com/github/gitignore/blob/master/Python.gitignore
