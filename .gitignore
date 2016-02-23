@@ -3,9 +3,7 @@
 .DS_Store
 local_copies_untracked/
 timetrack/
-secrets.sh
-.aws/
-.boto
+secrets.py
 
 # The entries below are from:
 # https://github.com/github/gitignore/blob/master/Python.gitignore

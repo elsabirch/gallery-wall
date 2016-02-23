@@ -1,17 +1,15 @@
 import os
-
-from flask import (Flask, render_template, jsonify, url_for,
-                   request, redirect, flash, session) 
-from jinja2 import StrictUndefined
-
 import boto3
 
-from model import User, Picture, Gallery, Wall, Placement
-from model import connect_to_db, db
+from flask import (Flask, render_template, jsonify, url_for,
+                   request, redirect, flash, session)
+from jinja2 import StrictUndefined
 
+from model import User, Picture, Gallery, Wall, Placement, connect_to_db, db
 from arrange import Workspace
 
 import settings
+import secrets
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -117,11 +115,6 @@ def process_logout():
 
 @app.route('/upload')
 def upload_shakedown():
-
-    # my_session = boto3.session.Session(
-    #                 aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-    #                 aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
-    #                 region_name=os.environ['AWS_DEFAULT_REGION'])
 
     # s = my_session.resource('')
 
