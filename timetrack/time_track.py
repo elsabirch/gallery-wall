@@ -12,104 +12,134 @@ Example:
 
 import datetime
 
+CHART_COLORS = {
+                # Activities
+                'planning': (165, 21, 53, 1),  # Burgundy
+                'code': (75, 173, 158, 1),  # Teal
+                'meeting': (227, 173, 53, 1),  # gold
+                'setup': (121, 130, 56, 1),  # olive
+                'research': (251, 109, 80, 1),  # peach
+                'documentation': (121, 121, 121, 1),
+                # Features
+                'algorithm': (165, 21, 53, 1),  # Burgundy
+                'seed-data': (75, 173, 158, 1),  # Teal
+                'page-flow': (227, 173, 53, 1),  # gold
+                'upload': (168, 210, 0, 1),  # lime
+                'data-model': (121, 130, 56, 1),  # olive
+                'data-structures': (251, 109, 80, 1),  # peach
+                'time-track': (121, 121, 121, 1),  # charcoal
+                'display': (255, 124, 0, 1),
+                'tools': (64, 125, 214, 1),  # light blue
+                "setup": (0, 72, 170, 1),  # cobalt
+                'advisor-mentor': (171, 77, 169, 1),  # violet
+                'scrum': (121, 121, 121, 1),  # charcoal
+                'code-review': (122, 74, 169, 1),  # purple
+                "help": (0, 72, 170, 1),  # cobalt
+                }
+DEFAULT_COLOR = (194, 185, 162, 1)  # ivory
 
 def get_time():
 
-    # Parse into dicts from file
-    activities, features = parse_time()
-
-    # Now sort out into lists by date with color annotation etc used by chartjs
-    # see format example at end of file
+    # Parse into dicts from file, these are a sparse representation of the data
+    # in that they include only non-zero time durration activities/features.
+    #
+    # dict = {'activityA': { 'date1': minutes
+    #                        'date2': minutes},
+    #         'activityB': { 'date1': minutes
+    #                        'date3': minutes},
+    #        }
+    activities_sparse, features_sparse = parse_time()
 
     # Date detection from parsed time
-    all_date_str = sorted([d for a in activities for d in activities[a]])
+    all_date_str = sorted([d for a in activities_sparse for d in activities_sparse[a]])
     first_date_str = all_date_str[0]
     last_date_str = all_date_str[-1]
     first_date = datetime.datetime.strptime(first_date_str, '%Y%m%d')
     last_date = datetime.datetime.strptime(last_date_str, '%Y%m%d')
-    days = (last_date - first_date).days
+    days = (last_date - first_date).days + 2  # I like to see the next day too
 
-    date_labels = []
-    activity_data = {a: [] for a in activities.keys()}
-    feature_data = {f: [] for f in features.keys()}
+    # create the lists of dates and data needed for chartjs
+    date_labels = [(first_date + datetime.timedelta(days=d)).strftime('%Y%m%d')
+                   for d in range(days)]
+    activities_vects = {a: [activities_sparse[a].get(d, 0) for d in date_labels]
+                        for a in activities_sparse}
+    features_vects = {f: [features_sparse[f].get(d, 0) for d in date_labels]
+                      for f in features_sparse}
 
-    date = first_date
-    for days in range(days):
-        date_labels.append(date.strftime('%Y%m%d'))
-        for activity in activity_data:
-            activity_data[activity].append(activities[activity].get(date_labels[-1], 0))
-        for feature in feature_data:
-            feature_data[feature].append(features[feature].get(date_labels[-1], 0))
-        date += datetime.timedelta(days=1)
+    # Now sort out into lists by date with color annotation etc used by chartjs
+    # EXAMPLE CHART JS FORMAT
+    #
+    # data = {
+    #     labels: ["January", "February", "March", "April", "May", "June", "July"],
+    #     datasets: [
+    #         {
+    #             label: "My First dataset",
+    #             fillColor: "rgba(220,220,220,0.5)",
+    #             strokeColor: "rgba(220,220,220,0.8)",
+    #             highlightFill: "rgba(220,220,220,0.75)",
+    #             highlightStroke: "rgba(220,220,220,1)",
+    #             data: [65, 59, 80, 81, 56, 55, 40]
+    #         },
+    #         {
+    #             label: "My Second dataset",
+    #             fillColor: "rgba(151,187,205,0.5)",
+    #             strokeColor: "rgba(151,187,205,0.8)",
+    #             highlightFill: "rgba(151,187,205,0.75)",
+    #             highlightStroke: "rgba(151,187,205,1)",
+    #             data: [28, 48, 40, 19, 86, 27, 90]
+    #         }
+    #     ]
+    # }
 
+    # All plots will be stored as a list of dicts to maintain order,
+    # within another dict for jasonification
     plots = {'all_plots': []}
 
-    chart_colors = {'planning': (165, 21, 53, 1),  # Burgundy
-                    'code': (75, 173, 158, 1),  # Teal
-                    'meeting': (227, 173, 53, 1),  # gold
-                    'setup': (121, 130, 56, 1),  # olive
-                    'research': (251, 109, 80, 1),  # peach
-                    'documentation': (121, 121, 121, 1),
-    }
-    default_color = (194, 185, 162, 1)  # ivory
+    # Activities (all plotted on a single set of axes)
 
-    data_activities = {'labels': date_labels,
-                       'datasets': []}
-    for activity in activity_data:
-        activity_dataset = {}
-        activity_dataset['label'] = activity
-        color = chart_colors.get(activity, default_color)
-        activity_dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-        activity_dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-        activity_dataset['data'] = activity_data[activity]
-        data_activities['datasets'].append(activity_dataset)
+    data_chartjs = {'labels': date_labels,
+                    'datasets': []}
+    for activity in activities_vects:
+        dataset = {}
+        dataset['label'] = activity
+        color = CHART_COLORS.get(activity, DEFAULT_COLOR)
+        dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+        dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+        dataset['data'] = activities_vects[activity]
+        data_chartjs['datasets'].append(dataset)
 
-    plots["all_plots"].append(data_activities)
+    plots["all_plots"].append(data_chartjs)
 
-    # Functions
-    chart_colors = {'algorithm': (165, 21, 53, 1),  # Burgundy
-                    'seed-data': (75, 173, 158, 1),  # Teal
-                    'page-flow': (227, 173, 53, 1),  # gold
-                    'upload': (168, 210, 0, 1),  # lime
-                    'data-model': (121, 130, 56, 1),  # olive
-                    'data-structures': (251, 109, 80, 1),  # peach
-                    'time-track': (121, 121, 121, 1),  # charcoal
-                    'display': (255, 124, 0, 1),
-                    'tools': (64, 125, 214, 1),  # light blue
-                    "setup": (0, 72, 170, 1),  # cobalt
-                    'advisor-mentor': (171, 77, 169, 1),  # violet
-                    'scrum': (121, 121, 121, 1),  # charcoal
-                    'code-review': (122, 74, 169, 1),  #purple
-                    "help": (0, 72, 170, 1),  # cobalt
-                    }
+    # Features (plotted as groups on differnt axes)
 
-
-    # User defined groups to plot together, and finding the other features
+    # User defined groups to plot together
     feature_groups = [('algorithm', 'data-structures'),
-                       ('page-flow',  'display'),
-                       ('scrum', 'help', 'code-review', 'advisor-mentor'),
-                       ('data-model', 'seed-data'),
-                       ('upload',),
-                       ]
-    features_all = set(feature_data.keys())
-    functons_grouped = set([f  for g in feature_groups for f in g])
+                      ('page-flow',  'display'),
+                      ('scrum', 'help', 'code-review', 'advisor-mentor'),
+                      ('data-model', 'seed-data'),
+                      ('upload',),
+                      ]
+    # Finding the other features not included in a pre-defined group
+    features_all = set(features_vects.keys())
+    functons_grouped = set([f for g in feature_groups for f in g])
     features_other = features_all - functons_grouped
     feature_groups.append(features_other)
 
     for this_group in feature_groups:
-        data_features = {'labels': date_labels,
-                           'datasets': []}
+        data_chartjs = {'labels': date_labels,
+                        'datasets': []}
         for feature in this_group:
-            feature_dataset = {}
-            feature_dataset['label'] = feature
-            color = chart_colors.get(feature, default_color)
-            feature_dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-            feature_dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-            feature_dataset['data'] = feature_data[feature]
-            data_features['datasets'].append(feature_dataset)
-        plots["all_plots"].append(data_features)
+            dataset = {}
+            dataset['label'] = feature
+            color = CHART_COLORS.get(feature, DEFAULT_COLOR)
+            dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+            dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+            dataset['data'] = features_vects[feature]
+            data_chartjs['datasets'].append(dataset)
+        plots["all_plots"].append(data_chartjs)
 
     return plots
+
 
 def parse_time():
     """Parses time from text file into dicts for activities and features.
@@ -158,26 +188,4 @@ def parse_time():
 
     return activities, features
 
-# EXAMPLE CHART JS FORMAT
-#
-# data = {
-#     labels: ["January", "February", "March", "April", "May", "June", "July"],
-#     datasets: [
-#         {
-#             label: "My First dataset",
-#             fillColor: "rgba(220,220,220,0.5)",
-#             strokeColor: "rgba(220,220,220,0.8)",
-#             highlightFill: "rgba(220,220,220,0.75)",
-#             highlightStroke: "rgba(220,220,220,1)",
-#             data: [65, 59, 80, 81, 56, 55, 40]
-#         },
-#         {
-#             label: "My Second dataset",
-#             fillColor: "rgba(151,187,205,0.5)",
-#             strokeColor: "rgba(151,187,205,0.8)",
-#             highlightFill: "rgba(151,187,205,0.75)",
-#             highlightStroke: "rgba(151,187,205,1)",
-#             data: [28, 48, 40, 19, 86, 27, 90]
-#         }
-#     ]
-# }
+
