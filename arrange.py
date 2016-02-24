@@ -149,7 +149,7 @@ class Workspace(object):
     def combine_columns(self):
         """Place columns together in a wall.
 
-        Currently uses a reandom order of the generated columns.
+        Currently uses a random order of the generated columns.
         """
 
         random.shuffle(self.columns)
@@ -213,24 +213,31 @@ class Workspace(object):
         while self.width_sort[i] not in self.pics_remaining:
             i += -1
         single = self.width_sort[i]
+        self.pics_remaining.remove(single)
 
         # Get a pair from the skinny end of the gallery
-        # TODO: add some variation in the small items slected
-        pair = []
-        i = 0
-        while len(pair) < 2:
-            if (self.width_sort[i] in self.pics_remaining):
-                pair.append(self.width_sort[i])
-            i += 1
+        small_set = (set(self.width_sort[:(self.n / 3)]) &
+                     self.pics_remaining)
+        if len(small_set) < 2:
+            # Old method will work for small number remaining
+            pair = []
+            i = 0
+            while len(pair) < 2:
+                if (self.width_sort[i] in self.pics_remaining):
+                    pair.append(self.width_sort[i])
+                i += 1
+            random.shuffle(pair)
+        else:
+            # New method adds more vairety
+            pair = random.sample(small_set, 2)
+
         # Vary which is placed on which side of the nesting
-        random.shuffle(pair)
         pair1 = pair[0]
         pair2 = pair[1]
 
         self.columns.append([single, pair1, pair2])
 
         # Remove these from the pictures to be used
-        self.pics_remaining.remove(single)
         self.pics_remaining.remove(pair2)
         self.pics_remaining.remove(pair1)
 
