@@ -253,9 +253,9 @@ def get_gallery_data():
 def get_time_data():
     """Get data from time tracking file."""
 
-    from timetrack.time_track import parse_time
+    from timetrack.time_track import get_time
 
-    plots = parse_time()
+    plots = get_time()
 
     return jsonify(plots)
 
