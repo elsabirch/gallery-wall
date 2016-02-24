@@ -2,3 +2,14 @@
 canvas {
     border: 1px solid #d3d3d3;
 }
+
+.bar-legend li span {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 0.5em;
+}
+
+.bar-legend ul {
+    list-style-type: none;
+}

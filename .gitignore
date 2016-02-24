@@ -2,8 +2,8 @@
 
 .DS_Store
 local_copies_untracked/
-timetrack/
-secrets.sh
+time.txt
+secrets.py
 
 # The entries below are from:
 # https://github.com/github/gitignore/blob/master/Python.gitignore
