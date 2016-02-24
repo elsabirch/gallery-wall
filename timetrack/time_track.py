@@ -12,6 +12,7 @@ Example:
 
 import datetime
 
+
 def parse_time():
 
     activities = {}
@@ -57,11 +58,11 @@ def parse_time():
     # TODO: set to date detection from parsed time
     first_date_str = '20160131'
     first_date = datetime.datetime.strptime(first_date_str, '%Y%m%d')
-    days = 25
+    days = 30
 
     date_labels = []
-    activity_data = {a:[] for a in activities.keys()}
-    function_data = {f:[] for f in functions.keys()}
+    activity_data = {a: [] for a in activities.keys()}
+    function_data = {f: [] for f in functions.keys()}
 
     date = first_date
     for days in range(days):
@@ -72,27 +73,74 @@ def parse_time():
             function_data[function].append(functions[function].get(date_labels[-1], 0))
         date += datetime.timedelta(days=1)
 
+    plots = {'all_plots': []}
+
     chart_colors = {'planning': (165, 21, 53, 1),  # Burgundy
                     'code': (75, 173, 158, 1),  # Teal
                     'meeting': (227, 173, 53, 1),  # gold
                     'setup': (121, 130, 56, 1),  # olive
                     'research': (251, 109, 80, 1),  # peach
+                    'documentation': (121, 121, 121, 1),
     }
-    default_color = (194, 185, 162, 1)  # 'rgba(220,220,220,1)'
+    default_color = (194, 185, 162, 1)  # ivory
 
     data_activities = {'labels': date_labels,
                        'datasets': []}
     for activity in activity_data:
         activity_dataset = {}
         activity_dataset['label'] = activity
-        activity_dataset['data'] = activity_data[activity]
         color = chart_colors.get(activity, default_color)
         activity_dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-        activity_dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 0.75)".format(color[0], color[1], color[2])
+        activity_dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
         activity_dataset['data'] = activity_data[activity]
         data_activities['datasets'].append(activity_dataset)
 
-    return data_activities
+    plots["all_plots"].append(data_activities)
+
+    # Functions
+    chart_colors = {'algorithm': (165, 21, 53, 1),  # Burgundy
+                    'seed-data': (75, 173, 158, 1),  # Teal
+                    'page-flow': (227, 173, 53, 1),  # gold
+                    'upload': (168, 210, 0, 1),  # lime
+                    'data-model': (121, 130, 56, 1),  # olive
+                    'data-structures': (251, 109, 80, 1),  # peach
+                    'time-track': (121, 121, 121, 1),  # charcoal
+                    'display': (255, 124, 0, 1),
+                    'tools': (64, 125, 214, 1),  # light blue
+                    "setup": (0, 72, 170, 1),  # cobalt
+                    'advisor-mentor': (171, 77, 169, 1),  # violet
+                    'scrum': (121, 121, 121, 1),  # charcoal
+                    'code-review': (122, 74, 169, 1),  #purple
+                    "help": (0, 72, 170, 1),  # cobalt
+                    }
+
+
+    # User defined groups to plot together, and finding the other functions
+    function_groups = [('algorithm', 'data-structures'),
+                       ('page-flow',  'display'),
+                       ('scrum', 'help', 'code-review', 'advisor-mentor'),
+                       ('data-model', 'seed-data'),
+                       ('upload',),
+                       ]
+    functions_all = set(function_data.keys())
+    functons_grouped = set([f  for g in function_groups for f in g])
+    functions_other = functions_all - functons_grouped
+    function_groups.append(functions_other)
+
+    for this_group in function_groups:
+        data_functions = {'labels': date_labels,
+                           'datasets': []}
+        for function in this_group:
+            function_dataset = {}
+            function_dataset['label'] = function
+            color = chart_colors.get(function, default_color)
+            function_dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+            function_dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+            function_dataset['data'] = function_data[function]
+            data_functions['datasets'].append(function_dataset)
+        plots["all_plots"].append(data_functions)
+
+    return plots
 
 # EXAMPLE CHART JS FORMAT
 #

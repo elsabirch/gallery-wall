@@ -255,9 +255,9 @@ def get_time_data():
 
     from timetrack.time_track import parse_time
 
-    data = parse_time()
+    plots = parse_time()
 
-    return jsonify(data)
+    return jsonify(plots)
 
 if __name__ == "__main__":
     # Use debug mode
