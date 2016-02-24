@@ -4,6 +4,7 @@ import boto3
 from flask import (Flask, render_template, jsonify, url_for,
                    request, redirect, flash, session)
 from jinja2 import StrictUndefined
+from flask.ext.uploads import UploadSet, IMAGES, configure_uploads
 
 from model import User, Picture, Gallery, Wall, Placement, connect_to_db, db
 from arrange import Workspace
@@ -20,6 +21,12 @@ app.secret_key = "^*V6Er$&!DN9dzMrpP994*Mx2"
 
 # Jinja should not fail silently
 app.jinja_env.undefined = StrictUndefined
+
+app.config['JQUERY_PATH'] = settings.jquery_path
+
+app.config['UPLOADED_PICS_DEST'] = 'upload'
+pictures = UploadSet('pics', IMAGES)
+configure_uploads(app, (pictures,))
 
 DEFAULT_USER_ID = 1
 
@@ -121,10 +128,23 @@ def upload_shakedown():
     # s3 = boto3.resource('s3')
     # boto3_bucket = s3.Bucket('mybucket')
 
-    for bucket in boto3.resource('s3').buckets.all():
-        print(bucket.name)
+    # for bucket in boto3.resource('s3').buckets.all():
+    #     print(bucket.name)
 
-    return "nothing to see here"
+    return render_template('upload.html')
+
+@app.route('/upload-process', methods=["POST"])
+def process_upload_shakedown():
+
+    pictures = UploadSet('pics', IMAGES)
+    configure_uploads(app, (pictures,))
+
+    filename = pictures.save(request.files['picture'])
+    # file_up = request.files['picture']
+
+    print(filename)
+
+    return str(filename)
 
 @app.route('/galleries')
 def show_galleries():
@@ -261,6 +281,6 @@ if __name__ == "__main__":
 
     connect_to_db(app)
 
-    app.config['JQUERY_PATH'] = settings.jquery_path
+
 
     app.run()
