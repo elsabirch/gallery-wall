@@ -130,7 +130,7 @@ def process_logout():
 
 
 @app.route('/upload')
-def upload_shakedown():
+def input_upload():
 
     return render_template('upload.html')
 
@@ -151,7 +151,7 @@ def process_upload():
 
         picture = Picture(user_id=user_id, width=width, height=height)
         if name:
-            picture.name = name
+            picture.picture_name = name
         db.session.add(picture)
         db.session.flush()
 
@@ -230,6 +230,26 @@ def to_clean_string_from_input(input_string, max_length):
     return clean_string
 
 
+@app.route('/curate')
+def show_pictures():
+
+    user_id = session.get('user_id', None)
+    pictures = User.query.get(user_id).pictures
+
+    return render_template('curate.html',
+                            user_pictures=pictures)
+
+@app.route('/process-curation', methods=["POST"])
+def process_curation():
+
+    user_id = session.get('user_id', None)
+
+    picture_ids = [int(p) for p in request.form.getlist('gallery_member')]
+
+    Gallery.make_from_pictures(curator_id=user_id, picture_list=picture_ids)
+
+    return redirect('/galleries')
+
 @app.route('/galleries')
 def show_galleries():
     """Show a user's galleries that they can choose to arrange."""
@@ -304,7 +324,7 @@ def show_new_wall():
 
     wall_id = request.args.get('wall_id')
 
-    Wall.query.get(int(wall_id)).print_seed()
+    # Wall.query.get(int(wall_id)).print_seed()
 
     return render_template("new-wall.html", wall_id=wall_id)
 

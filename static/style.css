@@ -3,6 +3,15 @@ canvas {
     border: 1px solid #d3d3d3;
 }
 
-input {
+.upload-form input {
     display: block;
+}
+
+.picture-display {
+    display: inline-block;
+}
+
+.picture-display label {
+    display: block;
+    text-align: center;
 }
