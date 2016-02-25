@@ -136,15 +136,33 @@ def upload_shakedown():
 @app.route('/upload-process', methods=["POST"])
 def process_upload_shakedown():
 
-    pictures = UploadSet('pics', IMAGES)
-    configure_uploads(app, (pictures,))
+    # pictures = UploadSet('pics', IMAGES)
+    # configure_uploads(app, (pictures,))
 
     filename = pictures.save(request.files['picture'])
-    # file_up = request.files['picture']
 
-    print(filename)
+    width_raw = request.form.get('width')
+    height_raw = request.form.get('height')
+    name_raw = request.form.get('name')
 
-    return str(filename)
+    # Upload tmp.txt to bucket-name
+    client = boto3.client('s3')
+    transfer = boto3.s3.transfer.S3Transfer(client)
+    folder_server = app.config['UPLOADED_PICS_DEST']
+    folder_s3 = 'pictures'
+    bucket_s3 = "gallerywallshakedown"
+    transfer.upload_file('{}/{}'.format(folder_server, filename),
+                   bucket_s3,
+                   '{}/{}'.format(folder_s3, filename),
+                   extra_args={'ACL': 'public-read'})
+
+    uploaded = '{}/{}/{}'.format(client.meta.endpoint_url,
+                            bucket_s3,
+                            '{}/{}'.format(folder_s3, filename))
+
+    print uploaded
+
+    return render_template('uploaded.html', uploaded=uploaded)
 
 @app.route('/galleries')
 def show_galleries():
