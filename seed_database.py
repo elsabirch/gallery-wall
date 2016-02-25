@@ -83,7 +83,7 @@ def load_pictures():
     result = db.session.query(func.max(Picture.picture_id)).one()
     max_id = int(result[0])
     query = "ALTER SEQUENCE pictures_picture_id_seq RESTART WITH :next_id"
-    db.session.execute(query, {'next_id': max_id})
+    db.session.execute(query, {'next_id': max_id+1})
     db.session.commit()
 
 

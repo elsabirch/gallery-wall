@@ -1,5 +1,7 @@
 import os
 import boto3
+import re
+import random
 
 from flask import (Flask, render_template, jsonify, url_for,
                    request, redirect, flash, session)
@@ -22,11 +24,17 @@ app.secret_key = "^*V6Er$&!DN9dzMrpP994*Mx2"
 # Jinja should not fail silently
 app.jinja_env.undefined = StrictUndefined
 
-app.config['JQUERY_PATH'] = settings.jquery_path
 
-app.config['UPLOADED_PICS_DEST'] = 'upload'
-pictures = UploadSet('pics', IMAGES)
+# Configurations for flask-uploads
+app.config['UPLOADED_PICTURES_DEST'] = 'upload_temp'
+pictures = UploadSet('pictures', IMAGES)
 configure_uploads(app, (pictures,))
+
+FOLDER_S3 = 'pictures'
+BUCKET_S3 = 'gallerywallshakedown'
+
+# Configure paths for online resources
+app.config['JQUERY_PATH'] = settings.jquery_path
 
 DEFAULT_USER_ID = 1
 
@@ -120,49 +128,107 @@ def process_logout():
     flash("Successful log out. Goodbye!")
     return redirect('/')
 
+
 @app.route('/upload')
 def upload_shakedown():
 
-    # s = my_session.resource('')
-
-    # s3 = boto3.resource('s3')
-    # boto3_bucket = s3.Bucket('mybucket')
-
-    # for bucket in boto3.resource('s3').buckets.all():
-    #     print(bucket.name)
-
     return render_template('upload.html')
 
+
 @app.route('/upload-process', methods=["POST"])
-def process_upload_shakedown():
+def process_upload():
 
-    # pictures = UploadSet('pics', IMAGES)
-    # configure_uploads(app, (pictures,))
+    filename_provided = pictures.save(request.files['picture'])
 
-    filename = pictures.save(request.files['picture'])
+    width = to_float_from_input(request.form.get('width'))
+    height = to_float_from_input(request.form.get('height'))
+    name = to_clean_string_from_input(request.form.get('name'), 100)
+    # TODO: Validate hight/width roughly match image, are positive and nonzero
 
-    width_raw = request.form.get('width')
-    height_raw = request.form.get('height')
-    name_raw = request.form.get('name')
+    user_id = session.get('user_id', None)
 
-    # Upload tmp.txt to bucket-name
+    if filename_provided and width and height and user_id:
+
+        picture = Picture(user_id=user_id, width=width, height=height)
+        if name:
+            picture.name = name
+        db.session.add(picture)
+        db.session.flush()
+
+        # Rename file after adding so that the picture_id can be used,
+        # this may not really be neccesary to include in the file name.
+        filename = rename_picture_on_server(filename_provided, picture.picture_id)
+        url = move_picture_to_cloud(filename)
+        picture.image_file = url
+        db.session.commit()
+
+        # TODO: redirect to pictures page instead
+        return render_template('uploaded.html', uploaded=url)
+
+    else:
+        flash('Something about the upload did not work.')
+        return redirect('/upload')
+
+
+def move_picture_to_cloud(filename):
+    """Uploads file to s3, deletes from server, returns url for picture."""
+
+    folder_server = app.config['UPLOADED_PICTURES_DEST']
+
     client = boto3.client('s3')
     transfer = boto3.s3.transfer.S3Transfer(client)
-    folder_server = app.config['UPLOADED_PICS_DEST']
-    folder_s3 = 'pictures'
-    bucket_s3 = "gallerywallshakedown"
+
     transfer.upload_file('{}/{}'.format(folder_server, filename),
-                   bucket_s3,
-                   '{}/{}'.format(folder_s3, filename),
-                   extra_args={'ACL': 'public-read'})
+                         BUCKET_S3,
+                         '{}/{}'.format(FOLDER_S3, filename),
+                         extra_args={'ACL': 'public-read'})
 
     uploaded = '{}/{}/{}'.format(client.meta.endpoint_url,
-                            bucket_s3,
-                            '{}/{}'.format(folder_s3, filename))
+                                 BUCKET_S3,
+                                 '{}/{}'.format(FOLDER_S3, filename))
 
-    print uploaded
+    os.remove('{}/{}'.format(folder_server, filename))
 
-    return render_template('uploaded.html', uploaded=uploaded)
+    return uploaded
+
+
+def rename_picture_on_server(filename_provided, picture_id):
+    """Rename picture using id and random number, returns new name."""
+
+    extension = filename_provided[filename_provided.find('.'):]
+    unpredictable = random.randint(100000, 999999)
+    filename = 'picture{:d}_{:d}{:s}'.format(picture_id,
+                                             unpredictable,
+                                             extension)
+
+    folder_server = app.config['UPLOADED_PICTURES_DEST']
+    os.rename('{}/{}'.format(folder_server, filename_provided),
+              '{}/{}'.format(folder_server, filename))
+
+    return filename
+
+
+def to_float_from_input(input_string):
+    """From an input text string return the first float found otherwise None."""
+
+    input_string.strip()
+
+    match = re.search('\d+(\.\d+)?', input_string)
+    if match:
+        return float(match.group(0))
+    else:
+        return
+
+
+def to_clean_string_from_input(input_string, max_length):
+    """Clean a string to only alphanumeric, and limit to input length."""
+
+    clean_string = re.sub('\W', '', input_string)
+    if len(clean_string) >= max_length:
+        clean_string = clean_string[:max_length]
+
+    return clean_string
+
 
 @app.route('/galleries')
 def show_galleries():
