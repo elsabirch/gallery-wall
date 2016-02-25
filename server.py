@@ -35,6 +35,10 @@ BUCKET_S3 = 'gallerywallshakedown'
 
 # Configure paths for online resources
 app.config['JQUERY_PATH'] = settings.jquery_path
+app.config['BOOSTRAP_CSS_PATH'] = settings.boostrap_css_path
+app.config['BOOSTRAP_JS_PATH'] = settings.boostrap_js_path
+app.config['CHARTJS_PATH'] = settings.chartjs_path
+
 
 DEFAULT_USER_ID = 1
 
