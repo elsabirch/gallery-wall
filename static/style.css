@@ -13,3 +13,16 @@ canvas {
 .bar-legend ul {
     list-style-type: none;
 }
+
+.upload-form input {
+    display: block;
+}
+
+.picture-display {
+    display: inline-block;
+}
+
+.picture-display label {
+    display: block;
+    text-align: center;
+}

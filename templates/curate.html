@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<form action='/process-curation' method='POST'>
+    <input type='submit' value='Create Gallery'>
+    <hr>
+    {% for picture in user_pictures %}
+    <div class='picture-display'>
+        {% if picture.image_file is not none %}
+        <img src='{{picture.image_file}}' height='100'>
+        {% else %}
+        <img class='empty-picture'
+             src='/static/img/empty.jpg' 
+             height='100'
+             width='{{100 * picture.width / picture.height}}'>
+        {% endif %}
+
+        <label>
+            {{picture.display_name}}
+        <input type='checkbox' 
+               name='gallery_member' 
+               value={{picture.picture_id}}>
+        </label>
+    </div>
+    {% endfor %}
+
+    <!-- TODO: add the public pictures to choices -->
+
+</form>
+
+{% endblock %}

@@ -7,6 +7,7 @@ import model
 DEFAULT_MARGIN = 2
 
 
+
 class Workspace(object):
     """Class on which arrangments can be performed."""
 
@@ -340,6 +341,7 @@ class Workspace(object):
 
         for p in self.pics:
             self.pics[p].remove_margin()
+
 
 
 class Pic(object):

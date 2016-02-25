@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- Check that user is logged in before redering form -->
+<div class='upload-form'>
+    <form action='/upload-process' method='POST' enctype='multipart/form-data'>
+        <label>File: <input type=file name=picture></label>
+        <label>Picture Width in Inches: <input type=text name=width></label>
+        <label>Picture Height in Inches: <input type=text name=height></label>
+        <label>Picture Name (optional): <input type=text name=name></label>
+
+        <input type="submit">
+    </form>
+</div>
+
+
+{% endblock %}

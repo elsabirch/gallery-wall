@@ -105,7 +105,7 @@ class Gallery(db.Model):
         if not wall_id:
 
             arrange_options = {}
-            
+
             lazy_load_of_workspace()
             wkspc = Workspace(self.gallery_id, arrange_options)
             wkspc.arrange_gallery_display()
@@ -121,6 +121,26 @@ class Gallery(db.Model):
             wall_id = wall_id[0]
 
         return wall_id
+
+    @classmethod
+    def make_from_pictures(cls, curator_id, picture_list, gallery_name=None):
+
+        gallery = Gallery(gallery_name=gallery_name,
+                          curator_id=curator_id)
+
+        db.session.add(gallery)
+        db.session.flush()
+
+        # TODO: Check that all pictures belong to user or are public
+
+        # Store memberships in database
+        for picture_id in picture_list:
+            membership = GalleryMembership(gallery_id=gallery.gallery_id,
+                                           picture_id=picture_id)
+            db.session.add(membership)
+        db.session.commit()
+
+        return gallery.gallery_id
 
     def __repr__(self):
         """Representation format for output."""
@@ -157,7 +177,7 @@ class Wall(db.Model):
                    wall_height=workspace.height,
                    )
         db.session.add(wall)
-        db.session.commit()
+        db.session.flush()
 
         wall_id = wall.wall_id
 
