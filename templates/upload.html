@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div class="container">
+
 <!-- Check that user is logged in before redering form -->
 <div class='upload-form'>
     <form action='/upload-process' method='POST' enctype='multipart/form-data'>
@@ -13,5 +15,6 @@
     </form>
 </div>
 
+</div> <!-- /container -->
 
 {% endblock %}

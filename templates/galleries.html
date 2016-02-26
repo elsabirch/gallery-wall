@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Template For Content -->
+<div class="container">
+
 <p> Step right up! Pick a gallery! </p>
 
 {% for gallery in galleries %}
@@ -25,6 +26,8 @@
 
     <hr>
 {% endfor %}
+
+</div> <!-- /container -->
 
 <script src="/static/js/wall.js"></script>
 

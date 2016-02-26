@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<!-- Template For Content -->
+<div class="container">
 
 <p> <a href="/galleries"> Galleries </a> (pick one to be arranged on a wall) </p>
 <p> <a href="/walls"> Walls </a> (see arranged galleries) </p>
@@ -12,5 +12,7 @@
 {% else %}
 <p> If you log in you can upload some pictures and stuff! </p>
 {% endif %}
+
+</div> <!-- /container -->
 
 {% endblock %}
