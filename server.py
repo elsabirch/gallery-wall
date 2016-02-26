@@ -170,7 +170,6 @@ def process_upload():
         flash('Image {} sucsessfully uploaded!'.format(filename_provided))
 
         return redirect('/curate')
-        # return render_template('uploaded.html', uploaded=url)
 
     else:
         flash('Something about the upload did not work.')
@@ -233,6 +232,8 @@ def to_clean_string_from_input(input_string, max_length):
     clean_string = re.sub('\W', '', input_string)
     if len(clean_string) >= max_length:
         clean_string = clean_string[:max_length]
+    elif len(clean_string) == 0:
+        clean_string = None
 
     return clean_string
 
@@ -253,7 +254,12 @@ def process_curation():
 
     picture_ids = [int(p) for p in request.form.getlist('gallery_member')]
 
-    Gallery.make_from_pictures(curator_id=user_id, picture_list=picture_ids)
+    gallery_name = to_clean_string_from_input(request.form.get('gallery_name'),
+                                              max_length=100)
+
+    Gallery.make_from_pictures(curator_id=user_id,
+                               picture_list=picture_ids,
+                               gallery_name=gallery_name)
 
     return redirect('/galleries')
 

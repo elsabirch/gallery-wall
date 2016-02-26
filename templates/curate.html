@@ -1,31 +1,54 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<form action='/process-curation' method='POST'>
-    <input type='submit' value='Create Gallery'>
-    <hr>
+
+
+<div class="container">
+<div class="row">
+    <div class="col-xs-6 col-md-8 col-md-offset-2">
+        <form action='/process-curation' method='POST' class="form-inline">
+        <div class="text-right">
+            <input type='text' name='gallery_name' class='form-control' placeholder='Optional Gallery Name'> 
+            <input type='submit' value='Create Gallery' class="btn btn-default"> 
+        </div>
+        <!-- NOTE: form stays open to include checkboxs with pictures -->
+    </div>
+</div> <!-- row -->
+
+<hr>
+
+<div class="row">
+
     {% for picture in user_pictures %}
-    <div class='picture-display'>
+
+    <div class="col-xs-4 col-sm-3 col-md-2">
         {% if picture.image_file is not none %}
-        <img src='{{picture.image_file}}' height='100'>
+        <img src='{{picture.image_file}}' height='100' class='center-block'>
         {% else %}
-        <img class='empty-picture'
-             src='/static/img/empty.jpg' 
+        <img src='/static/img/empty.jpg' 
              height='100'
-             width='{{100 * picture.width / picture.height}}'>
+             width='{{100 * picture.width / picture.height}}'
+             class='center-block'>
         {% endif %}
 
-        <label>
+        <div class="text-center">
+            <label>
             {{picture.display_name}}
         <input type='checkbox' 
                name='gallery_member' 
-               value={{picture.picture_id}}>
+               value={{picture.picture_id}} >
         </label>
+        </div>
+        
     </div>
+
     {% endfor %}
 
+</div> <!-- row -->
     <!-- TODO: add the public pictures to choices -->
 
 </form>
+
+</div> <!-- /container -->
 
 {% endblock %}

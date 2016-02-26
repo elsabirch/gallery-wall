@@ -3,27 +3,55 @@
 
 <div class="container">
 
+<div class="row">
+
 <!-- Login for registered users -->
-
-<form action='/login-process' method='POST'>
-    <label>Username (not case sensitive): <input type='text' name='username'></label>
-    <label>Password: <input type="password" name="password"></label>
-    <input type="submit">
-</form>
-
-<hr>
+  <div class="col-xs-12 col-sm-5 col-sm-offset-1 col-md-4 col-md-offset-2 ">
+    <h3>Login for returning users</h3>
+    <form action='/login-process' method='POST' class='form-group'>
+        <div class='form-group'>
+            <label class='form-group'>
+            Username (not case sensitive)
+            <input type='text' name='username' class='form-control'>
+            </label>
+        </div>
+        <div class='form-group'>
+            <label>
+            Password 
+            <input type="password" name="password" class='form-control'></label>
+        </div>
+        <input type="submit" class="btn btn-default" value="Log In">
+    </form>
+  </div>
 
 <!-- Signup for new users -->
+  <div class="col-xs-12 col-sm-5 col-md-4">
+    <h3>Signup for new users</h3>
 
-<h2>Sign up for users not yet registered:</h2>
-<p>This username and password are for conveneince and not security. 
-    Please do not use a password you have used on another website.</p>
-<form action='/signup-process' method='POST'>
-    <label>Username (not case sensitive): <input type='text' name='username'></label>
-    <label>Email: <input type='text' name='email'></label>
-    <label>Password: <input type="password" name="password"></label>
-    <input type="submit">
-</form>
+    <form action='/signup-process' method='POST' class='form-group'>
+        <div class='form-group'>
+            <label class='form-group'>
+            Username (not case sensitive)
+            <input type='text' name='username' class='form-control'>
+            </label>
+        </div>
+            <label class='form-group'>
+            Email
+            <input type='text' name='email' class='form-control'></label>
+        <div class='form-group'>
+            <label>
+            Password 
+            <input type="password" name="password" class='form-control'></label>
+            <p class="help-block"> This username and password are for conveneince and not security. Please do not use a password you have used on another website.
+            </p>
+
+        </div>
+        <!-- TODO: add prompt that they use this software under the MIT liscense -->
+        <input type="submit" class="btn btn-default" value="Sign Up">
+    </form>
+
+  </div>
+</div>
 
 </div> <!-- /container -->
 
