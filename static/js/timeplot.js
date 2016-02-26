@@ -5,12 +5,17 @@ function plotAllTimeData(data) {
 
     for(var i=0; i<nPlots; i++){
 
+        var titleColumnHtml = "<div class='col-xs-12 col-md-12'>";
         var canvasColumnHtml = "<div class='col-xs-12 col-md-9'>";
         var legendColumnHtml = "<div class='col-xs-6 col-md-3'>";
         var canvasHtml = "<canvas id=\"plot" + i + "\" width=\"750\" height=\"300\"></canvas>";
         var legendHtml = "<div id=\"legend-plot" + i + "\" class=\"bar-legend\"></div>";
 
+        var title = data['all_labels'][i];
+        var titleHtml = '<h5>' + title + '</h5>';
+
         var plotHtml = ("<div class='row'>" +
+                        titleColumnHtml + titleHtml + '</div>' +
                         canvasColumnHtml + canvasHtml + '</div>' +
                         legendColumnHtml + legendHtml + '</div>' +
                         '</div>');

@@ -20,22 +20,25 @@ CHART_COLORS = {
                 'setup': (121, 130, 56, 1),  # olive
                 'research': (251, 109, 80, 1),  # peach
                 'documentation': (121, 121, 121, 1),
+                'Total': (121, 121, 121, 1),  # charcoal
                 # Features
                 'algorithm': (165, 21, 53, 1),  # Burgundy
                 'seed-data': (75, 173, 158, 1),  # Teal
-                'page-flow': (227, 173, 53, 1),  # gold
-                'upload': (168, 210, 0, 1),  # lime
-                'data-model': (121, 130, 56, 1),  # olive
+                'page-flow': (255, 211, 0, 1),  # (227, 173, 53, 1),  # gold
+                'upload': (0, 209, 66, 1),  # lime
+                'data-model': (79, 143, 0, 1),  # olive
                 'data-structures': (251, 109, 80, 1),  # peach
                 'time-track': (121, 121, 121, 1),  # charcoal
                 'display': (255, 124, 0, 1),
                 'tools': (64, 125, 214, 1),  # light blue
-                "setup": (0, 72, 170, 1),  # cobalt
-                'advisor-mentor': (171, 77, 169, 1),  # violet
+                'setup': (0, 72, 170, 1),  # cobalt
+                'design': (171, 77, 169, 1),  # violet
                 'scrum': (121, 121, 121, 1),  # charcoal
                 'code-review': (122, 74, 169, 1),  # purple
-                "help": (0, 72, 170, 1),  # cobalt
+                'advisor-mentor': (0, 72, 170, 1),  # cobalt
+                'testing': (0, 209, 66, 1),  # lime
                 }
+
 DEFAULT_COLOR = (194, 185, 162, 1)  # ivory
 
 def get_time():
@@ -93,7 +96,8 @@ def get_time():
 
     # All plots will be stored as a list of dicts to maintain order,
     # within another dict for jasonification
-    plots = {'all_plots': []}
+    plots = {'all_plots': [],
+             'all_labels': []}
 
     # Activities (all plotted on a single set of axes)
 
@@ -101,7 +105,7 @@ def get_time():
                     'datasets': []}
     for activity in activities_vects:
         dataset = {}
-        dataset['label'] = activity
+        dataset['label'] = activity.title()
         color = CHART_COLORS.get(activity, DEFAULT_COLOR)
         dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
         dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
@@ -109,14 +113,30 @@ def get_time():
         data_chartjs['datasets'].append(dataset)
 
     plots["all_plots"].append(data_chartjs)
+    plots["all_labels"].append('Activities (Time by what I was doing)')
+
+    # Total time
+    data_chartjs = {'labels': date_labels,
+                    'datasets': []}
+    dataset = {}
+    dataset['label'] = 'Total'
+    color = CHART_COLORS.get(dataset['label'], DEFAULT_COLOR)
+    dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+    dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+    dataset['data'] = [sum([activities_vects[a][i] for a in activities_vects]) for i in range(len(date_labels)) ]
+    data_chartjs['datasets'].append(dataset)
+    plots["all_plots"].append(data_chartjs)
+    plots["all_labels"].append('All Time (How long I was doing stuff)')
 
     # Features (plotted as groups on differnt axes)
 
     # User defined groups to plot together
-    feature_groups = [('algorithm', 'data-structures'),
+    feature_groups = [
                       ('page-flow',  'display', 'upload'),
-                      ('scrum', 'help', 'code-review', 'advisor-mentor'),
+                      ('scrum', 'code-review', 'advisor-mentor'),
+                      ('algorithm', 'data-structures'),
                       ('data-model', 'seed-data'),
+                      ('testing',)
                       ]
     # Finding the other features not included in a pre-defined group
     features_all = set(features_vects.keys())
@@ -129,13 +149,15 @@ def get_time():
                         'datasets': []}
         for feature in this_group:
             dataset = {}
-            dataset['label'] = feature
+            dataset['label'] = feature.title()
             color = CHART_COLORS.get(feature, DEFAULT_COLOR)
             dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
             dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
             dataset['data'] = features_vects[feature]
             data_chartjs['datasets'].append(dataset)
         plots["all_plots"].append(data_chartjs)
+        plots["all_labels"].append('Features (what I was building, seperated into groups)')
+
 
     return plots
 
