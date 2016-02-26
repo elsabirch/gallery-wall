@@ -245,7 +245,8 @@ def show_pictures():
     pictures = User.query.get(user_id).pictures
 
     return render_template('curate.html',
-                            user_pictures=pictures)
+                           user_pictures=pictures)
+
 
 @app.route('/process-curation', methods=["POST"])
 def process_curation():
@@ -254,14 +255,17 @@ def process_curation():
 
     picture_ids = [int(p) for p in request.form.getlist('gallery_member')]
 
-    gallery_name = to_clean_string_from_input(request.form.get('gallery_name'),
-                                              max_length=100)
+    if len(picture_ids) > 0:
+        gallery_name = to_clean_string_from_input(request.form.get('gallery_name'),
+                                                  max_length=100)
+        Gallery.make_from_pictures(curator_id=user_id,
+                                   picture_list=picture_ids,
+                                   gallery_name=gallery_name)
+        return redirect('/galleries')
+    else:
+        flash('Cannot create empty gallery.')
+        return redirect('/curate')
 
-    Gallery.make_from_pictures(curator_id=user_id,
-                               picture_list=picture_ids,
-                               gallery_name=gallery_name)
-
-    return redirect('/galleries')
 
 @app.route('/galleries')
 def show_galleries():
