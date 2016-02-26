@@ -167,7 +167,10 @@ def process_upload():
         db.session.commit()
 
         # TODO: redirect to pictures page instead
-        return render_template('uploaded.html', uploaded=url)
+        flash('Image {} sucsessfully uploaded!'.format(filename_provided))
+
+        return redirect('/curate')
+        # return render_template('uploaded.html', uploaded=url)
 
     else:
         flash('Something about the upload did not work.')
