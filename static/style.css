@@ -3,6 +3,8 @@ canvas {
     border: 1px solid #d3d3d3;
 }
 
+body { padding-top: 70px; }
+
 .bar-legend li span {
     display: inline-block;
     width: 1em;
