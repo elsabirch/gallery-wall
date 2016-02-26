@@ -114,10 +114,9 @@ def get_time():
 
     # User defined groups to plot together
     feature_groups = [('algorithm', 'data-structures'),
-                      ('page-flow',  'display'),
+                      ('page-flow',  'display', 'upload'),
                       ('scrum', 'help', 'code-review', 'advisor-mentor'),
                       ('data-model', 'seed-data'),
-                      ('upload',),
                       ]
     # Finding the other features not included in a pre-defined group
     features_all = set(features_vects.keys())

@@ -4,7 +4,18 @@ function plotAllTimeData(data) {
     var nPlots = data['all_plots'].length;
 
     for(var i=0; i<nPlots; i++){
-        $('#all-plots').append("<canvas id=\"plot" + i + "\" width=\"900\" height=\"400\"></canvas><div id=\"legend-plot" + i + "\" class=\"bar-legend\"></div>");
+
+        var canvasColumnHtml = "<div class='col-xs-12 col-md-9'>";
+        var legendColumnHtml = "<div class='col-xs-6 col-md-3'>";
+        var canvasHtml = "<canvas id=\"plot" + i + "\" width=\"750\" height=\"300\"></canvas>";
+        var legendHtml = "<div id=\"legend-plot" + i + "\" class=\"bar-legend\"></div>";
+
+        var plotHtml = ("<div class='row'>" +
+                        canvasColumnHtml + canvasHtml + '</div>' +
+                        legendColumnHtml + legendHtml + '</div>' +
+                        '</div>');
+
+        $('#all-plots').append(plotHtml);
 
         var options = {legendTemplate : "<ul class=\"<%=name.toLowerCase()%>-legend\"><% for (var i=0; i<datasets.length; i++){%><li><span style=\"background-color:<%=datasets[i].fillColor%>\"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>"
                       };

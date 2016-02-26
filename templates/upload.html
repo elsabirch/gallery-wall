@@ -3,18 +3,46 @@
 
 <div class="container">
 
+<div class = 'row'>
 <!-- Check that user is logged in before redering form -->
-<div class='upload-form'>
-    <form action='/upload-process' method='POST' enctype='multipart/form-data'>
-        <label>File: <input type=file name=picture></label>
-        <label>Picture Width in Inches: <input type=text name=width></label>
-        <label>Picture Height in Inches: <input type=text name=height></label>
-        <label>Picture Name (optional): <input type=text name=name></label>
+<div class='upload-form' class="col-xs-12">
+    <form action='/upload-process' method='POST' enctype='multipart/form-data' class="form-horizontal">
 
-        <input type="submit">
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label" for='file-in'>File</label>
+            <div class="col-sm-9">
+                <input type=file name=picture class="form-control" id='file-in'>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label" for='width-in'>Picture Width in Inches</label>
+            <div class="col-sm-1">
+                <input type=text name=width class="form-control" id='width-in'>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label" for='height-in'>Picture Height in Inches</label>
+            <div class="col-sm-1">
+                <input type=text name=height class="form-control" id='height-in'>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label" for='name-in'>Picture Name (optional)</label>
+            <div class="col-sm-3">
+                <input type=text name=name class="form-control" id='name-in'>
+            </div>
+        </div>
+
+        <div class="col-sm-2 col-sm-offset-3">
+            <input type="submit" class="btn btn-default">
+        </div>
     </form>
 </div>
-
+</div> <!-- row -->
 </div> <!-- /container -->
 
 {% endblock %}
