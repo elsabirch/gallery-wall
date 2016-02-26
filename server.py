@@ -219,7 +219,7 @@ def to_float_from_input(input_string):
 
     input_string.strip()
 
-    match = re.search('\d+(\.\d+)?', input_string)
+    match = re.search('(\-)?\d+(\.\d+)?', input_string)
     if match:
         return float(match.group(0))
     else:
@@ -355,6 +355,7 @@ def save_wall():
 
     return redirect('/walls')
 
+
 @app.route('/time')
 def show_time():
     """For display of time tracked durring project."""
@@ -362,6 +363,7 @@ def show_time():
     return render_template('time.html')
 
 # Routes returning json data
+
 
 @app.route('/getwall.json')
 def get_wall_data():
@@ -417,7 +419,5 @@ if __name__ == "__main__":
     app.debug = True
 
     connect_to_db(app)
-
-
 
     app.run()
