@@ -3,4 +3,5 @@
 3 | elsa's wall empty frames | 2
 4 | bw sample | 1
 5 | mix classics | 1
-6 | all samples | 1
+6 | many samples | 1
+7 | small family | 1

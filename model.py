@@ -140,7 +140,18 @@ class Gallery(db.Model):
             db.session.add(membership)
         db.session.commit()
 
-        return gallery.gallery_id
+        return gallery
+
+    def print_seed(self):
+        """Print the seed format of a gallery to save as a sample."""
+
+        print '-'*20 + 'Memberships Entry' + '-'*20
+
+        # gallery_id | picture_id, picture_id, ...
+
+        pictures_str = [str(p.picture_id) for p in self.pictures]
+
+        print '{:d} | {:s}'.format(self.gallery_id, ', '.join(pictures_str))
 
     def __repr__(self):
         """Representation format for output."""

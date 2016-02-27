@@ -243,9 +243,16 @@ def show_pictures():
 
     user_id = session.get('user_id', None)
     pictures = User.query.get(user_id).pictures
+    pictures_public = db.session.query(Picture).filter(Picture.user_id != user_id, 
+                                           Picture.public == True).all()
+
+    print pictures
+    print pictures_public
+
+    all_pictures = pictures + pictures_public
 
     return render_template('curate.html',
-                           user_pictures=pictures)
+                           user_pictures=all_pictures)
 
 
 @app.route('/process-curation', methods=["POST"])
@@ -258,9 +265,10 @@ def process_curation():
     if len(picture_ids) > 0:
         gallery_name = to_clean_string_from_input(request.form.get('gallery_name'),
                                                   max_length=100)
-        Gallery.make_from_pictures(curator_id=user_id,
-                                   picture_list=picture_ids,
-                                   gallery_name=gallery_name)
+        gallery = Gallery.make_from_pictures(curator_id=user_id,
+                                             picture_list=picture_ids,
+                                             gallery_name=gallery_name)
+        gallery.print_seed()
         return redirect('/galleries')
     else:
         flash('Cannot create empty gallery.')
