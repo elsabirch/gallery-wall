@@ -84,5 +84,18 @@ class ServerHelperFunctionsTestCase(unittest.TestCase):
         self.assertAlmostEqual(server.to_float_from_input(test_in),
                          expect_out)
 
+
+class ServerRoutesTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.client = server.app.test_client()
+        server.app.config['TESTING'] = True
+
+    def test_navigation(self):
+
+        result = self.client.get('/navigation')
+        self.assertIn('(pick one to be arranged on a wall)', result.data)
+
+
 if __name__ == "__main__":
     unittest.main()
