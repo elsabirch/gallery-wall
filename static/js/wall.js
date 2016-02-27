@@ -70,12 +70,12 @@ function hangPicture(canvas, context, picture, wallToCanvas){
 
         // Event listener for when the image has loaded, src may need to be 
         // placed after this acording to some advice?
-        imageObj.onload = function() {context.drawImage(this,
-                                                        xForCanvas,
-                                                        yForCanvas,
-                                                        wForCanvas,
-                                                        hForCanvas
-                                                        );
+        imageObj.onload = function() {
+            context.drawImage(this, xForCanvas, yForCanvas, wForCanvas, hForCanvas);
+        };
+        imageObj.onerror = function() {
+           // If image not loaded draw rectangle
+            context.strokeRect(xForCanvas, yForCanvas, wForCanvas, hForCanvas);
         };
     } else {
         // Draw a rectangle in case there is no image
