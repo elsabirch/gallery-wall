@@ -32,12 +32,16 @@
         {% endif %}
 
         <div class="text-center">
-            <label>
+        <label class="sr-only" for='gallery_member'>
             {{picture.display_name}}
-        <input type='checkbox' 
-               name='gallery_member' 
-               value={{picture.picture_id}} >
         </label>
+            <!-- {{picture.display_name}} -->
+            <input type='checkbox'
+                    name='gallery_member'
+                    value={{picture.picture_id}}>
+            {% if picture.public %}
+            <span>Public</span>
+            {% endif %}  
         </div>
         
     </div>
