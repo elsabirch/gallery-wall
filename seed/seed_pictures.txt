@@ -37,3 +37,17 @@
 37 |  1  |  11 |  14 |  vase_11x14.jpg |  vase  |  @elsabirch |  public
 38 |  1  |  22 |  14 |  venus_22x14.jpg |  venus  |  @elsabirch |  public
 39 |  1  |  7  |  10 |  windows_7x10.jpg  |  windows |  @elsabirch |  public
+40  |   1   |   7   |   6   |   family_7x6.jpg  |   family  |   @elsabirch  |   public
+41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
+42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
+43  |   1   |   6   |   6   |   wed_6x6.jpg |   wed |   @elsabirch  |   public
+44  |   1   |   6   |   7   |   mona_6x7.jpg    |   mona    |   @elsabirch  |   public
+45  |   1   |   4   |   4   |   portrait_4x4.jpg    |   portrait    |   @elsabirch  |   public
+46  |   1   |   4   |   6   |   tower_4x6.jpg   |   tower   |   @elsabirch  |   public
+47  |   1   |   7   |   5   |   abs_7x5.jpg |   abs |   @elsabirch  |   public
+48  |   1   |   6   |   8   |   nb_6x8.jpg  |   nb  |   @elsabirch  |   public
+49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
+50  |   1   |   9   |   11  |   pearl_9x11.jpg  |   pearl   |   @elsabirch  |   public
+51  |   1   |   9   |   7   |   starry_9x7.jpg  |   starry  |   @elsabirch  |   public
+52  |   1   |   5   |   4   |   invader_5x4.jpg |   invader |   @elsabirch  |   public
+53  |   1   |   14  |   12  |   branch_14x12.jpg    |   branch  |   @elsabirch  |   public

@@ -4,6 +4,7 @@
 local_copies_untracked/
 time.txt
 secrets.py
+tests.py
 
 # The entries below are from:
 # https://github.com/github/gitignore/blob/master/Python.gitignore
