@@ -319,8 +319,8 @@ def process_arrangment():
     # Arrangement method (Eventually call a single function that will decide
     # based on the options passed )
     # wkspc.arrange_linear()
-    # wkspc.arrange_grid()
-    wkspc.arrange_column_heuristic()
+    wkspc.arrange_grid()
+    # wkspc.arrange_column_heuristic()
 
     # Readjust for the wall
     wkspc.readjust_for_wall()
