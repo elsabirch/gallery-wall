@@ -10,6 +10,12 @@
         <canvas id='canvas{{wall_id}}' height='300' width='900'> 
             If you dont have HTML5 canvas, you're gonna have a bad time.
         </canvas>
+
+    <form action='/wall-dimensions' method='GET'>
+    <input type='hidden' name='wall_id' value='{{ wall_id }}'>
+    <input type='submit' value='See wall dimensions'>
+    </form>
+
     </div>
 {% endfor %}
 

@@ -369,11 +369,25 @@ def save_wall():
     return redirect('/walls')
 
 
+@app.route('/wall-dimensions', methods=["GET"])
+def show_wall_dimensions():
+    """Shows page with wall and table of hanging demensions."""
+
+    wall_id = int(request.args.get('wall_id'))
+
+    placements = Wall.query.get(wall_id).placements
+
+    return render_template('wall-dimensions.html',
+                           wall_id=wall_id,
+                           placements=placements)
+
+
 @app.route('/time')
 def show_time():
     """For display of time tracked durring project."""
 
     return render_template('time.html')
+
 
 # Routes returning json data
 
