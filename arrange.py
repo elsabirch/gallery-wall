@@ -75,7 +75,7 @@ class Workspace(object):
         """From a set of grid indicies produce geometrically valid placements.
 
         (grid = relative psuedo locations without geometry)"""
-        # print '*'*80
+
         cols, rows = zip(*pics_in_grid.keys())
         mag_sort_j = sorted(set(cols), key=abs)
         mag_sort_i = sorted(set(rows), key=abs)
@@ -87,32 +87,18 @@ class Workspace(object):
         #  -i,j  | i,j
         #        v
 
-        print(pics_in_grid)
-        print(mag_sort_i)
-        print(mag_sort_j)
-
         for i in mag_sort_i:
             for j in mag_sort_j:
-
-                print '*'*30
-                print 'grid place: {}, {}'.format(i,j) 
 
                 pic_id = pics_in_grid.get((i, j), None)
 
                 if pic_id:
                     # Picture existed at that grid location, place in workspace
-                    x1, x2, y1, y2 = self.walk_out_to_place(pic_id, (i, j))
+                    self.walk_out_to_place(pic_id, (i, j))
 
-                    print 'placed!'
-                    self.pics[pic_id].x1 = x1
-                    self.pics[pic_id].x2 = x2
-                    self.pics[pic_id].y1 = y1
-                    self.pics[pic_id].y2 = y2
-
-                    print self.pics[pic_id]
 
     def walk_out_to_place(self, pic_id, grid):
-        """Given a picture and grid placement, return valid workspace placement.
+        """Given a picture and grid location, return valid workspace of placements.
 
         Method is a walk out diagonally in the roucgh direction of initial grid
         placement.
@@ -123,12 +109,10 @@ class Workspace(object):
         print 'placing pic '
         print pic.picture.display_name
 
-        x1_try = j
-        x2_try = j + pic.w
-        y1_try = i
-        y2_try = i + pic.h
-
-        print 'initial place: {} {} {} {}'.format(x1_try, x2_try, y1_try, y2_try)
+        pic.x1 = j
+        pic.x2 = j + pic.w
+        pic.y1 = i
+        pic.y2 = i + pic.h
 
         # Parameters for moving this placement until no conflict
         # Probability of movement in x or y direction at each attempt
@@ -137,22 +121,17 @@ class Workspace(object):
         x_inc = 1 if j > 0 else -1
         y_inc = 1 if i > 0 else -1
 
-        while self.any_conflict(x1_try, x2_try, y1_try, y2_try):
+        while self.any_conflict(pic.x1, pic.x2, pic.y1, pic.y2, pic):
 
             if random.random() < ratio_i:
                 # Move in y direction
-                y1_try += y_inc
-                y2_try += y_inc
-                print 'move to: {} {} {} {}'.format(x1_try, x2_try, y1_try, y2_try)
+                pic.y1 += y_inc
+                pic.y2 += y_inc
 
             else:
                 # Move in x direction
-                x1_try += x_inc
-                x2_try += x_inc
-
-                print 'move to: {} {} {} {}'.format(x1_try, x2_try, y1_try, y2_try)
-
-        return (x1_try, x2_try, y1_try, y2_try)
+                pic.x1 += x_inc
+                pic.x2 += x_inc
 
     def pull_in_placements(self):
         """From placed workspace, where possible bring pictures towards center.
@@ -163,7 +142,7 @@ class Workspace(object):
         moves = 1
         count = 0
 
-        while moves > 0 and count < 100:
+        while moves > 0 and count < 1000:
 
             moves = 0
             count += 1
@@ -175,11 +154,6 @@ class Workspace(object):
                 x_inc = -1 if ((pic.x1+pic.x2)/float(2)) > 0 else 1
                 y_inc = -1 if ((pic.y1+pic.y2)/float(2)) > 0 else 1
 
-                # CONFLICT WILL BE FOUND WITH SELF, REWRITE CONFLICT CHECK TO 
-                # EXEMPT THE PICTURE CURRENTLY IN QUESTION FROM PLACMENT CONFLICT 
-                # CHECKS THAT WILL ALSO PERMIT THE USE OF X1 ETC FOR TRACKIGN 
-                # DURREING PLACEMNT RATHER THAN _TRYS
-
                 # this inhenrently does one move before other, scramble?
                 if not self.any_conflict(pic.x1+x_inc, pic.x2+x_inc, pic.y1, pic.y2, pic):
                     pic.x1 += x_inc
@@ -190,25 +164,13 @@ class Workspace(object):
                     pic.y2 += y_inc
                     moves += 1
 
-                print 'count: {} moves: {}'.format(count, moves)
+                # print 'count: {} moves: {}'.format(count, moves)
 
     def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic = None):
         """Check placed pictures, return true if any conflict with this placement."""
 
-        print 'conflict checking- - - -- - - - - - --'
-
-        print self.pics
-
-        # for p in self.pics:
-        #     print '*** conflict check'
-
-        #     print self.pics[p].picture.display_name
-        #     print self.pics[p].x1
-        #     print self.pics[p].x2
-        #     print self.pics[p].y1
-        #     print self.pics[p].y2
-        #     print self.pics[p].h
-        #     print self.pics[p].w
+        # print 'conflict checking- - - -- - - - - - --'
+        # print self.pics
 
         # Check each picture in workspace
         for p in self.pics:
@@ -218,7 +180,9 @@ class Workspace(object):
                 if is_conflict(pic.x1, pic.x2, pic.y1, pic.y2,
                                x1_try, x2_try, y1_try, y2_try):
                     # Conflicts with attempted placement, fail fast
-                    print 'conflict found with {}'.format(pic)
+
+                    # print 'conflict found with {}'.format(pic)
+
                     return True
 
         # No conflicts found
