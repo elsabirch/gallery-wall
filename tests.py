@@ -10,6 +10,7 @@ def load_tests(loader, tests, ignore):
     # tests.addTests(doctest.DocFileSuite("tests.txt"))
     return tests
 
+
 class ServerHelperFunctionsTestCase(unittest.TestCase):
 
     def test_to_clean_string_from_input(self):
@@ -90,7 +91,7 @@ class ServerHelperFunctionsTestCase(unittest.TestCase):
         test_in = '-0.0 '
         expect_out = 0.0
         self.assertAlmostEqual(server.to_float_from_input(test_in),
-                         expect_out)
+                               expect_out)
 
 
 class ServerRoutesTestCase(unittest.TestCase):
@@ -104,6 +105,11 @@ class ServerRoutesTestCase(unittest.TestCase):
         result = self.client.get('/navigation')
         self.assertIn('(pick one to be arranged on a wall)', result.data)
 
+    # def navigation while logged in
+
+    # def navigations while not logged in
+
+    # tear down by logging out
 
 if __name__ == "__main__":
     unittest.main()
