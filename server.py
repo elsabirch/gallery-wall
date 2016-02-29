@@ -219,7 +219,7 @@ def to_float_from_input(input_string):
 
     input_string.strip()
 
-    match = re.search('\d+(\.\d+)?', input_string)
+    match = re.search('(\-)?\d+(\.\d+)?', input_string)
     if match:
         return float(match.group(0))
     else:
@@ -227,7 +227,12 @@ def to_float_from_input(input_string):
 
 
 def to_clean_string_from_input(input_string, max_length):
-    """Clean a string to only alphanumeric, and limit to input length."""
+    """Clean a string to only alphanumeric, and limit to input length.
+
+    >>> to_clean_string_from_input('foo*', 10)
+    'foo'
+
+    """
 
     clean_string = re.sub('\W', '', input_string)
     if len(clean_string) >= max_length:
@@ -363,6 +368,7 @@ def save_wall():
 
     return redirect('/walls')
 
+
 @app.route('/time')
 def show_time():
     """For display of time tracked durring project."""
@@ -370,6 +376,7 @@ def show_time():
     return render_template('time.html')
 
 # Routes returning json data
+
 
 @app.route('/getwall.json')
 def get_wall_data():
@@ -425,7 +432,5 @@ if __name__ == "__main__":
     app.debug = True
 
     connect_to_db(app)
-
-
 
     app.run()
