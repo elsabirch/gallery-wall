@@ -46,7 +46,7 @@ class Picture(db.Model):
         if self.picture_name:
             return self.picture_name
         else:
-            return "<Id {:d}".format(self.picture_id)
+            return "Id {:d}".format(self.picture_id)
 
     def __repr__(self):
         """Representation format for output."""
