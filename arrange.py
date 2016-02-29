@@ -69,7 +69,7 @@ class Workspace(object):
 
         self.expand_grid_to_arrangment(pics_in_grid)
 
-        self.pull_in_placements()
+        self.pull_in_pictures()
 
     def expand_grid_to_arrangment(self, pics_in_grid):
         """From a set of grid indicies produce geometrically valid placements.
@@ -133,7 +133,7 @@ class Workspace(object):
                 pic.x1 += x_inc
                 pic.x2 += x_inc
 
-    def pull_in_placements(self):
+    def pull_in_pictures(self):
         """From placed workspace, where possible bring pictures towards center.
 
         Although this code might work on a non-centered arrangmet I suspec the
@@ -142,29 +142,47 @@ class Workspace(object):
         moves = 1
         count = 0
 
-        while moves > 0 and count < 1000:
+        while moves > 0 and count < 500:
 
             moves = 0
             count += 1
 
+            scrambled_pics = self.pics.keys()
+            random.shuffle(scrambled_pics)
+
             # Loop through pictures
-            for p in self.pics:
-                pic = self.pics[p]
+            for p in scrambled_pics:
 
-                x_inc = -1 if ((pic.x1+pic.x2)/float(2)) > 0 else 1
-                y_inc = -1 if ((pic.y1+pic.y2)/float(2)) > 0 else 1
+                move = self.pull_in_picture(p)
 
-                # this inhenrently does one move before other, scramble?
-                if not self.any_conflict(pic.x1+x_inc, pic.x2+x_inc, pic.y1, pic.y2, pic):
-                    pic.x1 += x_inc
-                    pic.x2 += x_inc
-                    moves += 1
-                if not self.any_conflict(pic.x1, pic.x2, pic.y1+y_inc, pic.y2+y_inc, pic):
-                    pic.y1 += y_inc
-                    pic.y2 += y_inc
+                if move:
                     moves += 1
 
-                # print 'count: {} moves: {}'.format(count, moves)
+    def pull_in_picture(self, pic_id):
+        """From placed workspace, step single picture towards center if possible.
+
+        Return boolean true if pictures is moved.
+        """
+
+        move = False
+
+        pic = self.pics[pic_id]
+
+        x_inc = -1 if ((pic.x1+pic.x2)/float(2)) > 0 else 1
+        y_inc = -1 if ((pic.y1+pic.y2)/float(2)) > 0 else 1
+
+        # this inhenrently does one move before other, scramble?
+        if not self.any_conflict(pic.x1+x_inc, pic.x2+x_inc, pic.y1, pic.y2, pic):
+            pic.x1 += x_inc
+            pic.x2 += x_inc
+            move = True
+        if not self.any_conflict(pic.x1, pic.x2, pic.y1+y_inc, pic.y2+y_inc, pic):
+            pic.y1 += y_inc
+            pic.y2 += y_inc
+            move = True
+
+        return move
+
 
     def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic = None):
         """Check placed pictures, return true if any conflict with this placement."""
