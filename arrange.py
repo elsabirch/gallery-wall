@@ -197,16 +197,18 @@ class Workspace(object):
 
         print 'conflict checking- - - -- - - - - - --'
 
-        for p in self.pics:
-            print '*** conflict check'
+        print self.pics
 
-            print self.pics[p].picture.display_name
-            print self.pics[p].x1
-            print self.pics[p].x2
-            print self.pics[p].y1
-            print self.pics[p].y2
-            print self.pics[p].h
-            print self.pics[p].w
+        # for p in self.pics:
+        #     print '*** conflict check'
+
+        #     print self.pics[p].picture.display_name
+        #     print self.pics[p].x1
+        #     print self.pics[p].x2
+        #     print self.pics[p].y1
+        #     print self.pics[p].y2
+        #     print self.pics[p].h
+        #     print self.pics[p].w
 
         # Check each picture in workspace
         for p in self.pics:
@@ -509,12 +511,12 @@ class Pic(object):
     def __repr__(self):
         """Representation format for output."""
 
-        return "<{:s}, x1: {:.1f} x2: {:.1f} y1: {:.1f} y2: {:.1f}>".format(
+        return "<{}, x1: {} x2: {} y1: {} y2: {}>".format(
             self.picture.display_name,
-            self.x1,
-            self.x2,
-            self.y1,
-            self.y2)
+            '{:.1f}'.format(self.x1) if isinstance(self.x1, float) else str(self.x1),
+            '{:.1f}'.format(self.x2) if isinstance(self.x2, float) else str(self.x2),
+            '{:.1f}'.format(self.y1) if isinstance(self.y1, float) else str(self.y1),
+            '{:.1f}'.format(self.y2) if isinstance(self.y2, float) else str(self.y2))
 
     def remove_margin(self):
         """Adjusts placement to that used for actual picture without margin.
