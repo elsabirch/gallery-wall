@@ -1,6 +1,14 @@
 import unittest
 import server
+import doctest
 
+
+def load_tests(loader, tests, ignore):
+    """Also run our doctests and file-based doctests."""
+
+    tests.addTests(doctest.DocTestSuite(server))
+    # tests.addTests(doctest.DocFileSuite("tests.txt"))
+    return tests
 
 class ServerHelperFunctionsTestCase(unittest.TestCase):
 

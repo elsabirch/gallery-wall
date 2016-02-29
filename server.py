@@ -227,7 +227,12 @@ def to_float_from_input(input_string):
 
 
 def to_clean_string_from_input(input_string, max_length):
-    """Clean a string to only alphanumeric, and limit to input length."""
+    """Clean a string to only alphanumeric, and limit to input length.
+
+    >>> to_clean_string_from_input('foo*', 10)
+    'foo'
+
+    """
 
     clean_string = re.sub('\W', '', input_string)
     if len(clean_string) >= max_length:
