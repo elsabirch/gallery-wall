@@ -7,16 +7,17 @@ import model
 
 DEFAULT_MARGIN = 2
 
-# Decorator for instance methods
+# Decorator for instance methods of workspace
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 def adjust_for_wall(func):
 
     # This decorator does not have access to instance
-
     @wraps(func)
     def wrapper(self):
 
         # This wrapper does have access to instance
-        
+
         # Calling the arrangement function
         func(self)
 
@@ -27,6 +28,8 @@ def adjust_for_wall(func):
         self.produce_placements()
 
     return wrapper
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Workspace(object):
     """Class on which arrangments can be performed."""
@@ -56,6 +59,8 @@ class Workspace(object):
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
                                   key=lambda x: self.pics[x].h)
 
+    # Arrangment methods for workspaces
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     @adjust_for_wall
     def arrange_gallery_display(self):
         """Arranges display for galleries, in rows by descending height."""
@@ -84,6 +89,26 @@ class Workspace(object):
 
             current_row_width += self.pics[p].w
 
+    @adjust_for_wall
+    def arrange_linear(self):
+        """Arrange gallery pictures in horizontal line, vertically centered."""
+
+        mid_index = self.n / 2
+        smaller_pics = self.area_sort[:mid_index]
+        larger_pics = self.area_sort[mid_index:]
+        random.shuffle(smaller_pics)
+        random.shuffle(larger_pics)
+
+        row_width = 0
+
+        for i in range(len(self.pics)):
+            p = larger_pics.pop() if (i % 2 == 0) else smaller_pics.pop()
+            self.pics[p].x1 = row_width
+            self.pics[p].x2 = row_width + self.pics[p].w
+            self.pics[p].y1 = -self.pics[p].h / 2.0
+            self.pics[p].y2 = self.pics[p].h + self.pics[p].y1
+
+            row_width = self.pics[p].x2
 
     @adjust_for_wall
     def arrange_grid(self):
@@ -94,6 +119,61 @@ class Workspace(object):
         self.expand_grid_to_arrangment(pics_in_grid)
 
         self.pull_in_pictures()
+
+    @adjust_for_wall
+    def arrange_column_heuristic(self):
+        """Arrange in columns by a few rules."""
+
+        self.pics_remaining = set(self.pics.keys())
+        self.columns = []
+
+        # Use the largest picture alone
+        self.make_single_column()
+
+        # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
+        # Written as while loop to tolertate small numbers
+        i = 0
+        while (i < (self.n / 7)) and (len(self.pics_remaining) > 5):
+            self.make_nested_column()
+            self.make_stacked_column(random.choice([2, 3]))
+            i += 1
+
+        # Then make stacks as long as possible
+        while len(self.pics_remaining) > 2:
+            self.make_stacked_column(random.choice([2, 3]))
+
+        while len(self.pics_remaining) > 1:
+            self.make_stacked_column(2)
+
+        # Create single columns for the rest of the pictures while testing functionality
+        while self.pics_remaining:
+            self.make_single_column()
+
+        self.combine_columns()
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # Methods supporting grid arrangments
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def random_place_in_grid(self):
+        """Place pics in random grid indicies.
+
+        Returns a dict of tuple keys of grid indicies with pic id values
+        {(i,j): pic}
+        """
+
+        n_grid = int(math.ceil(math.sqrt(self.n)))
+        min_grid = -n_grid/2
+        max_grid = min_grid + n_grid
+
+        grid_pairs = [(i, j) for i in range(min_grid, max_grid)
+                             for j in range(min_grid, max_grid)]
+
+        grid_sample = random.sample(grid_pairs, self.n)
+
+        grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.pics.keys())}
+
+        return grid_pics
 
     def expand_grid_to_arrangment(self, pics_in_grid):
         """From a set of grid indicies produce geometrically valid placements.
@@ -119,7 +199,6 @@ class Workspace(object):
                 if pic_id:
                     # Picture existed at that grid location, place in workspace
                     self.walk_out_to_place(pic_id, (i, j))
-
 
     def walk_out_to_place(self, pic_id, grid):
         """Given a picture and grid location, return valid workspace of placements.
@@ -207,8 +286,7 @@ class Workspace(object):
 
         return move
 
-
-    def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic = None):
+    def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic=None):
         """Check placed pictures, return true if any conflict with this placement."""
 
         # print 'conflict checking- - - -- - - - - - --'
@@ -230,56 +308,10 @@ class Workspace(object):
         # No conflicts found
         return False
 
-    def random_place_in_grid(self):
-        """Place pics in random grid indicies.
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        Returns a dict of tuple keys of grid indicies with pic id values
-        {(i,j): pic}
-        """
-
-        n_grid = int(math.ceil(math.sqrt(self.n)))
-        min_grid = -n_grid/2
-        max_grid = min_grid + n_grid
-
-        grid_pairs = [(i, j) for i in range(min_grid, max_grid) 
-                             for j in range(min_grid, max_grid)]
-
-        grid_sample = random.sample(grid_pairs, self.n)
-
-        grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.pics.keys())}
-
-        return grid_pics
-
-    @adjust_for_wall
-    def arrange_column_heuristic(self):
-        """Arrange in columns by a few rules."""
-
-        self.pics_remaining = set(self.pics.keys())
-        self.columns = []
-
-        # Use the largest picture alone
-        self.make_single_column()
-
-        # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
-        # Written as while loop to tolertate small numbers
-        i = 0
-        while (i < (self.n / 7)) and (len(self.pics_remaining) > 5):
-            self.make_nested_column()
-            self.make_stacked_column(random.choice([2, 3]))
-            i += 1
-
-        # Then make stacks as long as possible
-        while len(self.pics_remaining) > 2:
-            self.make_stacked_column(random.choice([2, 3]))
-
-        while len(self.pics_remaining) > 1:
-            self.make_stacked_column(2)
-
-        # Create single columns for the rest of the pictures while testing functionality
-        while self.pics_remaining:
-            self.make_single_column()
-
-        self.combine_columns()
+    # Methods supporting column arrangments
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def combine_columns(self):
         """Place columns together in a wall.
@@ -414,26 +446,11 @@ class Workspace(object):
             self.pics[pair2].y1 = pair_height - self.pics[pair2].h
             self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
 
-    @adjust_for_wall
-    def arrange_linear(self):
-        """Arrange gallery pictures in horizontal line, vertically centered."""
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        mid_index = self.n / 2
-        smaller_pics = self.area_sort[:mid_index]
-        larger_pics = self.area_sort[mid_index:]
-        random.shuffle(smaller_pics)
-        random.shuffle(larger_pics)
-
-        row_width = 0
-
-        for i in range(len(self.pics)):
-            p = larger_pics.pop() if (i % 2 == 0) else smaller_pics.pop()
-            self.pics[p].x1 = row_width
-            self.pics[p].x2 = row_width + self.pics[p].w
-            self.pics[p].y1 = -self.pics[p].h / 2.0
-            self.pics[p].y2 = self.pics[p].h + self.pics[p].y1
-
-            row_width = self.pics[p].x2
+    # Methods for preparing arranged workspace for use as wall
+    # (used by @adjust_for_wall decorator)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
@@ -468,6 +485,7 @@ class Workspace(object):
         for p in self.pics:
             self.pics[p].remove_margin()
 
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 class Pic(object):
