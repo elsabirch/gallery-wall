@@ -31,6 +31,7 @@ def adjust_for_wall(func):
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+
 class Workspace(object):
     """Class on which arrangments can be performed."""
 
@@ -42,6 +43,8 @@ class Workspace(object):
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
         self.n = len(pictures)
+
+        self.options = options
 
         self.pics = {}
 
@@ -58,6 +61,18 @@ class Workspace(object):
                                  key=lambda x: self.pics[x].w)
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
                                   key=lambda x: self.pics[x].h)
+
+    def arrange(self):
+        """Call arrangment method specified by options"""
+
+        if self.options['algorithm_type'] == 'linear':
+            self.arrange_linear()
+        elif self.options['algorithm_type'] == 'column':
+            self.arrange_column_heuristic()
+        elif self.options['algorithm_type'] == 'expand':
+            self.arrange_grid()
+        else:
+            self.arrange_column_heuristic()
 
     # Arrangment methods for workspaces
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

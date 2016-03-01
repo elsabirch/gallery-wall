@@ -316,16 +316,13 @@ def process_arrangment():
     """Process the arrangement."""
 
     gallery_id = request.form.get('gallery_id')
-
-    arrange_options = {}
+    # margin = request.form.get('margin')
+    algorithm_type = request.form.get('algorithm_type')
+    arrange_options = {'algorithm_type': algorithm_type}
 
     wkspc = Workspace(gallery_id, arrange_options)
 
-    # Arrangement method (Eventually call a single function that will decide
-    # based on the options passed )
-    # wkspc.arrange_linear()
-    wkspc.arrange_grid()
-    # wkspc.arrange_column_heuristic()
+    wkspc.arrange()
 
     wall_id = Wall.init_from_workspace(wkspc)
 
