@@ -84,12 +84,6 @@ class Workspace(object):
 
             current_row_width += self.pics[p].w
 
-            # print self.pics[p].x1
-            # print self.pics[p].x2
-            # print self.pics[p].y1
-            # print self.pics[p].y2
-
-            # print( self.pics[p] )
 
     @adjust_for_wall
     def arrange_grid(self):
@@ -99,24 +93,142 @@ class Workspace(object):
 
         self.expand_grid_to_arrangment(pics_in_grid)
 
+        self.pull_in_pictures()
+
     def expand_grid_to_arrangment(self, pics_in_grid):
         """From a set of grid indicies produce geometrically valid placements.
 
         (grid = relative psuedo locations without geometry)"""
-        # print '*'*80
-        grid_ordered = sorted(pics_in_grid.keys())
-        cols, rows = zip(*grid_ordered)
-        max_i = max(cols)
 
-        # for column # start in the middle
-            # for i in range(0)
-            # for row # start in the middle
+        cols, rows = zip(*pics_in_grid.keys())
+        mag_sort_j = sorted(set(cols), key=abs)
+        mag_sort_i = sorted(set(rows), key=abs)
 
-            #  if at the center just place it (consider detect even number)
+        # Ugh. HTML canvas coordinates:
+        #        ^
+        #  -i,-j | i,-j
+        # <------+------>
+        #  -i,j  | i,j
+        #        v
 
-            # if grid neighbor above/below place at that vertical level
+        for i in mag_sort_i:
+            for j in mag_sort_j:
 
-            # if can move towards center do that
+                pic_id = pics_in_grid.get((i, j), None)
+
+                if pic_id:
+                    # Picture existed at that grid location, place in workspace
+                    self.walk_out_to_place(pic_id, (i, j))
+
+
+    def walk_out_to_place(self, pic_id, grid):
+        """Given a picture and grid location, return valid workspace of placements.
+
+        Method is a walk out diagonally in the roucgh direction of initial grid
+        placement.
+        """
+        pic = self.pics[pic_id]
+        i, j = grid
+
+        print 'placing pic '
+        print pic.picture.display_name
+
+        pic.x1 = j
+        pic.x2 = j + pic.w
+        pic.y1 = i
+        pic.y2 = i + pic.h
+
+        # Parameters for moving this placement until no conflict
+        # Probability of movement in x or y direction at each attempt
+        ratio_i = (abs(i) / float(abs(i)+abs(j))) if (abs(i)+abs(j)) > 0 else 0.5
+        # increments chosen so that position is moved away from origin in given quadrant
+        x_inc = 1 if j > 0 else -1
+        y_inc = 1 if i > 0 else -1
+
+        while self.any_conflict(pic.x1, pic.x2, pic.y1, pic.y2, pic):
+
+            if random.random() < ratio_i:
+                # Move in y direction
+                pic.y1 += y_inc
+                pic.y2 += y_inc
+
+            else:
+                # Move in x direction
+                pic.x1 += x_inc
+                pic.x2 += x_inc
+
+    def pull_in_pictures(self):
+        """From placed workspace, where possible bring pictures towards center.
+
+        Although this code might work on a non-centered arrangmet I suspec the
+        results would be gnarly.
+        """
+        moves = 1
+        count = 0
+
+        while moves > 0 and count < 500:
+
+            moves = 0
+            count += 1
+
+            scrambled_pics = self.pics.keys()
+            random.shuffle(scrambled_pics)
+
+            # Loop through pictures
+            for p in scrambled_pics:
+
+                move = self.pull_in_picture(p)
+
+                if move:
+                    moves += 1
+
+    def pull_in_picture(self, pic_id):
+        """From placed workspace, step single picture towards center if possible.
+
+        Return boolean true if pictures is moved.
+        """
+
+        move = False
+
+        pic = self.pics[pic_id]
+
+        x_inc = -1 if ((pic.x1+pic.x2)/float(2)) > 0 else 1
+        y_inc = -1 if ((pic.y1+pic.y2)/float(2)) > 0 else 1
+
+        # this inhenrently does one move before other, scramble?
+        if not self.any_conflict(pic.x1+x_inc, pic.x2+x_inc, pic.y1, pic.y2, pic):
+            pic.x1 += x_inc
+            pic.x2 += x_inc
+            move = True
+        if not self.any_conflict(pic.x1, pic.x2, pic.y1+y_inc, pic.y2+y_inc, pic):
+            pic.y1 += y_inc
+            pic.y2 += y_inc
+            move = True
+
+        return move
+
+
+    def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic = None):
+        """Check placed pictures, return true if any conflict with this placement."""
+
+        # print 'conflict checking- - - -- - - - - - --'
+        # print self.pics
+
+        # Check each picture in workspace
+        for p in self.pics:
+            pic = self.pics[p]
+            if (pic.x1 is not None) and (pic is not this_pic):
+                # This picture has been placed, so check for conflict
+                if is_conflict(pic.x1, pic.x2, pic.y1, pic.y2,
+                               x1_try, x2_try, y1_try, y2_try):
+                    # Conflicts with attempted placement, fail fast
+
+                    # print 'conflict found with {}'.format(pic)
+
+                    return True
+
+        # No conflicts found
+        return False
 
     def random_place_in_grid(self):
         """Place pics in random grid indicies.
@@ -125,15 +237,14 @@ class Workspace(object):
         {(i,j): pic}
         """
 
-        n_pics = len(self.pics)
-        n_grid = int(math.ceil(math.sqrt(n_pics)))
+        n_grid = int(math.ceil(math.sqrt(self.n)))
         min_grid = -n_grid/2
         max_grid = min_grid + n_grid
 
         grid_pairs = [(i, j) for i in range(min_grid, max_grid) 
                              for j in range(min_grid, max_grid)]
 
-        grid_sample = random.sample(grid_pairs, n_pics)
+        grid_sample = random.sample(grid_pairs, self.n)
 
         grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.pics.keys())}
 
@@ -399,12 +510,12 @@ class Pic(object):
     def __repr__(self):
         """Representation format for output."""
 
-        return "<{:s}, x1: {:.1f} x2: {:.1f} y1: {:.1f} y2: {:.1f}>".format(
+        return "<{}, x1: {} x2: {} y1: {} y2: {}>".format(
             self.picture.display_name,
-            self.x1,
-            self.x2,
-            self.y1,
-            self.y2)
+            '{:.1f}'.format(self.x1) if isinstance(self.x1, float) else str(self.x1),
+            '{:.1f}'.format(self.x2) if isinstance(self.x2, float) else str(self.x2),
+            '{:.1f}'.format(self.y1) if isinstance(self.y1, float) else str(self.y1),
+            '{:.1f}'.format(self.y2) if isinstance(self.y2, float) else str(self.y2))
 
     def remove_margin(self):
         """Adjusts placement to that used for actual picture without margin.
@@ -435,4 +546,41 @@ class Pic(object):
         # also adjust the values of x2 and y2 (Could also adjust width/height here)
         self.x2 += - width_padding
         self.y2 += - height_padding
+
+
+def is_conflict(x1_a, x2_a, y1_a, y2_a, x1_b, x2_b, y1_b, y2_b):
+    """Check if the rectangles a and b described by the input coordinates overlap.
+
+        >>> is_conflict(1, 2, 1, 2, 1, 2, 1, 2)
+        True
+
+        >>> is_conflict(1, 2, 1, 2, -2, -1, -2, -1)
+        False
+
+        >>> is_conflict(1, 10, 1, 10, 2, 4, 2, 4)
+        True
+
+        >>> is_conflict(2, 4, 2, 4, 1, 10, 1, 10,)
+        True
+
+        >>> is_conflict(1, 10, 1, 10, 2, 4, 6, 11)
+        True
+
+        >>> is_conflict(2, 4, 6, 11, 1, 10, 1, 10)
+        True
+
+        >>> is_conflict(0, 11, -1, 8, -1, 9, 0, 12)
+        True
+
+
+    """
+
+    if ((((x1_a <= x1_b <= x2_a) or (x1_a <= x2_b <= x2_a)) and
+         ((y1_a <= y1_b <= y2_a) or (y1_a <= y2_b <= y2_a)))
+        or
+        (((x1_b <= x1_a <= x2_b) or (x1_b <= x2_a <= x2_b)) and
+         ((y1_b <= y1_a <= y2_b) or (y1_b <= y2_a <= y2_b)))):
+        return True
+    else:
+        return False
 
