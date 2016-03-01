@@ -50,7 +50,10 @@ function hangWall(wallToHang){
     var picturesToHangOrdered = getHangOrder(wallToHang.pictures_to_hang);
 
     if (wallToHang.is_gallery){
-        drawFloor(context);
+        var firstPicture = wallToHang.pictures_to_hang[picturesToHangOrdered[0]];
+        var nearBottomFirstPicture = (firstPicture.y * wallToCanvas.scale + wallToCanvas.y_offset +
+                                  firstPicture.height * wallToCanvas.scale * 0.9);
+        drawFloor(context, nearBottomFirstPicture);
     }
 
     for (var i=0; i < picturesToHangOrdered.length; i++){
@@ -130,9 +133,9 @@ function hangEmptyPicture(context, xForCanvas, yForCanvas, wForCanvas, hForCanva
     // context.stroke();
 }
 
-function drawFloor(ctx){
+function drawFloor(ctx, hFloor){
     var wFloor = 900;
-    var hFloor = 150;
+    // var hFloor = 150;
     var dFloor = 60;
 
     var x = 0;

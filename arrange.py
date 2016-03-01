@@ -63,7 +63,7 @@ class Workspace(object):
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     @adjust_for_wall
     def arrange_gallery_display(self):
-        """Arranges display for galleries, in rows by descending height."""
+        """Arranges display for galleries, in rows by descending height, aligned top."""
 
         total_width = sum([self.pics[p].w for p in self.pics])
         gallery_width = (total_width / 2.0) + (total_width / self.n)
@@ -91,10 +91,14 @@ class Workspace(object):
 
     @adjust_for_wall
     def arrange_gallery_display_floor(self):
-        """Arranges display for galleries, in rows by descending height."""
+        """Arranges display for galleries, in rows by descending height, aligned bottom."""
 
+        # Make two rows if many pictures, one row if not
         total_width = sum([self.pics[p].w for p in self.pics])
-        gallery_width = (total_width / 2.0) + (total_width / self.n)
+        if self.n < 10:
+            gallery_width = (total_width) + (total_width / self.n)
+        else:
+            gallery_width = (total_width / 2.0) + (total_width / self.n)
 
         self.height_sort.reverse()
 
