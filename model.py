@@ -236,6 +236,7 @@ class Wall(db.Model):
                         'height': self.wall_height,
                         'width': self.wall_width,
                         'pictures_to_hang': pictures_to_hang,
+                        'is_gallery': self.gallery_display,
                         }
 
         return hanging_info

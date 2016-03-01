@@ -106,14 +106,12 @@ class Workspace(object):
         for p in self.height_sort:
             # Start a new row if this one is full
             if (current_row_width + self.pics[p].w) > gallery_width:
-                # current_row_top = gallery_height
                 gallery_height += self.pics[p].h
                 current_row_width = 0 # random.choice([-4,4])
                 current_row_base = gallery_height
 
             self.pics[p].x1 = current_row_width
             self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
-             # = current_row_top
             self.pics[p].y2 = current_row_base
             self.pics[p].y1 = self.pics[p].y2 - self.pics[p].h
 

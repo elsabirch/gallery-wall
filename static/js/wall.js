@@ -49,6 +49,10 @@ function hangWall(wallToHang){
 
     var picturesToHangOrdered = getHangOrder(wallToHang.pictures_to_hang);
 
+    if (wallToHang.is_gallery){
+        drawFloor(context);
+    }
+
     for (var i=0; i < picturesToHangOrdered.length; i++){
         // console.log("---"+picture);
         var picture = picturesToHangOrdered[i];
@@ -77,11 +81,10 @@ function hangPicture(context, picture, wallToCanvas){
         };
         imageObj.onerror = function() {
            // If image not loaded draw rectangle
-            context.strokeRect(xForCanvas, yForCanvas, wForCanvas, hForCanvas);
+            hangEmptyPicture(context, xForCanvas, yForCanvas, wForCanvas, hForCanvas);
         };
     } else {
-        // Draw a rectangle in case there is no image
-        context.strokeRect(xForCanvas, yForCanvas, wForCanvas, hForCanvas);
+        hangEmptyPicture(context, xForCanvas, yForCanvas, wForCanvas, hForCanvas);
     }
 }
 
@@ -114,4 +117,54 @@ function getHangOrder(picturesToHang){
     );
 
     return pictureKeys;
+}
+
+function hangEmptyPicture(context, xForCanvas, yForCanvas, wForCanvas, hForCanvas){
+    
+    context.fillStyle = '#A9A9A9';
+    context.fillRect(xForCanvas, yForCanvas, wForCanvas, hForCanvas);
+    // context.stroke();
+    context.strokeStyle = '#000000';
+    context.lineWidth = 2;
+    context.strokeRect(xForCanvas, yForCanvas, wForCanvas, hForCanvas);
+    // context.stroke();
+}
+
+function drawFloor(ctx){
+    var wFloor = 900;
+    var hFloor = 150;
+    var dFloor = 60;
+
+    var x = 0;
+    var v = 0;
+    while(x < (900 + dFloor)){
+        x = x + 15;
+        v = dFloor * 0.1 * Math.random();
+        ctx.beginPath();
+        ctx.moveTo(x,hFloor);
+        ctx.lineTo(x-dFloor-v,hFloor+dFloor+v);
+        ctx.strokeStyle="#999999";
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    x = 0;
+    while(x < (900 + dFloor)){
+        x = x + 15;
+        v = dFloor * 0.1 * Math.random();
+        ctx.beginPath();
+        ctx.moveTo(x,hFloor);
+        ctx.lineTo(x,(hFloor-dFloor*0.5+v));
+        ctx.strokeStyle="#ECECEC";
+        ctx.stroke();
+        ctx.closePath();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(0,hFloor);
+    ctx.lineTo(wFloor,hFloor);
+    ctx.strokeStyle="#4B4B4B";
+    ctx.stroke();
+    ctx.closePath();
+
 }
