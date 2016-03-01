@@ -47,14 +47,16 @@ function hangWall(wallToHang){
 
     var wallToCanvas = getWallDisplayScale(wallToHang);
 
-    for (var picture in wallToHang.pictures_to_hang){
+    var picturesToHangOrdered = getHangOrder(wallToHang.pictures_to_hang);
+
+    for (var i=0; i < picturesToHangOrdered.length; i++){
         // console.log("---"+picture);
-        hangPicture(canvas, context, wallToHang.pictures_to_hang[picture], wallToCanvas);
+        var picture = picturesToHangOrdered[i];
+        hangPicture(context, wallToHang.pictures_to_hang[picture], wallToCanvas);
     }
 }
 
-
-function hangPicture(canvas, context, picture, wallToCanvas){
+function hangPicture(context, picture, wallToCanvas){
     // Draw picture on a wall in placement.
 
     // Convert placement coordinates and size to canvas size
@@ -103,3 +105,13 @@ function getWallDisplayScale(wallToHang){
     return wallToCanvas;
 }
 
+function getHangOrder(picturesToHang){
+    var pictureKeys = Object.keys(picturesToHang);
+
+    pictureKeys.sort(function(x,y){
+        return Math.sign(picturesToHang[y].height - picturesToHang[x].height);
+    }
+    );
+
+    return pictureKeys;
+}
