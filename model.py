@@ -109,7 +109,6 @@ class Gallery(db.Model):
             lazy_load_of_workspace()
             wkspc = Workspace(self.gallery_id, arrange_options)
             wkspc.arrange_gallery_display()
-            wkspc.readjust_for_wall()
 
             wall_id = Wall.init_from_workspace(wkspc)
 

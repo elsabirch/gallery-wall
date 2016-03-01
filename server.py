@@ -327,9 +327,6 @@ def process_arrangment():
     # wkspc.arrange_grid()
     wkspc.arrange_column_heuristic()
 
-    # Readjust for the wall
-    wkspc.readjust_for_wall()
-
     wall_id = Wall.init_from_workspace(wkspc)
 
     return redirect(url_for('show_new_wall', wall_id=wall_id))

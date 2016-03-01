@@ -7,15 +7,25 @@ import model
 
 DEFAULT_MARGIN = 2
 
-# Decorator as an instance method
-def decorator1(func):
-    # @wraps(func)
+# Decorator for instance methods
+def adjust_for_wall(func):
+
+    # This decorator does not have access to instance
+
+    @wraps(func)
     def wrapper(self):
-        print('Decorator 1 on your functionality!!!!!')
+
+        # This wrapper does have access to instance
+        
+        # Calling the arrangement function
         func(self)
-        print 'more stuff after your function ran {}'.format(self.gallery_id)
-        # return func()
-    # print('look I also have selfy stuff in the decorator {}'.format(self.gallery_id))
+
+        # These calls readjust the workspace to the origin, calculate precise
+        # placments for wall hanging, and save other information for display
+        self.realign_to_origin()
+        self.get_wall_size()
+        self.produce_placements()
+
     return wrapper
 
 class Workspace(object):
@@ -46,23 +56,7 @@ class Workspace(object):
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
                                   key=lambda x: self.pics[x].h)
 
-    # # Decorator as an instance method
-    # def decorator1(self, func):
-    #     # @wraps(func)
-    #     def wrapper():
-    #         print('Decorator 1 on your functionality!!!!!')
-    #         func()
-    #         print 'more stuff after your function ran'
-    #         # return func()
-    #     print('look I also have selfy stuff in the decorator {}'.format(self.gallery_id))
-    #     return wrapper
-
-    # # a = Workspace()
-
-    @decorator1
-    def simple_lil_fn(self):
-        print "look I'm a workspace of gallery {}".format(self.gallery_id)
-
+    @adjust_for_wall
     def arrange_gallery_display(self):
         """Arranges display for galleries, in rows by descending height."""
 
@@ -97,6 +91,7 @@ class Workspace(object):
 
             # print( self.pics[p] )
 
+    @adjust_for_wall
     def arrange_grid(self):
         """Arrangment via an initial placement in a grid."""
 
@@ -144,6 +139,7 @@ class Workspace(object):
 
         return grid_pics
 
+    @adjust_for_wall
     def arrange_column_heuristic(self):
         """Arrange in columns by a few rules."""
 
@@ -307,6 +303,7 @@ class Workspace(object):
             self.pics[pair2].y1 = pair_height - self.pics[pair2].h
             self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
 
+    @adjust_for_wall
     def arrange_linear(self):
         """Arrange gallery pictures in horizontal line, vertically centered."""
 
@@ -326,22 +323,6 @@ class Workspace(object):
             self.pics[p].y2 = self.pics[p].h + self.pics[p].y1
 
             row_width = self.pics[p].x2
-
-    def readjust_for_wall(self):
-        """Readjust coordinates to + quadrant, and remove margins from pictures."""
-
-        # These calls readjust the workspace to the origin, calculate precise
-        # placments for wall hanging, and save other information for display
-        self.realign_to_origin()
-        self.get_wall_size()
-        self.produce_placements()
-
-        
-        # # testing ground
-        self.simple_lil_fn()
-        # self.simple_lil_fn = self.decorator1(self.simple_lil_fn)
-
-        # self.simple_lil_fn()
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
