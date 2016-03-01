@@ -1,12 +1,22 @@
 import math
 import random
+from functools import wraps
 
 # Note: unable to import Gallery from model specifically because model imports arrange too
 import model
 
 DEFAULT_MARGIN = 2
 
-
+# Decorator as an instance method
+def decorator1(func):
+    # @wraps(func)
+    def wrapper(self):
+        print('Decorator 1 on your functionality!!!!!')
+        func(self)
+        print 'more stuff after your function ran {}'.format(self.gallery_id)
+        # return func()
+    # print('look I also have selfy stuff in the decorator {}'.format(self.gallery_id))
+    return wrapper
 
 class Workspace(object):
     """Class on which arrangments can be performed."""
@@ -35,6 +45,23 @@ class Workspace(object):
                                  key=lambda x: self.pics[x].w)
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
                                   key=lambda x: self.pics[x].h)
+
+    # # Decorator as an instance method
+    # def decorator1(self, func):
+    #     # @wraps(func)
+    #     def wrapper():
+    #         print('Decorator 1 on your functionality!!!!!')
+    #         func()
+    #         print 'more stuff after your function ran'
+    #         # return func()
+    #     print('look I also have selfy stuff in the decorator {}'.format(self.gallery_id))
+    #     return wrapper
+
+    # # a = Workspace()
+
+    @decorator1
+    def simple_lil_fn(self):
+        print "look I'm a workspace of gallery {}".format(self.gallery_id)
 
     def arrange_gallery_display(self):
         """Arranges display for galleries, in rows by descending height."""
@@ -308,6 +335,13 @@ class Workspace(object):
         self.realign_to_origin()
         self.get_wall_size()
         self.produce_placements()
+
+        
+        # # testing ground
+        self.simple_lil_fn()
+        # self.simple_lil_fn = self.decorator1(self.simple_lil_fn)
+
+        # self.simple_lil_fn()
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
