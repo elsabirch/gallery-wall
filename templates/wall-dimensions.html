@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+
+<p>How to hang you wall!</p>
+
+<div class='wall-display' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
+    <p> Wall {{wall_id}} Display: </p>
+    <canvas id='canvas{{wall_id}}' height='300' width='900'> 
+        If you dont have HTML5 canvas, you're gonna have a bad time.
+    </canvas>
+
+</div>
+
+<div class='row'>
+    <div class="col-xs-12 col-md-6 col-md-offset-3">
+        <table class="table table-striped">
+          <tr>
+            <th>Picture</th>
+            <th>From top (inches)</th>
+            <th>From left (inches)</th>
+            <!-- <th>Width and Height (inches)</th> -->
+          </tr>
+          {% for placement in placements %}
+              <tr>
+                <td>{{ placement.picture.display_name.title() }}</td>
+                <td>{{ placement.y_coord }}</td>
+                <td>{{ placement.x_coord }}</td>
+                <!-- <td> Placeholder </td> -->
+              </tr>
+          {% endfor %}
+        </table>
+    </div>
+</div>
+
+</div> <!-- /container -->
+
+<script src="/static/js/wall.js"></script>
+
+{% endblock %}
