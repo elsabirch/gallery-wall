@@ -1,7 +1,3 @@
-import os
-import boto3
-import re
-import random
 
 from flask import (Flask, render_template, jsonify, url_for,
                    request, redirect, flash, session)
@@ -13,6 +9,7 @@ from arrange import Workspace
 
 import settings
 import secrets
+import utilities as ut
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -55,10 +52,7 @@ def index():
 
 @app.route('/navigation')
 def navigation():
-    """Navigate to various functional pages after login/guest.
-
-    May be incorperated as navbar later.
-    """
+    """Navigate to various functional pages after login/guest."""
 
     return render_template("navigation.html")
 
@@ -74,24 +68,14 @@ def prompt_login():
 def process_login():
     """Handle form submission for login process."""
 
-    attempted_username = request.form.get('username').strip().lower()
-    attempted_password = request.form.get('password')
+    login_success = ut.attempt_login()
 
-    user = User.query.filter(User.username == attempted_username).first()
-
-    if (user is None) or not attempted_username:
-        flash("Nonexistent user. Please retry log in.")
-        return redirect('/login')
-
-    elif attempted_password == user.password:
-        session['user_id'] = user.user_id
-        session['username'] = user.username
-
-        flash("Successful log in! Welcome {}.".format(user.username))
+    if login_success:
+        flash('Welcome {}!'.format(session['username']))
         return redirect('/navigation')
 
     else:
-        flash("Invalid password.")
+        flash("Something about that login attempt was invalid.")
         return redirect('/login')
 
 
@@ -99,25 +83,14 @@ def process_login():
 def process_signup():
     """Handle form submission for signup process."""
 
-    attempted_username = request.form.get('username').strip().lower()
-    attempted_email = request.form.get('email')
-    attempted_password = request.form.get('password')
+    signup_success = ut.attempt_signup()
 
-    user = User.query.filter(User.username == attempted_username).first()
-
-    if (user is None) and attempted_username:
-        # User not already existing, and a username was entered
-        user = User(username=attempted_username,
-                    email=attempted_email,
-                    password=attempted_password)
-        db.session.add(user)
-        db.session.commit()
-
+    if signup_success:
         flash("Sign up successful! Now log in.")
         return redirect('/login')
 
     else:
-        flash("Invalid sign up attempt.")
+        flash("Something about that login attempt was invalid.")
         return redirect('/login')
 
 
@@ -142,105 +115,15 @@ def input_upload():
 @app.route('/upload-process', methods=["POST"])
 def process_upload():
 
-    filename_provided = pictures.save(request.files['picture'])
+    upload_success = ut.attempt_upload()
 
-    width = to_float_from_input(request.form.get('width'))
-    height = to_float_from_input(request.form.get('height'))
-    name = to_clean_string_from_input(request.form.get('name'), 100)
-    # TODO: Validate hight/width roughly match image, are positive and nonzero
-
-    user_id = session.get('user_id', None)
-
-    if filename_provided and width and height and user_id:
-
-        picture = Picture(user_id=user_id, width=width, height=height)
-        if name:
-            picture.picture_name = name
-        db.session.add(picture)
-        db.session.flush()
-
-        # Rename file after adding so that the picture_id can be used,
-        # this may not really be neccesary to include in the file name.
-        filename = rename_picture_on_server(filename_provided, picture.picture_id)
-        url = move_picture_to_cloud(filename)
-        picture.image_file = url
-        db.session.commit()
-
-        # TODO: redirect to pictures page instead
-        flash('Image {} sucsessfully uploaded!'.format(filename_provided))
-
+    if upload_success:
+        flash('Image sucsessfully uploaded!')
         return redirect('/curate')
 
     else:
         flash('Something about the upload did not work.')
         return redirect('/upload')
-
-
-def move_picture_to_cloud(filename):
-    """Uploads file to s3, deletes from server, returns url for picture."""
-
-    folder_server = app.config['UPLOADED_PICTURES_DEST']
-
-    client = boto3.client('s3')
-    transfer = boto3.s3.transfer.S3Transfer(client)
-
-    transfer.upload_file('{}/{}'.format(folder_server, filename),
-                         BUCKET_S3,
-                         '{}/{}'.format(FOLDER_S3, filename),
-                         extra_args={'ACL': 'public-read'})
-
-    uploaded = '{}/{}/{}'.format(client.meta.endpoint_url,
-                                 BUCKET_S3,
-                                 '{}/{}'.format(FOLDER_S3, filename))
-
-    os.remove('{}/{}'.format(folder_server, filename))
-
-    return uploaded
-
-
-def rename_picture_on_server(filename_provided, picture_id):
-    """Rename picture using id and random number, returns new name."""
-
-    extension = filename_provided[filename_provided.find('.'):]
-    unpredictable = random.randint(100000, 999999)
-    filename = 'picture{:d}_{:d}{:s}'.format(picture_id,
-                                             unpredictable,
-                                             extension)
-
-    folder_server = app.config['UPLOADED_PICTURES_DEST']
-    os.rename('{}/{}'.format(folder_server, filename_provided),
-              '{}/{}'.format(folder_server, filename))
-
-    return filename
-
-
-def to_float_from_input(input_string):
-    """From an input text string return the first float found otherwise None."""
-
-    input_string.strip()
-
-    match = re.search('(\-)?\d+(\.\d+)?', input_string)
-    if match:
-        return float(match.group(0))
-    else:
-        return
-
-
-def to_clean_string_from_input(input_string, max_length):
-    """Clean a string to only alphanumeric, and limit to input length.
-
-    >>> to_clean_string_from_input('foo*', 10)
-    'foo'
-
-    """
-
-    clean_string = re.sub('\W', '', input_string)
-    if len(clean_string) >= max_length:
-        clean_string = clean_string[:max_length]
-    elif len(clean_string) == 0:
-        clean_string = None
-
-    return clean_string
 
 
 @app.route('/curate')
@@ -256,8 +139,7 @@ def show_pictures():
 
     all_pictures = pictures + pictures_public
 
-    return render_template('curate.html',
-                           user_pictures=all_pictures)
+    return render_template('curate.html', user_pictures=all_pictures)
 
 
 @app.route('/process-curation', methods=["POST"])
