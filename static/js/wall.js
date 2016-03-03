@@ -18,6 +18,21 @@ for(var i=0; i < wallIds.length; i++){
     getWall(wallIds[i]);
 }
 
+
+// In the case that this is the arrangment page, set up a bunch of other functionanality
+
+// save state of which walls have been genrated in this visit to the page
+
+// Listen for click on one of the arrangment icons
+    // clear canvas and redraw if already generated
+    // if not already there then request an arrangment and then plot
+
+// listen for click on refresh buttons which would prompt a new arrangment and 
+// reset of the state for each arrangemnet type
+
+
+// - - - - - - - - - - - - - - - - - -
+
 // Functions to handle getting wall info from server, then plotting it in canvas
 
 function getWall(wallId){
@@ -169,5 +184,4 @@ function drawFloor(ctx, hFloor){
     ctx.strokeStyle="#4B4B4B";
     ctx.stroke();
     ctx.closePath();
-
 }
