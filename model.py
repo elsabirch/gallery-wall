@@ -4,9 +4,16 @@ from flask_sqlalchemy import SQLAlchemy
 # import arrange
 
 def lazy_load_of_workspace():
+    print 'lazy loading'
     global Workspace
+    global GalleryFloorArranger
+    # import arrange as ar
+
     from arrange import Workspace as _Workspace
+    from arrange import GalleryFloorArranger as _GalleryFloorArranger
     Workspace = _Workspace
+    GalleryFloorArranger = _GalleryFloorArranger
+    # import arrange as ar
 
 db = SQLAlchemy()
 
@@ -107,8 +114,10 @@ class Gallery(db.Model):
             arrange_options = {}
 
             lazy_load_of_workspace()
-            wkspc = Workspace(self.gallery_id, arrange_options)
-            wkspc.arrange_gallery_display_floor()
+            wkspc = Workspace(self.gallery_id)
+            arr = GalleryFloorArranger(wkspc)
+            arr.arrange()
+            # wkspc.arrange_gallery_display_floor()
 
             wall_id = Wall.init_from_workspace(wkspc)
 

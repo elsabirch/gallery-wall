@@ -9,7 +9,7 @@ from jinja2 import StrictUndefined
 from flask.ext.uploads import UploadSet, IMAGES, configure_uploads
 
 from model import User, Picture, Gallery, Wall, Placement, connect_to_db, db
-from arrange import Workspace
+from arrange import Workspace, Arranger
 
 import settings
 import secrets
@@ -314,6 +314,16 @@ def prompt_arrangment():
 @app.route('/arrange-o-matic', methods=["POST"])
 def process_arrangment():
     """Process the arrangement."""
+
+    # Logic from current workspace aranger to use here as interface patch
+    # if self.options['algorithm_type'] == 'linear':
+    #             self.arrange_linear()
+    #         elif self.options['algorithm_type'] == 'column':
+    #             self.arrange_column_heuristic()
+    #         elif self.options['algorithm_type'] == 'expand':
+    #             self.arrange_grid()
+    #         else:
+    #             self.arrange_column_heuristic()
 
     gallery_id = request.form.get('gallery_id')
     # margin = request.form.get('margin')

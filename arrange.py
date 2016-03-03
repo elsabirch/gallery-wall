@@ -30,21 +30,105 @@ def adjust_for_wall(func):
     return wrapper
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class Arranger(object):
+    """Arranges items in a workspace. Base class"""
 
+    def __init__(self, workspace):
+
+        self.ws = workspace
+
+
+        # TODO: Arrangment tracking that is calc'ed once from workspace stuff
+        # pics left to place
+
+    def realign_to_origin(self):
+        """Shift all placements to positive quadrant with origin upper left."""
+
+        x1s = [self.ws.pics[p].x1 for p in self.ws.pics]
+        y1s = [self.ws.pics[p].y1 for p in self.ws.pics]
+
+        x_shift = -min(x1s)
+        y_shift = -min(y1s)
+
+        for pic in self.ws.pics:
+            self.ws.pics[pic].x1 += x_shift
+            self.ws.pics[pic].x2 += x_shift
+            self.ws.pics[pic].y1 += y_shift
+            self.ws.pics[pic].y2 += y_shift
+
+    def get_wall_size(self):
+        """Assgins as attributes the total wall height and width."""
+
+        x1s = [self.ws.pics[p].x1 for p in self.ws.pics]
+        x2s = [self.ws.pics[p].x2 for p in self.ws.pics]
+        y1s = [self.ws.pics[p].y1 for p in self.ws.pics]
+        y2s = [self.ws.pics[p].y2 for p in self.ws.pics]
+
+        # If already adjusted to origin the second term of each expression is unnecesary
+        self.ws.width = max(x2s) - min(x1s)
+        self.ws.height = max(y2s) - min(y1s)
+
+    # TODO: RENAME THIS!!!!
+    def produce_placements(self):
+        """Convert coordinates: remove rounding and margins used for placement."""
+
+        for p in self.ws.pics:
+            self.ws.pics[p].remove_margin()
+
+
+    # Methods to get over all that 'find the little ones' junk code
+    # def get_small()
+
+class GalleryFloorArranger(Arranger):
+    """Arranges display for galleries, in rows by descending height, aligned bottom."""
+
+    @adjust_for_wall
+    def arrange(self):
+        """Arranges display for galleries, in rows by descending height, aligned bottom."""
+
+        # Make two rows if many pictures, one row if not
+        total_width = sum([self.ws.pics[p].w for p in self.ws.pics])
+        if self.ws.n < 10:
+            gallery_width = (total_width) + (total_width / self.ws.n)
+        else:
+            gallery_width = (total_width / 2.0) + (total_width / self.ws.n)
+
+        self.ws.height_sort.reverse()
+
+        gallery_height = self.ws.pics[self.ws.height_sort[0]].h
+        current_row_width = 0
+        current_row_base = gallery_height
+
+        # Set pictures in rows
+        for p in self.ws.height_sort:
+            # Start a new row if this one is full
+            if (current_row_width + self.ws.pics[p].w) > gallery_width:
+                gallery_height += self.ws.pics[p].h
+                current_row_width = 0 # random.choice([-4,4])
+                current_row_base = gallery_height
+
+            self.ws.pics[p].x1 = current_row_width
+            self.ws.pics[p].x2 = self.ws.pics[p].x1 + self.ws.pics[p].w
+            self.ws.pics[p].y2 = current_row_base
+            self.ws.pics[p].y1 = self.ws.pics[p].y2 - self.ws.pics[p].h
+
+            current_row_width += self.ws.pics[p].w
 
 class Workspace(object):
     """Class on which arrangments can be performed."""
 
-    def __init__(self, gallery_id, options):
+    def __init__(self, gallery_id):
         """Constructor from picture list."""
 
         pictures = model.Gallery.query.get(gallery_id).pictures
+
+        options = {}
 
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
         self.n = len(pictures)
 
-        self.options = options
+        # self.options = options
 
         self.pics = {}
 
@@ -62,17 +146,24 @@ class Workspace(object):
         self.height_sort = sorted([self.pics[p].id for p in self.pics],
                                   key=lambda x: self.pics[x].h)
 
-    def arrange(self):
-        """Call arrangment method specified by options"""
+    # def arrange(self):
+    #     """Call arrangment method specified by options"""
 
-        if self.options['algorithm_type'] == 'linear':
-            self.arrange_linear()
-        elif self.options['algorithm_type'] == 'column':
-            self.arrange_column_heuristic()
-        elif self.options['algorithm_type'] == 'expand':
-            self.arrange_grid()
-        else:
-            self.arrange_column_heuristic()
+    #     if self.options['algorithm_type'] == 'linear':
+    #         self.arrange_linear()
+    #     elif self.options['algorithm_type'] == 'column':
+    #         self.arrange_column_heuristic()
+    #     elif self.options['algorithm_type'] == 'expand':
+    #         self.arrange_grid()
+    #     else:
+    #         self.arrange_column_heuristic()
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+
 
     # Arrangment methods for workspaces
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -198,6 +289,8 @@ class Workspace(object):
 
         self.combine_columns()
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
 
     # Methods supporting grid arrangments
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -611,6 +704,9 @@ class Pic(object):
         # also adjust the values of x2 and y2 (Could also adjust width/height here)
         self.x2 += - width_padding
         self.y2 += - height_padding
+
+
+# class IntrospectivePictureSet(Object):
 
 
 def is_conflict(x1_a, x2_a, y1_a, y2_a, x1_b, x2_b, y1_b, y2_b):
