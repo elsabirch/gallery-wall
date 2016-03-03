@@ -382,6 +382,11 @@ def show_time():
 
     return render_template('time.html')
 
+@app.route('/time-spark')
+def show_time_spark():
+    """For display of time tracked durring project."""
+
+    return render_template('time-spark.html')
 
 # Routes returning json data
 
@@ -432,6 +437,16 @@ def get_time_data():
     from timetrack.time_track import get_time
 
     plots = get_time()
+
+    return jsonify(plots)
+
+@app.route('/gettimespark.json')
+def get_time_spark_data():
+    """Get data from time tracking file."""
+
+    from timetrack.time_track import get_time_spark
+
+    plots = get_time_spark()
 
     return jsonify(plots)
 

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container">
+
+<!-- Total time plotting -->
+
+<div class='row' id="total-plots">
+    <div class='col-xs-12'> 
+        <h3>Total Time</h3>
+        <h5>All plots are shown on the same normalized scale.</h5> 
+    </div>
+
+</div>
+
+<hr>
+
+<div class='row' id="activity-plots">
+    <div class='col-xs-12'> 
+        <h3>Activities - What I was was doing.</h3>
+    </div>
+</div>
+
+<hr>
+
+<div class='row' id="feature-plots">
+    <div class='col-xs-12'> 
+        <h3>Features - What I was working on.</h3>
+    </div>
+</div>
+
+
+</div> <!-- /container -->
+
+<script src="/static/js/timeplot-spark.js"></script>
+
+{% endblock %}
