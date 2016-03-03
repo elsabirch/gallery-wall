@@ -49,8 +49,18 @@ class Arranger(object):
                                  key=lambda x: self.ws.pics[x].w)
         self.height_sort = sorted([self.ws.pics[p].id for p in self.ws.pics],
                                   key=lambda x: self.ws.pics[x].h)
-        # Methods to get over all that 'find the little ones' junk code
-        # ex: def get_small()
+
+    # Methods to get over all that 'find the little ones' junk code
+    # ex: def get_small()
+
+    def pop_tallest():
+        """Return tallest picture reminaing, and remove from list of those remaining."""
+
+        for p in self.height_sort:
+            if p in self.pics_remaining:
+                self.pics_remaining.remove(p)
+                return p
+
 
     # Methods used for each arrangement (so far)
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -147,14 +157,15 @@ class GalleryFloorArranger(Arranger):
         else:
             gallery_width = (total_width / 2.0) + (total_width / self.ws.n)
 
-        self.ws.height_sort.reverse()
-
-        gallery_height = self.ws.pics[self.ws.height_sort[0]].h
+        gallery_height = self.ws.pics[self.ws.height_sort[-1]].h
         current_row_width = 0
         current_row_base = gallery_height
 
         # Set pictures in rows
-        for p in self.ws.height_sort:
+        while self.pics_remaining:
+
+            p = self.pop_tallest()
+
             # Start a new row if this one is full
             if (current_row_width + self.ws.pics[p].w) > gallery_width:
                 gallery_height += self.ws.pics[p].h
