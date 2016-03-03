@@ -9,10 +9,10 @@ from jinja2 import StrictUndefined
 from flask.ext.uploads import UploadSet, IMAGES, configure_uploads
 
 from model import User, Picture, Gallery, Wall, Placement, connect_to_db, db
-from arrange import Workspace, Arranger
 
 import settings
 import secrets
+import arrange as ar
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -315,24 +315,25 @@ def prompt_arrangment():
 def process_arrangment():
     """Process the arrangement."""
 
-    # Logic from current workspace aranger to use here as interface patch
-    # if self.options['algorithm_type'] == 'linear':
-    #             self.arrange_linear()
-    #         elif self.options['algorithm_type'] == 'column':
-    #             self.arrange_column_heuristic()
-    #         elif self.options['algorithm_type'] == 'expand':
-    #             self.arrange_grid()
-    #         else:
-    #             self.arrange_column_heuristic()
 
     gallery_id = request.form.get('gallery_id')
     # margin = request.form.get('margin')
+    wkspc = ar.Workspace(gallery_id)
+
     algorithm_type = request.form.get('algorithm_type')
-    arrange_options = {'algorithm_type': algorithm_type}
 
-    wkspc = Workspace(gallery_id, arrange_options)
+    if algorithm_type == 'linear':
+        arr = ar.LinearArranger(wkspc)
+    elif algorithm_type == 'column':
+        arr = ar.ColumnArranger(wkspc)
+    elif algorithm_type == 'expand':
+        arr = ar.GridArrangement(wkspc)
+    else:
+        # Default to column arrangement
+        arr = ar.ColumnArranger(wkspc)
 
-    wkspc.arrange()
+    # arr = ar.ColumnArranger(wkspc)
+    arr.arrange()
 
     wall_id = Wall.init_from_workspace(wkspc)
 

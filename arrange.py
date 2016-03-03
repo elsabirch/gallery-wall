@@ -25,11 +25,11 @@ def adjust_for_wall(func):
         # placments for wall hanging, and save other information for display
         self.realign_to_origin()
         self.get_wall_size()
-        self.produce_placements()
+        self.remove_margins()
 
     return wrapper
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Arranger(object):
     """Arranges items in a workspace. Base class"""
 
@@ -37,9 +37,23 @@ class Arranger(object):
 
         self.ws = workspace
 
-
         # TODO: Arrangment tracking that is calc'ed once from workspace stuff
-        # pics left to place
+        self.pics_remaining = set(self.ws.pics.keys())
+
+        # TODO: reimplement
+        # Because it is common to need the largest, tallest, smallest, etc,
+        # prepare these ahead fo time for the workspace
+        self.area_sort = sorted([self.ws.pics[p].id for p in self.ws.pics],
+                                key=lambda x: self.ws.pics[x].a)
+        self.width_sort = sorted([self.ws.pics[p].id for p in self.ws.pics],
+                                 key=lambda x: self.ws.pics[x].w)
+        self.height_sort = sorted([self.ws.pics[p].id for p in self.ws.pics],
+                                  key=lambda x: self.ws.pics[x].h)
+    # Methods to get over all that 'find the little ones' junk code
+    # def get_small()
+
+    # Methods used for each arrangement (so far)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     def realign_to_origin(self):
         """Shift all placements to positive quadrant with origin upper left."""
@@ -68,16 +82,61 @@ class Arranger(object):
         self.ws.width = max(x2s) - min(x1s)
         self.ws.height = max(y2s) - min(y1s)
 
-    # TODO: RENAME THIS!!!!
-    def produce_placements(self):
+    def remove_margins(self):
         """Convert coordinates: remove rounding and margins used for placement."""
 
         for p in self.ws.pics:
             self.ws.pics[p].remove_margin()
 
+    # Methods used in potentially mutiple arrangement types
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    def pull_in_picture(self, pic_id):
+        """From placed workspace, step single picture towards center if possible.
 
-    # Methods to get over all that 'find the little ones' junk code
-    # def get_small()
+        Return boolean true if pictures is moved.
+        """
+
+        move = False
+
+        pic = self.ws.pics[pic_id]
+
+        x_inc = -1 if ((pic.x1+pic.x2)/float(2)) > 0 else 1
+        y_inc = -1 if ((pic.y1+pic.y2)/float(2)) > 0 else 1
+
+        # this inhenrently does one move before other, scramble?
+        if not self.any_conflict(pic.x1+x_inc, pic.x2+x_inc, pic.y1, pic.y2, pic):
+            pic.x1 += x_inc
+            pic.x2 += x_inc
+            move = True
+        if not self.any_conflict(pic.x1, pic.x2, pic.y1+y_inc, pic.y2+y_inc, pic):
+            pic.y1 += y_inc
+            pic.y2 += y_inc
+            move = True
+
+        return move
+
+    def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic=None):
+        """Check placed pictures, return true if any conflict with this placement."""
+
+        # print 'conflict checking- - - -- - - - - - --'
+        # print self.pics
+
+        # Check each picture in workspace
+        for p in self.ws.pics:
+            pic = self.ws.pics[p]
+            if (pic.x1 is not None) and (pic is not this_pic):
+                # This picture has been placed, so check for conflict
+                if is_conflict(pic.x1, pic.x2, pic.y1, pic.y2,
+                               x1_try, x2_try, y1_try, y2_try):
+                    # Conflicts with attempted placement, fail fast
+
+                    # print 'conflict found with {}'.format(pic)
+
+                    return True
+
+        # No conflicts found
+        return False
+
 
 class GalleryFloorArranger(Arranger):
     """Arranges display for galleries, in rows by descending height, aligned bottom."""
@@ -114,156 +173,15 @@ class GalleryFloorArranger(Arranger):
 
             current_row_width += self.ws.pics[p].w
 
-class Workspace(object):
-    """Class on which arrangments can be performed."""
 
-    def __init__(self, gallery_id):
-        """Constructor from picture list."""
+class ColumnArranger(Arranger):
+    """Arrange in columns by a few rules."""
 
-        pictures = model.Gallery.query.get(gallery_id).pictures
-
-        options = {}
-
-        self.gallery_id = gallery_id
-        self.margin = options.get('margin', DEFAULT_MARGIN)
-        self.n = len(pictures)
-
-        # self.options = options
-
-        self.pics = {}
-
-        for picture in pictures:
-
-            self.pics[picture.picture_id] = Pic(picture=picture,
-                                                margin=self.margin)
-
-        # Because it is common to need the largest, tallest, smallest, etc,
-        # prepare these ahead fo time for the workspace
-        self.area_sort = sorted([self.pics[p].id for p in self.pics],
-                                key=lambda x: self.pics[x].a)
-        self.width_sort = sorted([self.pics[p].id for p in self.pics],
-                                 key=lambda x: self.pics[x].w)
-        self.height_sort = sorted([self.pics[p].id for p in self.pics],
-                                  key=lambda x: self.pics[x].h)
-
-    # def arrange(self):
-    #     """Call arrangment method specified by options"""
-
-    #     if self.options['algorithm_type'] == 'linear':
-    #         self.arrange_linear()
-    #     elif self.options['algorithm_type'] == 'column':
-    #         self.arrange_column_heuristic()
-    #     elif self.options['algorithm_type'] == 'expand':
-    #         self.arrange_grid()
-    #     else:
-    #         self.arrange_column_heuristic()
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-
-
-
-    # Arrangment methods for workspaces
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    @adjust_for_wall
-    def arrange_gallery_display(self):
-        """Arranges display for galleries, in rows by descending height, aligned top."""
-
-        total_width = sum([self.pics[p].w for p in self.pics])
-        gallery_width = (total_width / 2.0) + (total_width / self.n)
-
-        self.height_sort.reverse()
-
-        gallery_height = self.pics[self.height_sort[0]].h
-        current_row_width = 0
-        current_row_top = 0
-
-        # Hang pictures in rows
-        for p in self.height_sort:
-            # Start a new row if this one is full
-            if (current_row_width + self.pics[p].w) > gallery_width:
-                current_row_top = gallery_height
-                gallery_height += self.pics[p].h
-                current_row_width = 0
-
-            self.pics[p].x1 = current_row_width
-            self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
-            self.pics[p].y1 = current_row_top
-            self.pics[p].y2 = self.pics[p].y1 + self.pics[p].h
-
-            current_row_width += self.pics[p].w
+    columns = []
 
     @adjust_for_wall
-    def arrange_gallery_display_floor(self):
-        """Arranges display for galleries, in rows by descending height, aligned bottom."""
-
-        # Make two rows if many pictures, one row if not
-        total_width = sum([self.pics[p].w for p in self.pics])
-        if self.n < 10:
-            gallery_width = (total_width) + (total_width / self.n)
-        else:
-            gallery_width = (total_width / 2.0) + (total_width / self.n)
-
-        self.height_sort.reverse()
-
-        gallery_height = self.pics[self.height_sort[0]].h
-        current_row_width = 0
-        current_row_base = gallery_height
-
-        # Set pictures in rows
-        for p in self.height_sort:
-            # Start a new row if this one is full
-            if (current_row_width + self.pics[p].w) > gallery_width:
-                gallery_height += self.pics[p].h
-                current_row_width = 0 # random.choice([-4,4])
-                current_row_base = gallery_height
-
-            self.pics[p].x1 = current_row_width
-            self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
-            self.pics[p].y2 = current_row_base
-            self.pics[p].y1 = self.pics[p].y2 - self.pics[p].h
-
-            current_row_width += self.pics[p].w
-
-    @adjust_for_wall
-    def arrange_linear(self):
-        """Arrange gallery pictures in horizontal line, vertically centered."""
-
-        mid_index = self.n / 2
-        smaller_pics = self.area_sort[:mid_index]
-        larger_pics = self.area_sort[mid_index:]
-        random.shuffle(smaller_pics)
-        random.shuffle(larger_pics)
-
-        row_width = 0
-
-        for i in range(len(self.pics)):
-            p = larger_pics.pop() if (i % 2 == 0) else smaller_pics.pop()
-            self.pics[p].x1 = row_width
-            self.pics[p].x2 = row_width + self.pics[p].w
-            self.pics[p].y1 = -self.pics[p].h / 2.0
-            self.pics[p].y2 = self.pics[p].h + self.pics[p].y1
-
-            row_width = self.pics[p].x2
-
-    @adjust_for_wall
-    def arrange_grid(self):
-        """Arrangment via an initial placement in a grid."""
-
-        pics_in_grid = self.random_place_in_grid()
-
-        self.expand_grid_to_arrangment(pics_in_grid)
-
-        self.pull_in_pictures()
-
-    @adjust_for_wall
-    def arrange_column_heuristic(self):
+    def arrange(self):
         """Arrange in columns by a few rules."""
-
-        self.pics_remaining = set(self.pics.keys())
-        self.columns = []
 
         # Use the largest picture alone
         self.make_single_column()
@@ -271,7 +189,7 @@ class Workspace(object):
         # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
         # Written as while loop to tolertate small numbers
         i = 0
-        while (i < (self.n / 7)) and (len(self.pics_remaining) > 5):
+        while (i < (self.ws.n / 7)) and (len(self.pics_remaining) > 5):
             self.make_nested_column()
             self.make_stacked_column(random.choice([2, 3]))
             i += 1
@@ -288,12 +206,172 @@ class Workspace(object):
             self.make_single_column()
 
         self.combine_columns()
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    def combine_columns(self):
+        """Place columns together in a wall.
+
+        Currently uses a random order of the generated columns.
+        """
+
+        random.shuffle(self.columns)
+
+        wall_width = 0
+        for column in self.columns:
+            col_width = max([self.ws.pics[p].x2 for p in column])
+            col_height_shift = max([self.ws.pics[p].y2 for p in column]) / 2.0
+
+            for p in column:
+                self.ws.pics[p].x1 += wall_width
+                self.ws.pics[p].x2 += wall_width
+                self.ws.pics[p].y1 += - col_height_shift
+                self.ws.pics[p].y2 += - col_height_shift
+
+            wall_width += col_width
+
+    def make_single_column(self):
+        """Create a column with the single tallest picture remaining."""
+
+        i = -1
+        while self.height_sort[i] not in self.pics_remaining:
+            i += -1
+        tallest = self.height_sort[i]
+        self.pics_remaining.remove(tallest)
+
+        self.columns.append([tallest])
+        self.ws.pics[tallest].x1 = 0
+        self.ws.pics[tallest].x2 = self.ws.pics[tallest].w
+        self.ws.pics[tallest].y1 = 0
+        self.ws.pics[tallest].y2 = self.ws.pics[tallest].h
+
+    def make_stacked_column(self, n):
+        """Create a column with two stacked pictures."""
+
+        stack = random.sample(self.pics_remaining, n)
+        self.columns.append(stack)
+
+        width_col = max([self.ws.pics[p].w for p in stack])
+        height_col = 0
+
+        for p in stack:
+            self.pics_remaining.remove(p)
+
+            self.ws.pics[p].x1 = (width_col - self.ws.pics[p].w) / 2.0
+            self.ws.pics[p].x2 = self.ws.pics[p].x1 + self.ws.pics[p].w
+            self.ws.pics[p].y1 = height_col
+            self.ws.pics[p].y2 = self.ws.pics[p].y1 + self.ws.pics[p].h
+
+            height_col = self.ws.pics[p].y2
+
+    def make_nested_column(self):
+        """Create a column with wide pic and two skinny ones."""
+
+        # Get the widest remaining picture
+        i = -1
+        while self.width_sort[i] not in self.pics_remaining:
+            i += -1
+        single = self.width_sort[i]
+        self.pics_remaining.remove(single)
+
+        # Get a pair from the skinny end of the gallery
+        small_set = (set(self.width_sort[:(self.ws.n / 3)]) &
+                     self.pics_remaining)
+        if len(small_set) < 2:
+            # Old method will work for small number remaining
+            pair = []
+            i = 0
+            while len(pair) < 2:
+                if (self.width_sort[i] in self.pics_remaining):
+                    pair.append(self.width_sort[i])
+                i += 1
+            random.shuffle(pair)
+        else:
+            # New method adds more vairety
+            pair = random.sample(small_set, 2)
+
+        # Vary which is placed on which side of the nesting
+        pair1 = pair[0]
+        pair2 = pair[1]
+
+        self.columns.append([single, pair1, pair2])
+
+        # Remove these from the pictures to be used
+        self.pics_remaining.remove(pair2)
+        self.pics_remaining.remove(pair1)
+
+        pair_width = self.ws.pics[pair1].w + self.ws.pics[pair2].w
+        single_width = self.ws.pics[single].w
+
+        # Handle the horizontal placements
+        col_width = max(pair_width, single_width)
+        pair_margin = (col_width - pair_width) / 3.0
+
+        self.ws.pics[single].x1 = (col_width - single_width) / 2.0
+        self.ws.pics[single].x2 = self.ws.pics[single].x1 + self.ws.pics[single].w
+
+        self.ws.pics[pair1].x1 = pair_margin
+        self.ws.pics[pair1].x2 = pair_margin + self.ws.pics[pair1].w
+
+        self.ws.pics[pair2].x1 = self.ws.pics[pair1].x2 + pair_margin
+        self.ws.pics[pair2].x2 = self.ws.pics[pair2].x1 + self.ws.pics[pair2].w
+
+        if random.random() > 0.5:
+            # Place single above
+            self.ws.pics[single].y1 = 0
+            self.ws.pics[single].y2 = self.ws.pics[single].h
+
+            self.ws.pics[pair1].y1 = self.ws.pics[single].y2
+            self.ws.pics[pair1].y2 = self.ws.pics[pair1].y1 + self.ws.pics[pair1].h
+
+            self.ws.pics[pair2].y1 = self.ws.pics[single].y2
+            self.ws.pics[pair2].y2 = self.ws.pics[pair2].y1 + self.ws.pics[pair2].h
+        else:
+            pair_height = (self.ws.pics[pair1].h + self.ws.pics[pair2].h)
+
+            self.ws.pics[single].y1 = pair_height
+            self.ws.pics[single].y2 = pair_height + self.ws.pics[single].h
+
+            self.ws.pics[pair1].y1 = pair_height - self.ws.pics[pair1].h
+            self.ws.pics[pair1].y2 = self.ws.pics[pair1].y1 + self.ws.pics[pair1].h
+
+            self.ws.pics[pair2].y1 = pair_height - self.ws.pics[pair2].h
+            self.ws.pics[pair2].y2 = self.ws.pics[pair2].y1 + self.ws.pics[pair2].h
 
 
+class LinearArranger(Arranger):
+    """Arrange gallery pictures in horizontal line, vertically centered."""
 
-    # Methods supporting grid arrangments
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    @adjust_for_wall
+    def arrange(self):
+
+        mid_index = self.ws.n / 2
+        smaller_pics = self.area_sort[:mid_index]
+        larger_pics = self.area_sort[mid_index:]
+        random.shuffle(smaller_pics)
+        random.shuffle(larger_pics)
+
+        row_width = 0
+
+        for i in range(len(self.ws.pics)):
+            p = larger_pics.pop() if (i % 2 == 0) else smaller_pics.pop()
+            self.ws.pics[p].x1 = row_width
+            self.ws.pics[p].x2 = row_width + self.ws.pics[p].w
+            self.ws.pics[p].y1 = -self.ws.pics[p].h / 2.0
+            self.ws.pics[p].y2 = self.ws.pics[p].h + self.ws.pics[p].y1
+
+            row_width = self.ws.pics[p].x2
+
+
+class GridArrangement(Arranger):
+
+    @adjust_for_wall
+    def arrange(self):
+        """Arrangment via an initial placement in a grid."""
+
+        pics_in_grid = self.random_place_in_grid()
+
+        self.expand_grid_to_arrangment(pics_in_grid)
+
+        self.pull_in_pictures()
 
     def random_place_in_grid(self):
         """Place pics in random grid indicies.
@@ -302,16 +380,16 @@ class Workspace(object):
         {(i,j): pic}
         """
 
-        n_grid = int(math.ceil(math.sqrt(self.n)))
+        n_grid = int(math.ceil(math.sqrt(self.ws.n)))
         min_grid = -n_grid/2
         max_grid = min_grid + n_grid
 
         grid_pairs = [(i, j) for i in range(min_grid, max_grid)
                              for j in range(min_grid, max_grid)]
 
-        grid_sample = random.sample(grid_pairs, self.n)
+        grid_sample = random.sample(grid_pairs, self.ws.n)
 
-        grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.pics.keys())}
+        grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.ws.pics.keys())}
 
         return grid_pics
 
@@ -340,13 +418,39 @@ class Workspace(object):
                     # Picture existed at that grid location, place in workspace
                     self.walk_out_to_place(pic_id, (i, j))
 
+
+    def pull_in_pictures(self):
+        """From placed workspace, where possible bring pictures towards center.
+
+        Although this code might work on a non-centered arrangmet I suspec the
+        results would be gnarly.
+        """
+        moves = 1
+        count = 0
+
+        while moves > 0 and count < 500:
+
+            moves = 0
+            count += 1
+
+            scrambled_pics = self.ws.pics.keys()
+            random.shuffle(scrambled_pics)
+
+            # Loop through pictures
+            for p in scrambled_pics:
+
+                move = self.pull_in_picture(p)
+
+                if move:
+                    moves += 1
+
     def walk_out_to_place(self, pic_id, grid):
         """Given a picture and grid location, return valid workspace of placements.
 
         Method is a walk out diagonally in the roucgh direction of initial grid
         placement.
         """
-        pic = self.pics[pic_id]
+        pic = self.ws.pics[pic_id]
         i, j = grid
 
         print 'placing pic '
@@ -376,257 +480,84 @@ class Workspace(object):
                 pic.x1 += x_inc
                 pic.x2 += x_inc
 
-    def pull_in_pictures(self):
-        """From placed workspace, where possible bring pictures towards center.
 
-        Although this code might work on a non-centered arrangmet I suspec the
-        results would be gnarly.
-        """
-        moves = 1
-        count = 0
+class Workspace(object):
+    """Class on which arrangments can be performed."""
 
-        while moves > 0 and count < 500:
+    def __init__(self, gallery_id):
+        """Constructor from picture list."""
 
-            moves = 0
-            count += 1
+        pictures = model.Gallery.query.get(gallery_id).pictures
 
-            scrambled_pics = self.pics.keys()
-            random.shuffle(scrambled_pics)
+        options = {}
 
-            # Loop through pictures
-            for p in scrambled_pics:
+        self.gallery_id = gallery_id
+        self.margin = options.get('margin', DEFAULT_MARGIN)
+        self.n = len(pictures)
 
-                move = self.pull_in_picture(p)
+        # self.options = options
 
-                if move:
-                    moves += 1
+        self.pics = {}
 
-    def pull_in_picture(self, pic_id):
-        """From placed workspace, step single picture towards center if possible.
+        for picture in pictures:
 
-        Return boolean true if pictures is moved.
-        """
+            self.pics[picture.picture_id] = Pic(picture=picture,
+                                                margin=self.margin)
 
-        move = False
+        # # Because it is common to need the largest, tallest, smallest, etc,
+        # # prepare these ahead fo time for the workspace
+        # self.area_sort = sorted([self.pics[p].id for p in self.pics],
+        #                         key=lambda x: self.pics[x].a)
+        # self.width_sort = sorted([self.pics[p].id for p in self.pics],
+        #                          key=lambda x: self.pics[x].w)
+        # self.height_sort = sorted([self.pics[p].id for p in self.pics],
+        #                           key=lambda x: self.pics[x].h)
 
-        pic = self.pics[pic_id]
+    # def arrange(self):
+    #     """Call arrangment method specified by options"""
 
-        x_inc = -1 if ((pic.x1+pic.x2)/float(2)) > 0 else 1
-        y_inc = -1 if ((pic.y1+pic.y2)/float(2)) > 0 else 1
+    #     if self.options['algorithm_type'] == 'linear':
+    #         self.arrange_linear()
+    #     elif self.options['algorithm_type'] == 'column':
+    #         self.arrange_column_heuristic()
+    #     elif self.options['algorithm_type'] == 'expand':
+    #         self.arrange_grid()
+    #     else:
+    #         self.arrange_column_heuristic()
 
-        # this inhenrently does one move before other, scramble?
-        if not self.any_conflict(pic.x1+x_inc, pic.x2+x_inc, pic.y1, pic.y2, pic):
-            pic.x1 += x_inc
-            pic.x2 += x_inc
-            move = True
-        if not self.any_conflict(pic.x1, pic.x2, pic.y1+y_inc, pic.y2+y_inc, pic):
-            pic.y1 += y_inc
-            pic.y2 += y_inc
-            move = True
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        return move
+# # Arrangment methods for workspace
+# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# @adjust_for_wall
+# def arrange_gallery_display(self):
+#     """Arranges display for galleries, in rows by descending height, aligned top."""
 
-    def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic=None):
-        """Check placed pictures, return true if any conflict with this placement."""
+#     total_width = sum([self.pics[p].w for p in self.pics])
+#     gallery_width = (total_width / 2.0) + (total_width / self.n)
 
-        # print 'conflict checking- - - -- - - - - - --'
-        # print self.pics
+#     self.height_sort.reverse()
 
-        # Check each picture in workspace
-        for p in self.pics:
-            pic = self.pics[p]
-            if (pic.x1 is not None) and (pic is not this_pic):
-                # This picture has been placed, so check for conflict
-                if is_conflict(pic.x1, pic.x2, pic.y1, pic.y2,
-                               x1_try, x2_try, y1_try, y2_try):
-                    # Conflicts with attempted placement, fail fast
+#     gallery_height = self.pics[self.height_sort[0]].h
+#     current_row_width = 0
+#     current_row_top = 0
 
-                    # print 'conflict found with {}'.format(pic)
+#     # Hang pictures in rows
+#     for p in self.height_sort:
+#         # Start a new row if this one is full
+#         if (current_row_width + self.pics[p].w) > gallery_width:
+#             current_row_top = gallery_height
+#             gallery_height += self.pics[p].h
+#             current_row_width = 0
 
-                    return True
+#         self.pics[p].x1 = current_row_width
+#         self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
+#         self.pics[p].y1 = current_row_top
+#         self.pics[p].y2 = self.pics[p].y1 + self.pics[p].h
 
-        # No conflicts found
-        return False
+#         current_row_width += self.pics[p].w
 
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Methods supporting column arrangments
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    def combine_columns(self):
-        """Place columns together in a wall.
-
-        Currently uses a random order of the generated columns.
-        """
-
-        random.shuffle(self.columns)
-
-        wall_width = 0
-        for column in self.columns:
-            # print "*"*20
-            # print column
-            # for p in column:
-            #     print(self.pics[p])
-            col_width = max([self.pics[p].x2 for p in column])
-            col_height_shift = max([self.pics[p].y2 for p in column]) / 2.0
-
-            for p in column:
-                self.pics[p].x1 += wall_width
-                self.pics[p].x2 += wall_width
-                self.pics[p].y1 += - col_height_shift
-                self.pics[p].y2 += - col_height_shift
-
-            wall_width += col_width
-
-    def make_single_column(self):
-        """Create a column with the single tallest picture remaining."""
-
-        i = -1
-        while self.height_sort[i] not in self.pics_remaining:
-            i += -1
-        tallest = self.height_sort[i]
-        self.pics_remaining.remove(tallest)
-
-        self.columns.append([tallest])
-        self.pics[tallest].x1 = 0
-        self.pics[tallest].x2 = self.pics[tallest].w
-        self.pics[tallest].y1 = 0
-        self.pics[tallest].y2 = self.pics[tallest].h
-
-    def make_stacked_column(self, n):
-        """Create a column with two stacked pictures."""
-
-        stack = random.sample(self.pics_remaining, n)
-        self.columns.append(stack)
-
-        width_col = max([self.pics[p].w for p in stack])
-        height_col = 0
-
-        for p in stack:
-            self.pics_remaining.remove(p)
-
-            self.pics[p].x1 = (width_col - self.pics[p].w) / 2.0
-            self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
-            self.pics[p].y1 = height_col
-            self.pics[p].y2 = self.pics[p].y1 + self.pics[p].h
-
-            height_col = self.pics[p].y2
-
-    def make_nested_column(self):
-        """Create a column with wide pic and two skinny ones."""
-
-        # Get the widest remaining picture
-        i = -1
-        while self.width_sort[i] not in self.pics_remaining:
-            i += -1
-        single = self.width_sort[i]
-        self.pics_remaining.remove(single)
-
-        # Get a pair from the skinny end of the gallery
-        small_set = (set(self.width_sort[:(self.n / 3)]) &
-                     self.pics_remaining)
-        if len(small_set) < 2:
-            # Old method will work for small number remaining
-            pair = []
-            i = 0
-            while len(pair) < 2:
-                if (self.width_sort[i] in self.pics_remaining):
-                    pair.append(self.width_sort[i])
-                i += 1
-            random.shuffle(pair)
-        else:
-            # New method adds more vairety
-            pair = random.sample(small_set, 2)
-
-        # Vary which is placed on which side of the nesting
-        pair1 = pair[0]
-        pair2 = pair[1]
-
-        self.columns.append([single, pair1, pair2])
-
-        # Remove these from the pictures to be used
-        self.pics_remaining.remove(pair2)
-        self.pics_remaining.remove(pair1)
-
-        pair_width = self.pics[pair1].w + self.pics[pair2].w
-        single_width = self.pics[single].w
-
-        # Handle the horizontal placements
-        col_width = max(pair_width, single_width)
-        pair_margin = (col_width - pair_width) / 3.0
-
-        self.pics[single].x1 = (col_width - single_width) / 2.0
-        self.pics[single].x2 = self.pics[single].x1 + self.pics[single].w
-
-        self.pics[pair1].x1 = pair_margin
-        self.pics[pair1].x2 = pair_margin + self.pics[pair1].w
-
-        self.pics[pair2].x1 = self.pics[pair1].x2 + pair_margin
-        self.pics[pair2].x2 = self.pics[pair2].x1 + self.pics[pair2].w
-
-        if random.random() > 0.5:
-            # Place single above
-            self.pics[single].y1 = 0
-            self.pics[single].y2 = self.pics[single].h
-
-            self.pics[pair1].y1 = self.pics[single].y2
-            self.pics[pair1].y2 = self.pics[pair1].y1 + self.pics[pair1].h
-
-            self.pics[pair2].y1 = self.pics[single].y2
-            self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
-        else:
-            pair_height = (self.pics[pair1].h + self.pics[pair2].h)
-
-            self.pics[single].y1 = pair_height
-            self.pics[single].y2 = pair_height + self.pics[single].h
-
-            self.pics[pair1].y1 = pair_height - self.pics[pair1].h
-            self.pics[pair1].y2 = self.pics[pair1].y1 + self.pics[pair1].h
-
-            self.pics[pair2].y1 = pair_height - self.pics[pair2].h
-            self.pics[pair2].y2 = self.pics[pair2].y1 + self.pics[pair2].h
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    # Methods for preparing arranged workspace for use as wall
-    # (used by @adjust_for_wall decorator)
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-    def realign_to_origin(self):
-        """Shift all placements to positive quadrant with origin upper left."""
-
-        x1s = [self.pics[p].x1 for p in self.pics]
-        y1s = [self.pics[p].y1 for p in self.pics]
-
-        x_shift = -min(x1s)
-        y_shift = -min(y1s)
-
-        for pic in self.pics:
-            self.pics[pic].x1 += x_shift
-            self.pics[pic].x2 += x_shift
-            self.pics[pic].y1 += y_shift
-            self.pics[pic].y2 += y_shift
-
-    def get_wall_size(self):
-        """Assgins as attributes the total wall height and width."""
-
-        x1s = [self.pics[p].x1 for p in self.pics]
-        x2s = [self.pics[p].x2 for p in self.pics]
-        y1s = [self.pics[p].y1 for p in self.pics]
-        y2s = [self.pics[p].y2 for p in self.pics]
-
-        # If already adjusted to origin the second term of each expression is unnecesary
-        self.width = max(x2s) - min(x1s)
-        self.height = max(y2s) - min(y1s)
-
-    def produce_placements(self):
-        """Convert coordinates: remove rounding and margins used for placement."""
-
-        for p in self.pics:
-            self.pics[p].remove_margin()
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
+# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Pic(object):
     """Pics are a data transfer object for placement genertion for pictures.
@@ -704,9 +635,6 @@ class Pic(object):
         # also adjust the values of x2 and y2 (Could also adjust width/height here)
         self.x2 += - width_padding
         self.y2 += - height_padding
-
-
-# class IntrospectivePictureSet(Object):
 
 
 def is_conflict(x1_a, x2_a, y1_a, y2_a, x1_b, x2_b, y1_b, y2_b):
