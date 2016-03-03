@@ -49,8 +49,8 @@ class Arranger(object):
                                  key=lambda x: self.ws.pics[x].w)
         self.height_sort = sorted([self.ws.pics[p].id for p in self.ws.pics],
                                   key=lambda x: self.ws.pics[x].h)
-    # Methods to get over all that 'find the little ones' junk code
-    # def get_small()
+        # Methods to get over all that 'find the little ones' junk code
+        # ex: def get_small()
 
     # Methods used for each arrangement (so far)
     # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -118,9 +118,6 @@ class Arranger(object):
     def any_conflict(self, x1_try, x2_try, y1_try, y2_try, this_pic=None):
         """Check placed pictures, return true if any conflict with this placement."""
 
-        # print 'conflict checking- - - -- - - - - - --'
-        # print self.pics
-
         # Check each picture in workspace
         for p in self.ws.pics:
             pic = self.ws.pics[p]
@@ -129,8 +126,6 @@ class Arranger(object):
                 if is_conflict(pic.x1, pic.x2, pic.y1, pic.y2,
                                x1_try, x2_try, y1_try, y2_try):
                     # Conflicts with attempted placement, fail fast
-
-                    # print 'conflict found with {}'.format(pic)
 
                     return True
 
@@ -504,58 +499,7 @@ class Workspace(object):
             self.pics[picture.picture_id] = Pic(picture=picture,
                                                 margin=self.margin)
 
-        # # Because it is common to need the largest, tallest, smallest, etc,
-        # # prepare these ahead fo time for the workspace
-        # self.area_sort = sorted([self.pics[p].id for p in self.pics],
-        #                         key=lambda x: self.pics[x].a)
-        # self.width_sort = sorted([self.pics[p].id for p in self.pics],
-        #                          key=lambda x: self.pics[x].w)
-        # self.height_sort = sorted([self.pics[p].id for p in self.pics],
-        #                           key=lambda x: self.pics[x].h)
-
-    # def arrange(self):
-    #     """Call arrangment method specified by options"""
-
-    #     if self.options['algorithm_type'] == 'linear':
-    #         self.arrange_linear()
-    #     elif self.options['algorithm_type'] == 'column':
-    #         self.arrange_column_heuristic()
-    #     elif self.options['algorithm_type'] == 'expand':
-    #         self.arrange_grid()
-    #     else:
-    #         self.arrange_column_heuristic()
-
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-# # Arrangment methods for workspace
-# # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# @adjust_for_wall
-# def arrange_gallery_display(self):
-#     """Arranges display for galleries, in rows by descending height, aligned top."""
-
-#     total_width = sum([self.pics[p].w for p in self.pics])
-#     gallery_width = (total_width / 2.0) + (total_width / self.n)
-
-#     self.height_sort.reverse()
-
-#     gallery_height = self.pics[self.height_sort[0]].h
-#     current_row_width = 0
-#     current_row_top = 0
-
-#     # Hang pictures in rows
-#     for p in self.height_sort:
-#         # Start a new row if this one is full
-#         if (current_row_width + self.pics[p].w) > gallery_width:
-#             current_row_top = gallery_height
-#             gallery_height += self.pics[p].h
-#             current_row_width = 0
-
-#         self.pics[p].x1 = current_row_width
-#         self.pics[p].x2 = self.pics[p].x1 + self.pics[p].w
-#         self.pics[p].y1 = current_row_top
-#         self.pics[p].y2 = self.pics[p].y1 + self.pics[p].h
-
-#         current_row_width += self.pics[p].w
 
 # # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -660,7 +604,6 @@ def is_conflict(x1_a, x2_a, y1_a, y2_a, x1_b, x2_b, y1_b, y2_b):
 
         >>> is_conflict(0, 11, -1, 8, -1, 9, 0, 12)
         True
-
 
     """
 
