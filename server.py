@@ -287,6 +287,9 @@ def show_galleries():
     user_id = session.get('user_id', DEFAULT_USER_ID)
     galleries = User.query.get(user_id).galleries
 
+    print(galleries[0].test_prop)
+    db.session.flush()
+
     return render_template("galleries.html",
                            galleries=galleries)
 

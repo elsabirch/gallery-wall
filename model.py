@@ -5,14 +5,15 @@ from flask_sqlalchemy import SQLAlchemy
 
 def lazy_load_of_workspace():
     print 'lazy loading'
-    global Workspace
-    global GalleryFloorArranger
-    # import arrange as ar
+    # global Workspace
+    # global GalleryFloorArranger
+    global ar
+    import arrange as ar
 
-    from arrange import Workspace as _Workspace
-    from arrange import GalleryFloorArranger as _GalleryFloorArranger
-    Workspace = _Workspace
-    GalleryFloorArranger = _GalleryFloorArranger
+    # from arrange import Workspace as _Workspace
+    # from arrange import GalleryFloorArranger as _GalleryFloorArranger
+    # Workspace = _Workspace
+    # GalleryFloorArranger = _GalleryFloorArranger
     # import arrange as ar
 
 db = SQLAlchemy()
@@ -101,6 +102,12 @@ class Gallery(db.Model):
     walls = db.relationship("Wall", order_by="Wall.wall_id")
 
     @property
+    def test_prop(self):
+
+        print 'I AM TEH PROPERTY OF GALLAREEEEEZ'
+        return 'I AM TEH PROPERTY & I work'
+
+    @property
     def display_wall_id(self):
 
         wall_id = (db.session.query(Wall.wall_id)
@@ -109,18 +116,26 @@ class Gallery(db.Model):
                                      Wall.gallery_display == True)
                              .first())
 
+        # wall_id = []
+
         if not wall_id:
 
             arrange_options = {}
 
             lazy_load_of_workspace()
-            wkspc = Workspace(self.gallery_id)
-            arr = GalleryFloorArranger(wkspc)
-            arr.arrange()
+            print 'making a workspace'
+            wkspc = ar.Workspace(self.gallery_id)
+            print 'made a workspace'
+            arranger_instance = ar.GalleryFloorArranger(wkspc)
+            print 'made a galelry arranger'
+            # import pdb
+            # pdb.set_trace()
+            arranger_instance.arrange_x()
+            print 'arranged that stuff'
             # wkspc.arrange_gallery_display_floor()
-
             wall_id = Wall.init_from_workspace(wkspc)
-
+            db.session.flush()
+            print 'i inited a wall'
             Wall.query.get(wall_id).set_gallery_display()
 
         else:
@@ -129,6 +144,7 @@ class Gallery(db.Model):
             wall_id = wall_id[0]
 
         return wall_id
+
 
     @classmethod
     def make_from_pictures(cls, curator_id, picture_list, gallery_name=None):
