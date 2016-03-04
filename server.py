@@ -9,10 +9,10 @@ from jinja2 import StrictUndefined
 from flask.ext.uploads import UploadSet, IMAGES, configure_uploads
 
 from model import User, Picture, Gallery, Wall, Placement, connect_to_db, db
-from arrange import Workspace
 
 import settings
 import secrets
+import arrange as ar
 
 # from flask_debugtoolbar import DebugToolbarExtension
 
@@ -287,6 +287,8 @@ def show_galleries():
     user_id = session.get('user_id', DEFAULT_USER_ID)
     galleries = User.query.get(user_id).galleries
 
+    # db.session.flush()
+
     return render_template("galleries.html",
                            galleries=galleries)
 
@@ -315,14 +317,25 @@ def prompt_arrangment():
 def process_arrangment():
     """Process the arrangement."""
 
+
     gallery_id = request.form.get('gallery_id')
     # margin = request.form.get('margin')
+    wkspc = ar.Workspace(gallery_id)
+
     algorithm_type = request.form.get('algorithm_type')
-    arrange_options = {'algorithm_type': algorithm_type}
 
-    wkspc = Workspace(gallery_id, arrange_options)
+    if algorithm_type == 'linear':
+        arr = ar.LinearArranger(wkspc)
+    elif algorithm_type == 'column':
+        arr = ar.ColumnArranger(wkspc)
+    elif algorithm_type == 'expand':
+        arr = ar.GridArranger(wkspc)
+    else:
+        # Default to column arrangement
+        arr = ar.ColumnArranger(wkspc)
 
-    wkspc.arrange()
+    # arr = ar.ColumnArranger(wkspc)
+    arr.arrange()
 
     wall_id = Wall.init_from_workspace(wkspc)
 
