@@ -83,7 +83,7 @@ class Arranger(object):
         Removes returned from pictures remaining.
         """
 
-        narrows = set(self.width_sort[:(self.ws.len / 3)]) and self.pics_remaining
+        narrows = set(self.width_sort[:(self.ws.len / 3)]).intersection(self.pics_remaining)
         if narrows:
             p = random.sample(narrows, 1)[0]
             self.pics_remaining.remove(p)
@@ -101,7 +101,7 @@ class Arranger(object):
         Removes returned from pictures remaining.
         """
 
-        smalls = set(self.area_sort[:(self.ws.len / 3)]) and self.pics_remaining
+        smalls = set(self.area_sort[:(self.ws.len / 3)]).intersection(self.pics_remaining)
         if smalls:
             p = random.sample(smalls, 1)[0]
             self.pics_remaining.remove(p)
