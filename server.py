@@ -23,12 +23,13 @@ app.jinja_env.undefined = StrictUndefined
 
 
 # Configurations for flask-uploads
+# These are required
 app.config['UPLOADED_PICTURES_DEST'] = 'upload_temp'
 pictures = UploadSet('pictures', IMAGES)
 configure_uploads(app, (pictures,))
-
-FOLDER_S3 = 'pictures'
-BUCKET_S3 = 'gallerywallshakedown'
+# These are a handy place to pass the info
+app.config['S3_FOLDER'] = 'pictures'
+app.config['S3_BUCKET'] = 'gallerywallshakedown'
 
 # Configure paths for online resources
 app.config['JQUERY_PATH'] = settings.jquery_path

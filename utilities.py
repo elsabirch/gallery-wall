@@ -11,10 +11,6 @@ def lazy_load_of_upload_imports():
     global app
     from server import pictures, app
 
-# TEMPORARY, put as part of APP config in server
-FOLDER_S3 = 'pictures'
-BUCKET_S3 = 'gallerywallshakedown'
-
 def attempt_login():
     """Logs user into session and returns True if POST credentials valid.
 
@@ -127,13 +123,13 @@ def move_picture_to_cloud(filename):
     transfer = boto3.s3.transfer.S3Transfer(client)
 
     transfer.upload_file('{}/{}'.format(folder_server, filename),
-                         BUCKET_S3,
-                         '{}/{}'.format(FOLDER_S3, filename),
+                         app.config['S3_BUCKET'],
+                         '{}/{}'.format(app.config['S3_FOLDER'], filename),
                          extra_args={'ACL': 'public-read'})
 
     uploaded = '{}/{}/{}'.format(client.meta.endpoint_url,
-                                 BUCKET_S3,
-                                 '{}/{}'.format(FOLDER_S3, filename))
+                                 app.config['S3_BUCKET'],
+                                 '{}/{}'.format(app.config['S3_FOLDER'], filename))
 
     os.remove('{}/{}'.format(folder_server, filename))
 
