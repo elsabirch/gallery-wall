@@ -10,6 +10,9 @@ var wallIds = $('.wall-display').map( function(){
     return $(this).data('wallid');
 }
 );
+console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
+console.log(wallIds);
+console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
 
 // For each wall_id that we found, make an ajax request to get the information 
 // need for plotting it up. The success handler for these AJAX requests then 
@@ -23,8 +26,9 @@ for(var i=0; i < wallIds.length; i++){
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // If this is an arrangement page this variable will exist
 var divArrange = $('#arrange-display');
-var canvasArrange = $('#canvas-arrange');
+var canvasArrange = $('.canvas-arrange');
 console.log(divArrange);
+console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
 console.log(canvasArrange);
 
 var galleryId = $('#arrange-display').data('galleryid');

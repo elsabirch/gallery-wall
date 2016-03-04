@@ -13,8 +13,11 @@
 <div class='row'>
     <div class='col-xs-12 col-md-12'>
         <h3> Choose Arrangement Methods and Parameters! </h3>
-        <div class='arrange-display' data-wallid='{{wall_id}}' data-galleryid='{{gallery_id}}'>
-            <canvas id='canvas-arrange' height='300' width='900'> 
+        <div class='arrange-display wall-display' 
+             data-wallid='{{wall_id}}' 
+             data-galleryid='{{gallery_id}}'>
+            <canvas class='canvas-arrange' 
+                    id='canvas{{wall_id}}' height='300' width='900'> 
                 If you dont have HTML5 canvas, you're gonna have a bad time.
             </canvas>
         </div>   
