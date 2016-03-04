@@ -1,11 +1,15 @@
 from flask import session, request
 from model import User, Picture, db
-# from server import pictures, app
 
 import re
 import random
 import os
 import boto3
+
+def lazy_load_of_upload_imports():
+    global pictures
+    global app
+    from server import pictures, app
 
 # TEMPORARY, put as part of APP config in server
 FOLDER_S3 = 'pictures'
@@ -65,6 +69,8 @@ def attempt_signup():
 
 
 def attempt_upload():
+
+    lazy_load_of_upload_imports()
 
     filename_provided = pictures.save(request.files['picture'])
 
