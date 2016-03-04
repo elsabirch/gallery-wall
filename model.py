@@ -102,12 +102,6 @@ class Gallery(db.Model):
     walls = db.relationship("Wall", order_by="Wall.wall_id")
 
     @property
-    def test_prop(self):
-
-        print 'I AM TEH PROPERTY OF GALLAREEEEEZ'
-        return 'I AM TEH PROPERTY & I work'
-
-    @property
     def display_wall_id(self):
 
         wall_id = (db.session.query(Wall.wall_id)
