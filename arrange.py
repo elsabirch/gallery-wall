@@ -50,8 +50,16 @@ class Arranger(object):
         self.height_sort = sorted([self.ws.pics[p].id for p in self.ws.pics],
                                   key=lambda x: self.ws.pics[x].h)
 
-    # Methods to get over all that 'find the little ones' junk code
-    # ex: def get_small()
+    # Methods to select rough sizes/heights/widths or other elections for use in
+    # arrangments
+
+    def pop_any_n(self, n):
+        """ Return any n remaining pictures, removes returned from pictures remaining."""
+
+        ps = random.sample(self.pics_remaining, n)
+        for p in ps:
+            self.pics_remaining.remove(p)
+        return ps
 
     def pop_tallest(self):
         """Return tallest picture reminaing, and remove from list of those remaining."""
@@ -60,6 +68,67 @@ class Arranger(object):
             if p in self.pics_remaining:
                 self.pics_remaining.remove(p)
                 return p
+
+    def pop_widest(self):
+        """Return widest picture reminaing, and remove from list of those remaining."""
+
+        for p in self.width_sort[::-1]:
+            if p in self.pics_remaining:
+                self.pics_remaining.remove(p)
+                return p
+
+    def pop_narrow(self):
+        """Return a picture from the narrow third of original gallery, or narrowest remaining.
+
+        Removes returned from pictures remaining.
+        """
+
+        narrows = set(self.width_sort[:(self.ws.n / 3)]) and self.pics_remaining
+        if narrows:
+            p = random.sample(narrows, 1)[0]
+            self.pics_remaining.remove(p)
+            return p
+        else:
+            for p in self.width_sort:
+                if p in self.pics_remaining:
+                    self.pics_remaining.remove(p)
+                    return p
+
+    def pop_small(self):
+        """Return a picture from the small third of areas in original gallery,
+        or smallest area remaining.
+
+        Removes returned from pictures remaining.
+        """
+
+        smalls = set(self.area_sort[:(self.ws.n / 3)]) and self.pics_remaining
+        if smalls:
+            p = random.sample(smalls, 1)[0]
+            self.pics_remaining.remove(p)
+            return p
+        else:
+            for p in self.area_sort:
+                if p in self.pics_remaining:
+                    self.pics_remaining.remove(p)
+                    return p
+
+    def pop_large(self):
+        """Return a picture from the large third of areas in original gallery,
+        or largest area remaining.
+
+        Removes returned from pictures remaining.
+        """
+
+        larges = set(self.area_sort[-(self.ws.n / 3):]) and self.pics_remaining
+        if larges:
+            p = random.sample(larges, 1)[0]
+            self.pics_remaining.remove(p)
+            return p
+        else:
+            for p in self.area_sort[::-1]:
+                if p in self.pics_remaining:
+                    self.pics_remaining.remove(p)
+                    return p
 
     @property
     def height_tallest(self):
@@ -189,11 +258,11 @@ class GalleryFloorArranger(Arranger):
 class ColumnArranger(Arranger):
     """Arrange in columns by a few rules."""
 
-    columns = []
-
     @adjust_for_wall
     def arrange(self):
         """Arrange in columns by a few rules."""
+
+        self.columns = []
 
         # Use the largest picture alone
         self.make_single_column()
@@ -243,11 +312,7 @@ class ColumnArranger(Arranger):
     def make_single_column(self):
         """Create a column with the single tallest picture remaining."""
 
-        i = -1
-        while self.height_sort[i] not in self.pics_remaining:
-            i += -1
-        tallest = self.height_sort[i]
-        self.pics_remaining.remove(tallest)
+        tallest = self.pop_tallest()
 
         self.columns.append([tallest])
         self.ws.pics[tallest].x1 = 0
@@ -258,15 +323,13 @@ class ColumnArranger(Arranger):
     def make_stacked_column(self, n):
         """Create a column with two stacked pictures."""
 
-        stack = random.sample(self.pics_remaining, n)
+        stack = self.pop_any_n(n)
         self.columns.append(stack)
 
         width_col = max([self.ws.pics[p].w for p in stack])
         height_col = 0
 
         for p in stack:
-            self.pics_remaining.remove(p)
-
             self.ws.pics[p].x1 = (width_col - self.ws.pics[p].w) / 2.0
             self.ws.pics[p].x2 = self.ws.pics[p].x1 + self.ws.pics[p].w
             self.ws.pics[p].y1 = height_col
@@ -278,37 +341,13 @@ class ColumnArranger(Arranger):
         """Create a column with wide pic and two skinny ones."""
 
         # Get the widest remaining picture
-        i = -1
-        while self.width_sort[i] not in self.pics_remaining:
-            i += -1
-        single = self.width_sort[i]
-        self.pics_remaining.remove(single)
+        single = self.pop_widest()
 
         # Get a pair from the skinny end of the gallery
-        small_set = (set(self.width_sort[:(self.ws.n / 3)]) &
-                     self.pics_remaining)
-        if len(small_set) < 2:
-            # Old method will work for small number remaining
-            pair = []
-            i = 0
-            while len(pair) < 2:
-                if (self.width_sort[i] in self.pics_remaining):
-                    pair.append(self.width_sort[i])
-                i += 1
-            random.shuffle(pair)
-        else:
-            # New method adds more vairety
-            pair = random.sample(small_set, 2)
-
-        # Vary which is placed on which side of the nesting
-        pair1 = pair[0]
-        pair2 = pair[1]
+        pair1 = self.pop_narrow()
+        pair2 = self.pop_narrow()
 
         self.columns.append([single, pair1, pair2])
-
-        # Remove these from the pictures to be used
-        self.pics_remaining.remove(pair2)
-        self.pics_remaining.remove(pair1)
 
         pair_width = self.ws.pics[pair1].w + self.ws.pics[pair2].w
         single_width = self.ws.pics[single].w
@@ -355,16 +394,10 @@ class LinearArranger(Arranger):
     @adjust_for_wall
     def arrange(self):
 
-        mid_index = self.ws.n / 2
-        smaller_pics = self.area_sort[:mid_index]
-        larger_pics = self.area_sort[mid_index:]
-        random.shuffle(smaller_pics)
-        random.shuffle(larger_pics)
-
         row_width = 0
 
         for i in range(len(self.ws.pics)):
-            p = larger_pics.pop() if (i % 2 == 0) else smaller_pics.pop()
+            p = self.pop_large() if (i % 2 == 0) else self.pop_small()
             self.ws.pics[p].x1 = row_width
             self.ws.pics[p].x2 = row_width + self.ws.pics[p].w
             self.ws.pics[p].y1 = -self.ws.pics[p].h / 2.0
