@@ -188,6 +188,7 @@ class Wall(db.Model):
     # Relationships
     gallery = db.relationship("Gallery")
     placements = db.relationship("Placement")
+    curator = db.relationship("User", secondary='galleries')
 
     @classmethod
     def init_from_workspace(cls, workspace):

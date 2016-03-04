@@ -5,7 +5,6 @@ local_copies_untracked/
 time.txt
 secrets.py
 upload_temp/
-utilities.py
 
 # The entries below are from:
 # https://github.com/github/gitignore/blob/master/Python.gitignore
