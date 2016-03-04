@@ -135,9 +135,6 @@ def show_pictures():
     pictures_public = db.session.query(Picture).filter(Picture.user_id != user_id, 
                                            Picture.public == True).all()
 
-    print pictures
-    print pictures_public
-
     all_pictures = pictures + pictures_public
 
     return render_template('curate.html', user_pictures=all_pictures)
