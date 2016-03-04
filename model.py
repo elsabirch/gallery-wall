@@ -4,9 +4,17 @@ from flask_sqlalchemy import SQLAlchemy
 # import arrange
 
 def lazy_load_of_workspace():
-    global Workspace
-    from arrange import Workspace as _Workspace
-    Workspace = _Workspace
+    print 'lazy loading'
+    # global Workspace
+    # global GalleryFloorArranger
+    global ar
+    import arrange as ar
+
+    # from arrange import Workspace as _Workspace
+    # from arrange import GalleryFloorArranger as _GalleryFloorArranger
+    # Workspace = _Workspace
+    # GalleryFloorArranger = _GalleryFloorArranger
+    # import arrange as ar
 
 db = SQLAlchemy()
 
@@ -107,11 +115,13 @@ class Gallery(db.Model):
             arrange_options = {}
 
             lazy_load_of_workspace()
-            wkspc = Workspace(self.gallery_id, arrange_options)
-            wkspc.arrange_gallery_display_floor()
-
+            wkspc = ar.Workspace(self.gallery_id)
+            arranger_instance = ar.GalleryFloorArranger(wkspc)
+            # import pdb
+            # pdb.set_trace()
+            arranger_instance.arrange()
             wall_id = Wall.init_from_workspace(wkspc)
-
+            # db.session.flush()
             Wall.query.get(wall_id).set_gallery_display()
 
         else:
@@ -120,6 +130,7 @@ class Gallery(db.Model):
             wall_id = wall_id[0]
 
         return wall_id
+
 
     @classmethod
     def make_from_pictures(cls, curator_id, picture_list, gallery_name=None):
@@ -177,6 +188,7 @@ class Wall(db.Model):
     # Relationships
     gallery = db.relationship("Gallery")
     placements = db.relationship("Placement")
+    curator = db.relationship("User", secondary='galleries')
 
     @classmethod
     def init_from_workspace(cls, workspace):
