@@ -13,8 +13,8 @@
 <div class='row'>
     <div class='col-xs-12 col-md-12'>
         <h3> Choose Arrangement Methods and Parameters! </h3>
-        <div class='wall-display' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
-            <canvas id='canvas{{wall_id}}' height='300' width='900'> 
+        <div class='arrange-display' data-wallid='{{wall_id}}' data-galleryid='{{gallery_id}}'>
+            <canvas id='canvas-arrange' height='300' width='900'> 
                 If you dont have HTML5 canvas, you're gonna have a bad time.
             </canvas>
         </div>   
@@ -24,14 +24,15 @@
 <hr>
 
 <div class='row'>
-    <form action='/arrange-o-matic' method='POST'>
 
         <div class='col-sm-3 col-md-3'>
             <div class="text-center">
             <h5 >Method: Simple Linear</h5>
             <img src="/static/img/arr_linear.jpg" class="img-thumbnail">
-            <input type='radio' name='algorithm_type' value='linear' id='select-linear'>
-            <label class='sr-only' for='select-linear'>Linear Arrangment Method</label>
+            <button type="button" class="btn btn-default" id='arrange-linear' data-wallid='null'>Linear</button>
+            <button type="button" class="btn btn-default" id='rearrange-linear'>Redo</button>
+            <!-- <input type='radio' name='algorithm_type' value='linear' id='select-linear'> -->
+            <!-- <label class='sr-only' for='select-linear'>Linear Arrangment Method</label> -->
             </div>
             <p>Describe this arrangment method</p>   
             <hr>
@@ -40,8 +41,8 @@
             <div class="text-center">
             <h5 >Method: Column Hueristic</h5>
             <img src="/static/img/arr_column.jpg" class="img-thumbnail">
-            <input type='radio' name='algorithm_type' value='column' id='select-column'>
-            <label class='sr-only' for='select-column'>Column Heuristic Arrangment Method</label>
+            <button type="button" class="btn btn-default" id='arrange-column' data-wallid='null'>Linear</button>
+            <button type="button" class="btn btn-default" id='rearrange-column'>Redo</button>
             </div>
             <p>Describe this arrangment method</p>   
             <hr>
@@ -50,8 +51,8 @@
             <div class="text-center">
             <h5 >Method: Grid Expansion</h5>
             <img src="/static/img/arr_expand.jpg" class="img-thumbnail">
-            <input type='radio' name='algorithm_type' value='expand' id='select-expand'>
-            <label class='sr-only' for='select-expand'>Grid Expansion Arrangment Method</label>
+            <button type="button" class="btn btn-default" id='arrange-grid' data-wallid='none'>Linear</button>
+            <button type="button" class="btn btn-default" id='rearrange-grid'>Redo</button>
             </div>
             <p>Describe this arrangment method</p>   
             <hr>
@@ -60,12 +61,11 @@
             <div class="text-center">
             <h5 >General Options</h5>
             <!-- <input type='text' name='margin' class='form-control'>  -->
-            <input type='hidden' name='gallery_id' value='{{ gallery_id }}'>
-            <input type='submit' value='Submit Gallery for Arrangement' class="btn btn-default">
+            <!-- <input type='hidden' name='gallery_id' value='{{ gallery_id }}'> -->
+            <!-- <input type='submit' value='Submit Gallery for Arrangement' class="btn btn-default"> -->
             </div>
             <hr>
         </div> 
-    </form>
 </div>
     
 

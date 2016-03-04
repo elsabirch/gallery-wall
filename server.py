@@ -424,6 +424,23 @@ def get_gallery_data():
 
     return jsonify(gallery_to_hang)
 
+@app.route('/arrange.json', methods=['POST'])
+def get_arranged_data():
+    """Get the information needed for displaying a gallery.
+
+    Response to an AJAX request.
+    """
+
+    gallery_id = request.form.get('gallery_id')
+    algorithm_type = request.form.get('algorithm_type')
+
+    print '>_<  '* 10
+    print algorithm_type
+    print(gallery_id)
+
+    stuff = {'ohhai': 42}
+
+    return jsonify(stuff)
 
 @app.route('/gettime.json')
 def get_time_data():

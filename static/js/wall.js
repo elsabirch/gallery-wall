@@ -3,7 +3,6 @@
 maxCanvasHeight = 300;
 maxCanvasWidth = 900;
 
-
 // Get the wall_ids that I'm going to need to fill into canvases
 // Note to self, this is some hard won synthax... each()
 // did not allow me to return the information.
@@ -13,25 +12,86 @@ var wallIds = $('.wall-display').map( function(){
 );
 
 // For each wall_id that we found, make an ajax request to get the information 
-// need for plotting it up.
+// need for plotting it up. The success handler for these AJAX requests then 
+// calls the functions for displaying it.
 for(var i=0; i < wallIds.length; i++){
     getWall(wallIds[i]);
 }
 
 
-// In the case that this is the arrangment page, set up a bunch of other functionanality
+// In the case that this is the arrangment page, set up other functionanality
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+// If this is an arrangement page this variable will exist
+var divArrange = $('#arrange-display');
+var canvasArrange = $('#canvas-arrange');
+console.log(divArrange);
+console.log(canvasArrange);
 
-// save state of which walls have been genrated in this visit to the page
+var galleryId = $('#arrange-display').data('galleryid');
+console.log(galleryId);
+
+var recentCall = 'Nope!';
+
+// save state of which walls have been generated in this visit to the page
 
 // Listen for click on one of the arrangment icons
-    // clear canvas and redraw if already generated
-    // if not already there then request an arrangment and then plot
+    // if already generated clear canvas and redraw 
+    // elif not already there then request an arrangment and then plot
+    // set the save button to the wall id
+$('#arrange-column').click( function(){
+    var wallId = $('#arrange-column').data('wallid');
+    console.log('Hi clicker!');
+    console.log(wallId);
+    if (wallId === null){
+        // No wall associated yet with this display type, request one.
+
+        var postData = {'gallery_id': galleryId,
+                        'algorithm_type': 'column'};
+
+        recentCall = 'columny';
+
+        // Make AJAX request for the wallId given
+        $.post('arrange.json', postData, handleNewWall);
+
+    } else {
+        // There is one, just re-display it.
+    }
+}
+);
+
 
 // listen for click on refresh buttons which would prompt a new arrangment and 
 // reset of the state for each arrangemnet type
+$('#rearrange-column').click( function(){
+    // request a new wall of this type
+    console.log('Refresh requested!');
+    console.log(recentCall);
 
+}
+);
 
-// - - - - - - - - - - - - - - - - - -
+function handleNewWall(results){
+    // For wall returned from AJAX request, see if a wall was found.
+    // If so plot it, otherwise give some information
+    var wallToHang = results;
+
+    console.log(wallToHang.ohhai);
+
+    // if (wallToHang['id'] !== null) {
+    //     // console.dir(wallToHang);
+    //     hangWall(wallToHang);
+    // } else {
+    //     console.log("This is not the wall you're looking for.");
+    // }
+}
+
+// function doing all the steps to reset the arrangment area and other data and 
+// buttons to reflect the current state
+function setWallDisplayed(){
+
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 
 // Functions to handle getting wall info from server, then plotting it in canvas
 
