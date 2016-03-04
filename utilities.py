@@ -1,6 +1,6 @@
 from flask import session, request
 from model import User, Picture, db
-from server import pictures, app
+# from server import pictures, app
 
 import re
 import random

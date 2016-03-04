@@ -217,9 +217,14 @@ def show_walls():
 
     user_id = session.get('user_id', DEFAULT_USER_ID)
 
-    walls = User.query.get(user_id).walls
-    wall_ids = [w.wall_id for w in walls if w.saved]
-    wall_ids.sort(reverse=True)
+    wall_ids = (db.session.query(Wall.wall_id)
+                          .join(Gallery, User)
+                          .filter(User.user_id == user_id,
+                                  Wall.saved == True)
+                          .order_by(Wall.wall_id.desc())
+                          .all())
+    # output is a list of tuples of ids
+    wall_ids = [w[0] for w in wall_ids]
 
     return render_template("walls.html", wall_ids=wall_ids)
 
@@ -295,9 +300,6 @@ def get_gallery_data():
 
     gallery_id = request.args.get('galleryid')
     gallery = Gallery.query.get(gallery_id)
-
-    print('getting gallery:')
-    print(gallery)
 
     if gallery:
         gallery_to_hang = gallery.get_display_info()
