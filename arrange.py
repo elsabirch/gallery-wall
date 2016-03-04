@@ -83,7 +83,7 @@ class Arranger(object):
         Removes returned from pictures remaining.
         """
 
-        narrows = set(self.width_sort[:(self.ws.n / 3)]) and self.pics_remaining
+        narrows = set(self.width_sort[:(self.ws.len / 3)]) and self.pics_remaining
         if narrows:
             p = random.sample(narrows, 1)[0]
             self.pics_remaining.remove(p)
@@ -101,7 +101,7 @@ class Arranger(object):
         Removes returned from pictures remaining.
         """
 
-        smalls = set(self.area_sort[:(self.ws.n / 3)]) and self.pics_remaining
+        smalls = set(self.area_sort[:(self.ws.len / 3)]) and self.pics_remaining
         if smalls:
             p = random.sample(smalls, 1)[0]
             self.pics_remaining.remove(p)
@@ -119,7 +119,7 @@ class Arranger(object):
         Removes returned from pictures remaining.
         """
 
-        larges = set(self.area_sort[-(self.ws.n / 3):]) and self.pics_remaining
+        larges = set(self.area_sort[-(self.ws.len / 3):]) and self.pics_remaining
         if larges:
             p = random.sample(larges, 1)[0]
             self.pics_remaining.remove(p)
@@ -227,10 +227,10 @@ class GalleryFloorArranger(Arranger):
 
         # Make two rows if many pictures, one row if not
         total_width = sum([self.ws.pics[p].w for p in self.ws.pics])
-        if self.ws.n < 10:
-            gallery_width = (total_width) + (total_width / self.ws.n)
+        if self.ws.len < 10:
+            gallery_width = (total_width) + (total_width / self.ws.len)
         else:
-            gallery_width = (total_width / 2.0) + (total_width / self.ws.n)
+            gallery_width = (total_width / 2.0) + (total_width / self.ws.len)
 
         gallery_height = self.height_tallest
         current_row_width = 0
@@ -270,7 +270,7 @@ class ColumnArranger(Arranger):
         # For each 7 or 8 pictures make a nest, and a 2 or 3 stack
         # Written as while loop to tolertate small numbers
         i = 0
-        while (i < (self.ws.n / 7)) and (len(self.pics_remaining) > 5):
+        while (i < (self.ws.len / 7)) and (len(self.pics_remaining) > 5):
             self.make_nested_column()
             self.make_stacked_column(random.choice([2, 3]))
             i += 1
@@ -425,14 +425,14 @@ class GridArranger(Arranger):
         {(i,j): pic}
         """
 
-        n_grid = int(math.ceil(math.sqrt(self.ws.n)))
+        n_grid = int(math.ceil(math.sqrt(self.ws.len)))
         min_grid = -n_grid/2
         max_grid = min_grid + n_grid
 
         grid_pairs = [(i, j) for i in range(min_grid, max_grid)
                              for j in range(min_grid, max_grid)]
 
-        grid_sample = random.sample(grid_pairs, self.ws.n)
+        grid_sample = random.sample(grid_pairs, self.ws.len)
 
         grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.ws.pics.keys())}
 
@@ -538,7 +538,7 @@ class Workspace(object):
 
         self.gallery_id = gallery_id
         self.margin = options.get('margin', DEFAULT_MARGIN)
-        self.n = len(pictures)
+        self.len = len(pictures)
 
         # self.options = options
 
