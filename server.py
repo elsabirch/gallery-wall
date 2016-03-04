@@ -329,7 +329,7 @@ def process_arrangment():
     elif algorithm_type == 'column':
         arr = ar.ColumnArranger(wkspc)
     elif algorithm_type == 'expand':
-        arr = ar.GridArrangement(wkspc)
+        arr = ar.GridArranger(wkspc)
     else:
         # Default to column arrangement
         arr = ar.ColumnArranger(wkspc)

@@ -406,7 +406,7 @@ class LinearArranger(Arranger):
             row_width = self.ws.pics[p].x2
 
 
-class GridArrangement(Arranger):
+class GridArranger(Arranger):
 
     @adjust_for_wall
     def arrange(self):
