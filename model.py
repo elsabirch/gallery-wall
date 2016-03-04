@@ -116,26 +116,18 @@ class Gallery(db.Model):
                                      Wall.gallery_display == True)
                              .first())
 
-        # wall_id = []
-
         if not wall_id:
 
             arrange_options = {}
 
             lazy_load_of_workspace()
-            print 'making a workspace'
             wkspc = ar.Workspace(self.gallery_id)
-            print 'made a workspace'
             arranger_instance = ar.GalleryFloorArranger(wkspc)
-            print 'made a galelry arranger'
             # import pdb
             # pdb.set_trace()
-            arranger_instance.arrange_x()
-            print 'arranged that stuff'
-            # wkspc.arrange_gallery_display_floor()
+            arranger_instance.arrange()
             wall_id = Wall.init_from_workspace(wkspc)
-            db.session.flush()
-            print 'i inited a wall'
+            # db.session.flush()
             Wall.query.get(wall_id).set_gallery_display()
 
         else:

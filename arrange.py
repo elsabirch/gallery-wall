@@ -53,13 +53,19 @@ class Arranger(object):
     # Methods to get over all that 'find the little ones' junk code
     # ex: def get_small()
 
-    # def pop_tallest():
-    #     """Return tallest picture reminaing, and remove from list of those remaining."""
+    def pop_tallest(self):
+        """Return tallest picture reminaing, and remove from list of those remaining."""
 
-    #     for p in self.height_sort:
-    #         if p in self.pics_remaining:
-    #             self.pics_remaining.remove(p)
-    #             return p
+        for p in self.height_sort[::-1]:
+            if p in self.pics_remaining:
+                self.pics_remaining.remove(p)
+                return p
+
+    @property
+    def height_tallest(self):
+        """Height of the tallest picture."""
+
+        return self.height_sort[-1]
 
 
     # Methods used for each arrangement (so far)
@@ -147,7 +153,7 @@ class GalleryFloorArranger(Arranger):
     """Arranges display for galleries, in rows by descending height, aligned bottom."""
 
     @adjust_for_wall
-    def arrange_x(self):
+    def arrange(self):
         """Arranges display for galleries, in rows by descending height, aligned bottom."""
 
         # Make two rows if many pictures, one row if not
@@ -157,24 +163,14 @@ class GalleryFloorArranger(Arranger):
         else:
             gallery_width = (total_width / 2.0) + (total_width / self.ws.n)
 
-        gallery_height = self.ws.pics[self.height_sort[-1]].h
-        current_row_width = 0
-        current_row_base = gallery_height
-
-        self.height_sort.reverse()
-
-        gallery_height = self.ws.pics[self.height_sort[0]].h
+        gallery_height = self.height_tallest
         current_row_width = 0
         current_row_base = gallery_height
 
         # Set pictures in rows
-        for p in self.height_sort:
-            # Start a new row if this one is full
+        while self.pics_remaining:
 
-            # # Set pictures in rows
-            # while self.pics_remaining:
-
-            #     p = self.pop_tallest()
+            p = self.pop_tallest()
 
             # Start a new row if this one is full
             if (current_row_width + self.ws.pics[p].w) > gallery_width:
