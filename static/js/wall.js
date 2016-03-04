@@ -28,11 +28,11 @@ console.log(divArrange);
 console.log(canvasArrange);
 
 var galleryId = $('#arrange-display').data('galleryid');
-console.log(galleryId);
-
-var recentCall = 'Nope!';
+// console.log(galleryId);
 
 // save state of which walls have been generated in this visit to the page
+var recentWalls = {};
+var recentCall = null;
 
 // Listen for click on one of the arrangment icons
     // if already generated clear canvas and redraw 
@@ -40,15 +40,15 @@ var recentCall = 'Nope!';
     // set the save button to the wall id
 $('#arrange-column').click( function(){
     var wallId = $('#arrange-column').data('wallid');
-    console.log('Hi clicker!');
-    console.log(wallId);
+    // console.log('Hi clicker!');
+    // console.log(wallId);
     if (wallId === null){
         // No wall associated yet with this display type, request one.
 
         var postData = {'gallery_id': galleryId,
                         'algorithm_type': 'column'};
 
-        recentCall = 'columny';
+        recentCall = '#arrange-column';
 
         // Make AJAX request for the wallId given
         $.post('arrange.json', postData, handleNewWall);
@@ -77,12 +77,26 @@ function handleNewWall(results){
 
     console.log(wallToHang.ohhai);
 
+    var newWallId = wallToHang.id;
+
+    // Get the wall plotting area ready for a new wall
+    divArrange.data('wallid', newWallId);
+    canvasArrange.attr('id', 'canvas' + newWallId);
+    console.log(canvasArrange);
+    context = canvasArrange[0].getContext('2d');
+    context.clearRect(0, 0, canvasArrange.width, canvasArrange.height);
+
+    // Hang the new wall
+
     // if (wallToHang['id'] !== null) {
     //     // console.dir(wallToHang);
     //     hangWall(wallToHang);
     // } else {
     //     console.log("This is not the wall you're looking for.");
     // }
+
+    // Set buttons and such for the the recent call that generated this wall
+
 }
 
 // function doing all the steps to reset the arrangment area and other data and 
@@ -117,6 +131,7 @@ function handleWall(results){
 function hangWall(wallToHang){
     // Draw the pictures of a wall on a canvas.
 
+    // TODO: Use jquery here
     var canvas = document.getElementById('canvas'+wallToHang.id);
     var context = canvas.getContext('2d');
 

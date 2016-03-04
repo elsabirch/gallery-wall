@@ -438,7 +438,8 @@ def get_arranged_data():
     print algorithm_type
     print(gallery_id)
 
-    stuff = {'ohhai': 42}
+    stuff = {'ohhai': 42,
+            'id':1042}
 
     return jsonify(stuff)
 
