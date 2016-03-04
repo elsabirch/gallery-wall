@@ -1,5 +1,5 @@
 from flask import session, request
-from model import User, Picture, db
+from model import User, Picture, Gallery, db
 
 import re
 import random
@@ -10,6 +10,7 @@ def lazy_load_of_upload_imports():
     global pictures
     global app
     from server import pictures, app
+
 
 def attempt_login():
     """Logs user into session and returns True if POST credentials valid.
@@ -97,6 +98,26 @@ def attempt_upload():
     else:
         return False
 
+
+def attempt_curation():
+    """Creates gallery from POST request pictures and returns True is successful.
+
+    Returns false otherwise."""
+
+    user_id = session.get('user_id', None)
+
+    picture_ids = [int(p) for p in request.form.getlist('gallery_member')]
+
+    if len(picture_ids) > 0:
+        gallery_name = to_clean_string_from_input(request.form.get('gallery_name'),
+                                                  max_length=100)
+        gallery = Gallery.make_from_pictures(curator_id=user_id,
+                                             picture_list=picture_ids,
+                                             gallery_name=gallery_name)
+        # gallery.print_seed()
+        return True
+    else:
+        return False
 
 def rename_picture_on_server(filename_provided, picture_id):
     """Rename picture using id and random number, returns new name."""
