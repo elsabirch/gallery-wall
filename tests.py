@@ -95,7 +95,7 @@ class UtilitiesParserFunctionsTestCase(unittest.TestCase):
                                expect_out)
 
 
-class ServerRoutesTestCase(unittest.TestCase):
+class NavigationServerRoutesTestCase(unittest.TestCase):
 
     def setUp(self):
         self.client = server.app.test_client()
@@ -124,6 +124,18 @@ class ServerRoutesTestCase(unittest.TestCase):
     # def navigations while not logged in
 
     # tear down by logging out
+
+class LoginServerRoutesTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.client = server.app.test_client()
+        server.app.config['TESTING'] = True
+
+    def test_login_signup(self):
+        result = self.client.get('/login')
+        self.assertIn('Username', result.data)
+        self.assertIn('Email', result.data)
+        self.assertIn('Password', result.data)
 
 if __name__ == "__main__":
     unittest.main()
