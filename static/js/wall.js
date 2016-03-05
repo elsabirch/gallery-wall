@@ -35,8 +35,12 @@ var galleryId = $('.arrange-display').data('galleryid');
 console.log('gallery id -*-*-*-*-*-*-*-*-*-*-*-*-*-*');
 console.log(galleryId);
 
-// save state of which walls have been generated in this visit to the page
-var recentWalls = {};
+// save state of which walls have been generated most recently for each method
+var recentWalls = {
+                   '#arrange-linear': null,
+                   '#arrange-column': null,
+                   '#arrange-grid': null,
+                   };
 var recentCall = null;
 
 // Listen for click on one of the arrangment icons
@@ -44,7 +48,8 @@ var recentCall = null;
     // elif not already there then request an arrangment and then plot
     // set the save button to the wall id
 $('#arrange-column').click( function(){
-    var wallId = $('#arrange-column').data('wallid');
+    // var wallId = $('#arrange-column').data('wallid');
+    var wallId = recentWalls['#arrange-column'];
     // console.log('Hi clicker!');
     // console.log(wallId);
     if (wallId === null){
@@ -56,7 +61,7 @@ $('#arrange-column').click( function(){
         recentCall = '#arrange-column';
 
         // Make AJAX request for the wallId given
-        $.post('arrange.json', postData, handleNewWall);
+        $.post('arrange.json', postData, handleArrangeNewWall);
 
     } else {
         // There is one, just re-display it.
@@ -75,37 +80,51 @@ $('#rearrange-column').click( function(){
 }
 );
 
-function handleNewWall(results){
-    // For wall returned from AJAX request, see if a wall was found.
-    // If so plot it, otherwise give some information
+function handleArrangeNewWall(results){
+    // Success handler for a brand new wall in the arrangment page.
+    // JSON containing wallId was returned from AJAX request, so pass that along
+    // to the function that handles plotting of new or recent walls in the 
+    // arrangment page.
+
     var arrangeResults = results;
 
     var newWallId = arrangeResults.id;
 
+    handleArrangeWall(newWallId);
+
+}
+
+function handleArrangeWall(wallId){
+
     // Set buttons and such for the the recent call that generated this wall
     // Get the wall plotting area ready for a new wall
-    setWallDisplayed(newWallId);
+    setArrangeWallDisplayed(wallId);
     clearCanvas();
 
-    // Get and hang the new wall
-    getWall(newWallId);
-
+    // Get and hang the new wall, this function is the same used for all wall
+    // and gallery displays.
+    getWall(wallId);
 }
 
 // function doing all the steps to reset the arrangment area and other data and 
 // buttons to reflect the current state
-function setWallDisplayed(newWallId){
+function setArrangeWallDisplayed(newWallId){
 
     // Set the display area to recieve the new wall via wall hanging functions
     divArrange.data('wallid', newWallId);
     canvasArrange.attr('id', 'canvas' + newWallId);
 
+    // Set the trigger for type of arrangment to remember this most recent wall
+    recentWalls[recentCall] = newWallId;
+
+    // Set save button to know which wall is displayed
 }
 
-// Function to clear canvas
+
 function clearCanvas(){
+    // Function to clear canvas so that a new wall may be displayed.
+
     context = canvasArrange[0].getContext('2d');
-    console.log(context);
     context.clearRect(0, 0, canvasArrange[0].width, canvasArrange[0].height);
 }
 
