@@ -655,14 +655,70 @@ def is_conflict(x1_a, x2_a, y1_a, y2_a, x1_b, x2_b, y1_b, y2_b):
         >>> is_conflict(0, 11, -1, 8, -1, 9, 0, 12)
         True
 
+           +----+
+        +----------+
+        |  |    |  |
+        |  |    |  |
+        +----------+
+           +----+
+
+        >>> is_conflict(0, 8, 2, 6, 2, 6, 1, 7)
+        True
+        >>> is_conflict(2, 6, 1, 7, 0, 8, 2, 6)
+        True
     """
 
-    if ((((x1_a <= x1_b <= x2_a) or (x1_a <= x2_b <= x2_a)) and
-         ((y1_a <= y1_b <= y2_a) or (y1_a <= y2_b <= y2_a)))
-        or
-        (((x1_b <= x1_a <= x2_b) or (x1_b <= x2_a <= x2_b)) and
-         ((y1_b <= y1_a <= y2_b) or (y1_b <= y2_a <= y2_b)))):
+    if (((x1_a <= x1_b <= x2_a) or (x1_a <= x2_b <= x2_a)) and
+         ((y1_a <= y1_b <= y2_a) or (y1_a <= y2_b <= y2_a))):
+
+        # This should be the case when any corner of b is within a:
+        #    a               a                a
+        # +------+       +--------+       +-------+
+        # |      |       |        |       |       |
+        # |   +-----+    |    +------+    |  +--+ |
+        # |   |b |  |    |    |b  |  |    |  |b | |
+        # +------+  |    |    +------+    |  +--+ |
+        #     |     |    |        |       |       |
+        #     +-----+    +--------+       +-------+
+        # (not all possible cases shown)
         return True
+
+    elif (((x1_b <= x1_a <= x2_b) or (x1_b <= x2_a <= x2_b)) and
+         ((y1_b <= y1_a <= y2_b) or (y1_b <= y2_a <= y2_b))):
+
+        # This should be the case when any corner of b is within a:
+        #    b               b                b
+        # +------+       +--------+       +-------+
+        # |      |       |        |       |       |
+        # |   +-----+    |    +------+    |  +--+ |
+        # |   |a |  |    |    |a  |  |    |  |a | |
+        # +------+  |    |    +------+    |  +--+ |
+        #     |     |    |        |       |       |
+        #     +-----+    +--------+       +-------+
+        # (not all possible cases shown, the first case shown would be in first
+        # condition too)
+        return True
+
+    elif ((x1_a < x1_b) and (x2_b < x2_a)) and ((y1_b < y1_a) and (y2_a < y2_b)):
+        #      b
+        #    +----+
+        # +----------+
+        # |a |    |  |
+        # |  |    |  |
+        # +----------+
+        #    +----+
+        return True
+
+    elif ((x1_b < x1_a) and (x2_a < x2_b)) and ((y1_a < y1_b) and (y2_b < y2_a)):
+        #      a
+        #    +----+
+        # +----------+
+        # |b |    |  |
+        # |  |    |  |
+        # +----------+
+        #    +----+
+        return True
+
     else:
         return False
 
