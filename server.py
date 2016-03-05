@@ -319,17 +319,29 @@ def get_arranged_data():
     Response to an AJAX request.
     """
 
-    gallery_id = request.form.get('gallery_id')
+    gallery_id = int(request.form.get('gallery_id'))
+    # margin = request.form.get('margin')
+    wkspc = ar.Workspace(gallery_id)
+
     algorithm_type = request.form.get('algorithm_type')
 
-    print '>_<  '* 10
-    print algorithm_type
-    print(gallery_id)
+    if algorithm_type == 'linear':
+        arr = ar.LinearArranger(wkspc)
+    elif algorithm_type == 'column':
+        arr = ar.ColumnArranger(wkspc)
+    elif algorithm_type == 'expand':
+        arr = ar.GridArranger(wkspc)
+    else:
+        # Default to column arrangement
+        arr = ar.ColumnArranger(wkspc)
 
-    stuff = {'ohhai': 42,
-            'id':1042}
+    arr.arrange()
 
-    return jsonify(stuff)
+    wall_id = Wall.init_from_workspace(wkspc)
+
+    new_wall_data = {'id':wall_id}
+
+    return jsonify(new_wall_data)
 
 @app.route('/gettime.json')
 def get_time_data():

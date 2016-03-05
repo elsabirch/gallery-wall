@@ -25,14 +25,15 @@ for(var i=0; i < wallIds.length; i++){
 // In the case that this is the arrangment page, set up other functionanality
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // If this is an arrangement page this variable will exist
-var divArrange = $('#arrange-display');
+var divArrange = $('.arrange-display');
 var canvasArrange = $('.canvas-arrange');
 console.log(divArrange);
 console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
 console.log(canvasArrange);
 
-var galleryId = $('#arrange-display').data('galleryid');
-// console.log(galleryId);
+var galleryId = $('.arrange-display').data('galleryid');
+console.log('gallery id -*-*-*-*-*-*-*-*-*-*-*-*-*-*');
+console.log(galleryId);
 
 // save state of which walls have been generated in this visit to the page
 var recentWalls = {};
@@ -77,36 +78,35 @@ $('#rearrange-column').click( function(){
 function handleNewWall(results){
     // For wall returned from AJAX request, see if a wall was found.
     // If so plot it, otherwise give some information
-    var wallToHang = results;
+    var arrangeResults = results;
 
-    console.log(wallToHang.ohhai);
-
-    var newWallId = wallToHang.id;
-
-    // Get the wall plotting area ready for a new wall
-    divArrange.data('wallid', newWallId);
-    canvasArrange.attr('id', 'canvas' + newWallId);
-    console.log(canvasArrange);
-    context = canvasArrange[0].getContext('2d');
-    context.clearRect(0, 0, canvasArrange.width, canvasArrange.height);
-
-    // Hang the new wall
-
-    // if (wallToHang['id'] !== null) {
-    //     // console.dir(wallToHang);
-    //     hangWall(wallToHang);
-    // } else {
-    //     console.log("This is not the wall you're looking for.");
-    // }
+    var newWallId = arrangeResults.id;
 
     // Set buttons and such for the the recent call that generated this wall
+    // Get the wall plotting area ready for a new wall
+    setWallDisplayed(newWallId);
+    clearCanvas();
+
+    // Get and hang the new wall
+    getWall(newWallId);
 
 }
 
 // function doing all the steps to reset the arrangment area and other data and 
 // buttons to reflect the current state
-function setWallDisplayed(){
+function setWallDisplayed(newWallId){
 
+    // Set the display area to recieve the new wall via wall hanging functions
+    divArrange.data('wallid', newWallId);
+    canvasArrange.attr('id', 'canvas' + newWallId);
+
+}
+
+// Function to clear canvas
+function clearCanvas(){
+    context = canvasArrange[0].getContext('2d');
+    console.log(context);
+    context.clearRect(0, 0, canvasArrange[0].width, canvasArrange[0].height);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
