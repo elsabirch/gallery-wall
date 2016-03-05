@@ -186,35 +186,6 @@ def prompt_arrangment():
                            wall_id=wall_id)
 
 
-@app.route('/arrange-o-matic', methods=["POST"])
-def process_arrangment():
-    """Process the arrangement."""
-
-
-    gallery_id = request.form.get('gallery_id')
-    # margin = request.form.get('margin')
-    wkspc = ar.Workspace(gallery_id)
-
-    algorithm_type = request.form.get('algorithm_type')
-
-    if algorithm_type == 'linear':
-        arr = ar.LinearArranger(wkspc)
-    elif algorithm_type == 'column':
-        arr = ar.ColumnArranger(wkspc)
-    elif algorithm_type == 'expand':
-        arr = ar.GridArranger(wkspc)
-    else:
-        # Default to column arrangement
-        arr = ar.ColumnArranger(wkspc)
-
-    # arr = ar.ColumnArranger(wkspc)
-    arr.arrange()
-
-    wall_id = Wall.init_from_workspace(wkspc)
-
-    return redirect(url_for('show_new_wall', wall_id=wall_id))
-
-
 @app.route('/walls')
 def show_walls():
     """Show a user's walls that they have arranged and saved."""
@@ -231,27 +202,6 @@ def show_walls():
     wall_ids = [w[0] for w in wall_ids]
 
     return render_template("walls.html", wall_ids=wall_ids)
-
-
-@app.route('/new-wall', methods=['GET'])
-def show_new_wall():
-    """Show a user wall that has just been arranged."""
-
-    wall_id = request.args.get('wall_id')
-
-    # Wall.query.get(int(wall_id)).print_seed()
-
-    return render_template("new-wall.html", wall_id=wall_id)
-
-
-@app.route('/save-wall', methods=["POST"])
-def save_wall():
-    """Changes the state of the wall in the database to saved."""
-
-    wall_id = int(request.form.get('wall_id'))
-    Wall.query.get(wall_id).save()
-
-    return redirect('/walls')
 
 
 @app.route('/wall-dimensions', methods=["GET"])
@@ -275,6 +225,15 @@ def show_time():
 
 
 # Routes returning json data
+
+@app.route('/save-wall.json', methods=["POST"])
+def save_wall():
+    """Changes the state of the wall in the database to saved."""
+
+    wall_id = int(request.form.get('wall_id'))
+    Wall.query.get(wall_id).save()
+
+    return jsonify({'wall_id': wall_id})
 
 
 @app.route('/getwall.json')
@@ -312,6 +271,36 @@ def get_gallery_data():
 
     return jsonify(gallery_to_hang)
 
+@app.route('/arrange.json', methods=['POST'])
+def get_arranged_data():
+    """Get the information needed for displaying a gallery.
+
+    Response to an AJAX request.
+    """
+
+    gallery_id = int(request.form.get('gallery_id'))
+    # margin = request.form.get('margin')
+    wkspc = ar.Workspace(gallery_id)
+
+    algorithm_type = request.form.get('algorithm_type')
+
+    if algorithm_type == 'linear':
+        arr = ar.LinearArranger(wkspc)
+    elif algorithm_type == 'column':
+        arr = ar.ColumnArranger(wkspc)
+    elif algorithm_type == 'expand':
+        arr = ar.GridArranger(wkspc)
+    else:
+        # Default to column arrangement
+        arr = ar.ColumnArranger(wkspc)
+
+    arr.arrange()
+
+    wall_id = Wall.init_from_workspace(wkspc)
+
+    new_wall_data = {'id':wall_id}
+
+    return jsonify(new_wall_data)
 
 @app.route('/gettime.json')
 def get_time_data():
