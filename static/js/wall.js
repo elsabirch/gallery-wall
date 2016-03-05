@@ -37,60 +37,57 @@ console.log(galleryId);
 
 // save state of which walls have been generated most recently for each method
 var recentWalls = {
-                   '#arrange-linear': null,
-                   '#arrange-column': null,
-                   '#arrange-grid': null,
+                   'linear': null,
+                   'column': null,
+                   'grid': null,
                    };
 var recentCall = null;
 
 // Temporary patch for my naming mistakes
 var algorithmServerTranslation = {
-                   '#arrange-linear': 'linear',
-                   '#arrange-column': 'column',
-                   '#arrange-grid': 'expand',
+                   'linear': 'linear',
+                   'column': 'column',
+                   'grid': 'expand',
                    };
 
 // Listen for click on one of the arrangment icons
 $('#arrange-linear').click( function(){
-    handleArrangeAlgorithmSelect('#arrange-linear'); }
+    handleArrangeAlgorithmSelect('linear'); }
 );
 
 $('#arrange-column').click( function(){
-    handleArrangeAlgorithmSelect('#arrange-column'); }
+    handleArrangeAlgorithmSelect('column'); }
 );
 
 $('#arrange-grid').click( function(){
-    handleArrangeAlgorithmSelect('#arrange-grid'); }
+    handleArrangeAlgorithmSelect('grid'); }
 );
 
 // listen for click on refresh buttons which will prompt a new arrangment 
 $('#rearrange-linear').click( function(){
-    // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
-    requestArrange('#arrange-linear'); }
+    requestArrange('linear'); }
 );
 
 $('#rearrange-column').click( function(){
-    // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
-    requestArrange('#arrange-column'); }
+    requestArrange('column'); }
 );
 
 $('#rearrange-grid').click( function(){
-    // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
-    requestArrange('#arrange-grid'); }
+    requestArrange('grid'); }
 );
 
 // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
-function handleArrangeAlgorithmSelect(arrangeAlgorithmIdSelectorStr){
+function handleArrangeAlgorithmSelect(arrangeAlgorithm){
     // Given any algorithm selected, check if an arrangment exists as recently 
     // generated.  If not then request a new arrangement.  If it exists call wall handling.
 
     // Check this state holding variable from global scope
-    var wallId = recentWalls[arrangeAlgorithmIdSelectorStr];
+    var wallId = recentWalls[arrangeAlgorithm];
 
     if (wallId === null){
         // No wall associated yet with this algorithm type, request one.
 
-        requestArrange(arrangeAlgorithmIdSelectorStr);
+        requestArrange(arrangeAlgorithm);
 
     } else {
         // There is one, just re-display it.
@@ -99,14 +96,14 @@ function handleArrangeAlgorithmSelect(arrangeAlgorithmIdSelectorStr){
 }
 
 // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
-function requestArrange(arrangeAlgorithmIdSelectorStr){
+function requestArrange(arrangeAlgorithm){
 
-    var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithmIdSelectorStr];
+    var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithm];
 
     var postData = {'gallery_id': galleryId,
                     'algorithm_type': algorithmTypeForServer};
 
-    recentCall = arrangeAlgorithmIdSelectorStr;
+    recentCall = arrangeAlgorithm;
 
     // Make AJAX request for the wallId given
     $.post('arrange.json', postData, handleArrangeNewWall);
@@ -149,7 +146,7 @@ function setArrangeWallDisplayed(newWallId){
     // Set the trigger for type of arrangment to remember this most recent wall
     recentWalls[recentCall] = newWallId;
 
-    // Set save button to know which wall is displayed
+    // TODO: Set save button to know which wall is displayed
 }
 
 function clearCanvas(){
