@@ -52,39 +52,45 @@ var algorithmServerTranslation = {
 
 // Listen for click on one of the arrangment icons
 $('#arrange-linear').click( function(){
-    handleArrangeAlgorithmSelect('#arrange-linear');
-}
+    handleArrangeAlgorithmSelect('#arrange-linear'); }
 );
 
 $('#arrange-column').click( function(){
-    handleArrangeAlgorithmSelect('#arrange-column');
-}
+    handleArrangeAlgorithmSelect('#arrange-column'); }
 );
 
 $('#arrange-grid').click( function(){
-    handleArrangeAlgorithmSelect('#arrange-grid');
-}
+    handleArrangeAlgorithmSelect('#arrange-grid'); }
 );
 
-function handleArrangeAlgorithmSelect(arrangeAlgorithmSelected){
+// listen for click on refresh buttons which will prompt a new arrangment 
+$('#rearrange-linear').click( function(){
+    // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
+    requestArrange('#arrange-linear'); }
+);
+
+$('#rearrange-column').click( function(){
+    // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
+    requestArrange('#arrange-column'); }
+);
+
+$('#rearrange-grid').click( function(){
+    // THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
+    requestArrange('#arrange-grid'); }
+);
+
+// THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
+function handleArrangeAlgorithmSelect(arrangeAlgorithmIdSelectorStr){
     // Given any algorithm selected, check if an arrangment exists as recently 
     // generated.  If not then request a new arrangement.  If it exists call wall handling.
 
     // Check this state holding variable from global scope
-    var wallId = recentWalls[arrangeAlgorithmSelected];
+    var wallId = recentWalls[arrangeAlgorithmIdSelectorStr];
 
     if (wallId === null){
         // No wall associated yet with this algorithm type, request one.
 
-        var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithmSelected];
-
-        var postData = {'gallery_id': galleryId,
-                        'algorithm_type': algorithmTypeForServer};
-
-        recentCall = arrangeAlgorithmSelected;
-
-        // Make AJAX request for the wallId given
-        $.post('arrange.json', postData, handleArrangeNewWall);
+        requestArrange(arrangeAlgorithmIdSelectorStr);
 
     } else {
         // There is one, just re-display it.
@@ -92,13 +98,20 @@ function handleArrangeAlgorithmSelect(arrangeAlgorithmSelected){
     }
 }
 
-// listen for click on refresh buttons which would prompt a new arrangment and 
-// reset of the state for each arrangemnet type
-$('#rearrange-column').click( function(){
-    // request a new wall of this type
-    console.log('Refresh requested!');
+// THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
+function requestArrange(arrangeAlgorithmIdSelectorStr){
+
+    var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithmIdSelectorStr];
+
+    var postData = {'gallery_id': galleryId,
+                    'algorithm_type': algorithmTypeForServer};
+
+    recentCall = arrangeAlgorithmIdSelectorStr;
+
+    // Make AJAX request for the wallId given
+    $.post('arrange.json', postData, handleArrangeNewWall);
+
 }
-);
 
 function handleArrangeNewWall(results){
     // Success handler for a brand new wall in the arrangment page.
