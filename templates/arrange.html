@@ -20,7 +20,19 @@
                     id='canvas{{wall_id}}' height='300' width='900'> 
                 If you dont have HTML5 canvas, you're gonna have a bad time.
             </canvas>
-        </div>   
+        </div>
+            <div id='save-div' style="display:none">
+                {% if 'user_id' in session %}
+                    <button type="button" class="btn btn-default" 
+                    id='save-button' data-wallid='null'>
+                    Save This Wall
+                    </button>
+                    <span id='save-confirm'>Saved!</span>
+                {% else %}
+                    <p>You can't save things!</p>
+                {% endif %}   
+            </div>
+            
     </div>   
 </div>
 
@@ -66,15 +78,7 @@
             <p>Describe this arrangment method</p>   
             <hr>
         </div> 
-        <div class='col-sm-3 col-md-3'>
-            <div class="text-center">
-            <h5 >General Options</h5>
-            <!-- <input type='text' name='margin' class='form-control'>  -->
-            <!-- <input type='hidden' name='gallery_id' value='{{ gallery_id }}'> -->
-            <!-- <input type='submit' value='Submit Gallery for Arrangement' class="btn btn-default"> -->
-            </div>
-            <hr>
-        </div> 
+
 </div>
     
 

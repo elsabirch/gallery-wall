@@ -10,9 +10,6 @@ var wallIds = $('.wall-display').map( function(){
     return $(this).data('wallid');
 }
 );
-console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
-console.log(wallIds);
-console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
 
 // For each wall_id that we found, make an ajax request to get the information 
 // need for plotting it up. The success handler for these AJAX requests then 
@@ -27,13 +24,8 @@ for(var i=0; i < wallIds.length; i++){
 // If this is an arrangement page this variable will exist
 var divArrange = $('.arrange-display');
 var canvasArrange = $('.canvas-arrange');
-console.log(divArrange);
-console.log('-*-*-*-*-*-*-*-*-*-*-*-*-*-*');
-console.log(canvasArrange);
 
 var galleryId = $('.arrange-display').data('galleryid');
-console.log('gallery id -*-*-*-*-*-*-*-*-*-*-*-*-*-*');
-console.log(galleryId);
 
 // save state of which walls have been generated most recently for each method
 var recentWalls = {
@@ -42,6 +34,7 @@ var recentWalls = {
                    'grid': null,
                    };
 var recentCall = null;
+var recentSaves = [];
 
 // Temporary patch for my naming mistakes
 var algorithmServerTranslation = {
@@ -58,6 +51,11 @@ $('.arrange-select').click( function(){
 // listen for click on refresh buttons which will prompt a new arrangment 
 $('.rearrange-select').click( function(){
     requestArrange($(this).data('algorithmtype')); }
+);
+
+// listen for click on wall save button 
+$('#save-button').click( function(){
+    saveWall($(this).data('wallid')); }
 );
 
 
@@ -90,7 +88,6 @@ function requestArrange(arrangeAlgorithm){
 
     // Make AJAX request for the wallId given
     $.post('arrange.json', postData, handleArrangeNewWall);
-
 }
 
 function handleArrangeNewWall(results){
@@ -118,18 +115,49 @@ function handleArrangeWall(wallId){
     getWall(wallId);
 }
 
-function setArrangeWallDisplayed(newWallId){
+function setArrangeWallDisplayed(wallId){
     // function doing all the steps to reset the arrangment area and other data and 
     // buttons to reflect the current state
 
     // Set the display area to recieve the new wall via wall hanging functions
-    divArrange.data('wallid', newWallId);
-    canvasArrange.attr('id', 'canvas' + newWallId);
+    divArrange.data('wallid', wallId);
+    canvasArrange.attr('id', 'canvas' + wallId);
 
     // Set the trigger for type of arrangment to remember this most recent wall
-    recentWalls[recentCall] = newWallId;
+    recentWalls[recentCall] = wallId;
 
-    // TODO: Set save button to know which wall is displayed
+    //Set save button to know which wall is displayed
+    $('#save-div').show();
+    $('#save-button').data('wallid', wallId);
+    setSaveButtonState(wallId);
+
+}
+
+function saveWall(wallId){
+    
+    var postData = {'wall_id': wallId};
+
+    // Make AJAX request for the wallId given
+    $.post('save-wall.json', postData, handleSavedWall);
+}
+
+function handleSavedWall(results){
+
+    wallId = results['wall_id'];
+
+    recentSaves.push(wallId);
+    setSaveButtonState(wallId);
+}
+
+function setSaveButtonState(wallId){
+
+    if (recentSaves.indexOf(wallId) > -1){
+        $('#save-button').hide();
+        $('#save-confirm').show();
+    } else {
+        $('#save-button').show();
+        $('#save-confirm').hide();
+    }
 }
 
 function clearCanvas(){
@@ -160,7 +188,6 @@ function handleWall(results){
         console.log("This is not the wall you're looking for.");
     }
 }
-
 
 function hangWall(wallToHang){
     // Draw the pictures of a wall on a canvas.
@@ -214,7 +241,6 @@ function hangPicture(context, picture, wallToCanvas){
         hangEmptyPicture(context, xForCanvas, yForCanvas, wForCanvas, hForCanvas);
     }
 }
-
 
 function getWallDisplayScale(wallToHang){
     // Get the scale so that the wall can be displayed as large as possible 
