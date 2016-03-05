@@ -43,40 +43,60 @@ var recentWalls = {
                    };
 var recentCall = null;
 
+// Temporary patch for my naming mistakes
+var algorithmServerTranslation = {
+                   '#arrange-linear': 'linear',
+                   '#arrange-column': 'column',
+                   '#arrange-grid': 'expand',
+                   };
+
 // Listen for click on one of the arrangment icons
-    // if already generated clear canvas and redraw 
-    // elif not already there then request an arrangment and then plot
-    // set the save button to the wall id
+$('#arrange-linear').click( function(){
+    handleArrangeAlgorithmSelect('#arrange-linear');
+}
+);
+
 $('#arrange-column').click( function(){
-    // var wallId = $('#arrange-column').data('wallid');
-    var wallId = recentWalls['#arrange-column'];
-    // console.log('Hi clicker!');
-    // console.log(wallId);
+    handleArrangeAlgorithmSelect('#arrange-column');
+}
+);
+
+$('#arrange-grid').click( function(){
+    handleArrangeAlgorithmSelect('#arrange-grid');
+}
+);
+
+function handleArrangeAlgorithmSelect(arrangeAlgorithmSelected){
+    // Given any algorithm selected, check if an arrangment exists as recently 
+    // generated.  If not then request a new arrangement.  If it exists call wall handling.
+
+    // Check this state holding variable from global scope
+    var wallId = recentWalls[arrangeAlgorithmSelected];
+
     if (wallId === null){
-        // No wall associated yet with this display type, request one.
+        // No wall associated yet with this algorithm type, request one.
+
+        var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithmSelected];
 
         var postData = {'gallery_id': galleryId,
-                        'algorithm_type': 'column'};
+                        'algorithm_type': algorithmTypeForServer};
 
-        recentCall = '#arrange-column';
+        recentCall = arrangeAlgorithmSelected;
 
         // Make AJAX request for the wallId given
         $.post('arrange.json', postData, handleArrangeNewWall);
 
     } else {
         // There is one, just re-display it.
+        handleArrangeWall(wallId);
     }
 }
-);
-
 
 // listen for click on refresh buttons which would prompt a new arrangment and 
 // reset of the state for each arrangemnet type
 $('#rearrange-column').click( function(){
     // request a new wall of this type
     console.log('Refresh requested!');
-    console.log(recentCall);
-
 }
 );
 
@@ -91,7 +111,6 @@ function handleArrangeNewWall(results){
     var newWallId = arrangeResults.id;
 
     handleArrangeWall(newWallId);
-
 }
 
 function handleArrangeWall(wallId){
@@ -106,9 +125,9 @@ function handleArrangeWall(wallId){
     getWall(wallId);
 }
 
-// function doing all the steps to reset the arrangment area and other data and 
-// buttons to reflect the current state
 function setArrangeWallDisplayed(newWallId){
+    // function doing all the steps to reset the arrangment area and other data and 
+    // buttons to reflect the current state
 
     // Set the display area to recieve the new wall via wall hanging functions
     divArrange.data('wallid', newWallId);
@@ -119,7 +138,6 @@ function setArrangeWallDisplayed(newWallId){
 
     // Set save button to know which wall is displayed
 }
-
 
 function clearCanvas(){
     // Function to clear canvas so that a new wall may be displayed.
