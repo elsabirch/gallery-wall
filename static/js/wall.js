@@ -51,32 +51,16 @@ var algorithmServerTranslation = {
                    };
 
 // Listen for click on one of the arrangment icons
-$('#arrange-linear').click( function(){
-    handleArrangeAlgorithmSelect('linear'); }
-);
-
-$('#arrange-column').click( function(){
-    handleArrangeAlgorithmSelect('column'); }
-);
-
-$('#arrange-grid').click( function(){
-    handleArrangeAlgorithmSelect('grid'); }
+$('.arrange-select').click( function(){
+    handleArrangeAlgorithmSelect($(this).data('algorithmtype')); }
 );
 
 // listen for click on refresh buttons which will prompt a new arrangment 
-$('#rearrange-linear').click( function(){
-    requestArrange('linear'); }
+$('.rearrange-select').click( function(){
+    requestArrange($(this).data('algorithmtype')); }
 );
 
-$('#rearrange-column').click( function(){
-    requestArrange('column'); }
-);
 
-$('#rearrange-grid').click( function(){
-    requestArrange('grid'); }
-);
-
-// THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
 function handleArrangeAlgorithmSelect(arrangeAlgorithm){
     // Given any algorithm selected, check if an arrangment exists as recently 
     // generated.  If not then request a new arrangement.  If it exists call wall handling.
@@ -95,7 +79,6 @@ function handleArrangeAlgorithmSelect(arrangeAlgorithm){
     }
 }
 
-// THIS PASSING ARROUND OF SELECTORS IS UGLY AND I WILL FIX IT SOON!
 function requestArrange(arrangeAlgorithm){
 
     var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithm];
