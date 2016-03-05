@@ -221,8 +221,7 @@ def show_wall_dimensions():
 def show_time():
     """For display of time tracked durring project."""
 
-    return render_template('time.html')
-
+    return render_template('time-spark.html')
 
 # Routes returning json data
 
@@ -306,9 +305,9 @@ def get_arranged_data():
 def get_time_data():
     """Get data from time tracking file."""
 
-    from timetrack.time_track import get_time
+    from timetrack.time_track import get_time_spark
 
-    plots = get_time()
+    plots = get_time_spark()
 
     return jsonify(plots)
 

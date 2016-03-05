@@ -41,7 +41,8 @@ CHART_COLORS = {
 
 DEFAULT_COLOR = (194, 185, 162, 1)  # ivory
 
-def get_time():
+
+def get_time_spark():
 
     # Parse into dicts from file, these are a sparse representation of the data
     # in that they include only non-zero time durration activities/features.
@@ -62,12 +63,24 @@ def get_time():
     days = (last_date - first_date).days + 2  # I like to see the next day too
 
     # create the lists of dates and data needed for chartjs
+    t_norm = 400.0
     date_labels = [(first_date + datetime.timedelta(days=d)).strftime('%Y%m%d')
                    for d in range(days)]
-    activities_vects = {a: [activities_sparse[a].get(d, 0) for d in date_labels]
+    activities_vects = {a: [(activities_sparse[a].get(d, 0)/t_norm) for d in date_labels]
                         for a in activities_sparse}
-    features_vects = {f: [features_sparse[f].get(d, 0) for d in date_labels]
+    features_vects = {f: [(features_sparse[f].get(d, 0)/t_norm) for d in date_labels]
                       for f in features_sparse}
+
+    # Display bar labels only at week starts
+    date_labels_display = []
+    start_idx = None
+    for i in range(len(date_labels)):
+        if date_labels[i] == '20160208':
+            start_idx = i
+        if start_idx and ((i-start_idx) % 7) == 0:
+            date_labels_display.append('w{}'.format(1+(i-start_idx)/7))
+        else:
+            date_labels_display.append('')
 
     # Now sort out into lists by date with color annotation etc used by chartjs
     # EXAMPLE CHART JS FORMAT
@@ -97,26 +110,11 @@ def get_time():
     # All plots will be stored as a list of dicts to maintain order,
     # within another dict for jasonification
     plots = {'all_plots': [],
-             'all_labels': []}
-
-    # Activities (all plotted on a single set of axes)
-
-    data_chartjs = {'labels': date_labels,
-                    'datasets': []}
-    for activity in activities_vects:
-        dataset = {}
-        dataset['label'] = activity.title()
-        color = CHART_COLORS.get(activity, DEFAULT_COLOR)
-        dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-        dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-        dataset['data'] = activities_vects[activity]
-        data_chartjs['datasets'].append(dataset)
-
-    plots["all_plots"].append(data_chartjs)
-    plots["all_labels"].append('Activities (Time by what I was doing)')
+             'all_labels': [],
+             'all_types': []}
 
     # Total time
-    data_chartjs = {'labels': date_labels,
+    data_chartjs = {'labels': date_labels_display,
                     'datasets': []}
     dataset = {}
     dataset['label'] = 'Total'
@@ -126,41 +124,49 @@ def get_time():
     dataset['data'] = [sum([activities_vects[a][i] for a in activities_vects]) for i in range(len(date_labels)) ]
     data_chartjs['datasets'].append(dataset)
     plots["all_plots"].append(data_chartjs)
-    plots["all_labels"].append('All Time (How long I was doing stuff)')
+    plots["all_labels"].append('Total Time')
+    plots["all_types"].append('total-plots')
 
-    # Features (plotted as groups on differnt axes)
 
-    # User defined groups to plot together
-    feature_groups = [
-                      ('page-flow',  'display', 'upload'),
-                      ('scrum', 'code-review', 'advisor-mentor'),
-                      ('algorithm', 'data-structures'),
-                      ('data-model', 'seed-data'),
-                      ('testing',)
-                      ]
-    # Finding the other features not included in a pre-defined group
-    features_all = set(features_vects.keys())
-    functons_grouped = set([f for g in feature_groups for f in g])
-    features_other = features_all - functons_grouped
-    feature_groups.append(features_other)
+    # Activities (all plotted on a single set of axes)
+    activities_sort_by_total = activities_vects.keys()
+    activities_sort_by_total.sort(key=lambda a: sum(activities_vects[a]), reverse=True)
 
-    for this_group in feature_groups:
-        data_chartjs = {'labels': date_labels,
-                        'datasets': []}
-        for feature in this_group:
-            dataset = {}
-            dataset['label'] = feature.title()
-            color = CHART_COLORS.get(feature, DEFAULT_COLOR)
-            dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-            dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
-            dataset['data'] = features_vects[feature]
-            data_chartjs['datasets'].append(dataset)
+    for activity in activities_sort_by_total:
+        data_chartjs = {'labels': date_labels_display,
+                    'datasets': []}
+        dataset = {}
+        dataset['label'] = activity.title()
+        color = CHART_COLORS.get(activity, DEFAULT_COLOR)
+        dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+        dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+        dataset['data'] = activities_vects[activity]
+        data_chartjs['datasets'].append(dataset)
+
         plots["all_plots"].append(data_chartjs)
-        plots["all_labels"].append('Features (what I was building, seperated into groups)')
+        plots["all_labels"].append(activity.title())
+        plots["all_types"].append('activity-plots')
+
+    # Features
+    features_sort_by_total = features_vects.keys()
+    features_sort_by_total.sort(key=lambda f: sum(features_vects[f]), reverse=True)
+
+    for feature in features_sort_by_total:
+        data_chartjs = {'labels': date_labels_display,
+                        'datasets': []}
+        dataset = {}
+        dataset['label'] = feature.title()
+        color = CHART_COLORS.get(feature, DEFAULT_COLOR)
+        dataset['strokeColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+        dataset['fillColor'] = "rgba({:d}, {:d}, {:d}, 1)".format(color[0], color[1], color[2])
+        dataset['data'] = features_vects[feature]
+        data_chartjs['datasets'].append(dataset)
+        plots["all_plots"].append(data_chartjs)
+        plots["all_labels"].append(feature.title())
+        plots["all_types"].append('feature-plots')
 
 
     return plots
-
 
 def parse_time():
     """Parses time from text file into dicts for activities and features.
