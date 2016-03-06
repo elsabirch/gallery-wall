@@ -12,7 +12,6 @@
 
 <div class='row'>
     <div class='col-xs-12 col-md-12'>
-        <h3> Choose Arrangement Methods and Parameters! </h3>
         <div class='arrange-display wall-display'
              data-wallid='{{gallery.display_wall_id}}' 
              data-galleryid='{{gallery.gallery_id}}'>
@@ -35,21 +34,20 @@
             
     </div>   
 </div>
-
-<hr>
-
 <div class='row'>
 
         {%  for option in arrange_options %}
 
-        <div class='col-sm-3 col-md-4'>
+        <div class='col-sm-3'>
             <div class="text-center">
             <h5>{{ option.display_name }}</h5>
-            <img src={{ option.image }} class="img-thumbnail">
+<!--             <img src={{ option.image }} class="img-thumbnail">
             <button type="button" class="btn btn-default arrange-select" 
                     data-algorithmtype={{ option.algorithm_type }}>
                 {{ option.display_name }}
-            </button>
+            </button> -->
+            <img src={{ option.image }} class="img-thumbnail arrange-select" data-algorithmtype={{ option.algorithm_type }}>
+
             <button type="button" class="btn btn-default rearrange-select" 
                 data-algorithmtype={{ option.algorithm_type }}>Redo
             </button>
