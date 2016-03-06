@@ -3,15 +3,38 @@
 
 <div class="container">
 
-<p> <a href="/galleries"> Galleries </a> (pick one to be arranged on a wall) </p>
-<p> <a href="/walls"> Walls </a> (see arranged galleries) </p>
+<div class='row'>
+    <div class='col-sm-6 col-md-4'>
+        <img src="/static/img/gallery_icon.jpg" class="img-thumbnail">
+        <p> <a href="/galleries"> Galleries </a> (pick one to be arranged on a wall) </p>
+    </div>   
+    <div class='col-sm-6 col-md-4'>
+        <img src="/static/img/wall_icon.jpg" class="img-thumbnail">
+        <p> <a href="/walls"> Walls </a> (see arranged galleries) </p>
+    </div> 
 
 {% if 'user_id' in session %}
-<p> <a href="/curate"> Curate </a> (pick pictures for wall) </p>
-<p> <a href="/upload"> Upload </a> (your very own pictures can be used) </p>
+
+    <div class='col-sm-6 col-md-4'>
+        <img src="/static/img/curate_icon.jpg" class="img-thumbnail">
+    <p> <a href="/curate"> Curate </a> (pick pictures for wall) </p>
+    </div> 
+
+        <div class='col-sm-6 col-md-4'>
+        <img src="/static/img/upload_icon.jpg" class="img-thumbnail">
+        <p> <a href="/upload"> Upload </a> (your very own pictures can be used) </p>
+    </div> 
+
 {% else %}
 <p> If you log in you can upload some pictures and stuff! </p>
 {% endif %}
+
+</div> <!-- row -->
+
+
+
+
+
 
 </div> <!-- /container -->
 
