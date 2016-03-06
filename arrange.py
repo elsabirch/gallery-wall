@@ -119,7 +119,7 @@ class Arranger(object):
         Removes returned from pictures remaining.
         """
 
-        larges = set(self.area_sort[-(self.ws.len / 3):]) and self.pics_remaining
+        larges = set(self.area_sort[-(self.ws.len / 3):]).intersection(self.pics_remaining)
         if larges:
             p = random.sample(larges, 1)[0]
             self.pics_remaining.remove(p)
@@ -413,6 +413,7 @@ class GridArranger(Arranger):
         """Arrangment via an initial placement in a grid."""
 
         pics_in_grid = self.random_place_in_grid()
+        # pics_in_grid = self.large_center_place_in_grid()
 
         self.expand_grid_to_arrangment(pics_in_grid)
 
@@ -437,6 +438,37 @@ class GridArranger(Arranger):
         grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.ws.pics.keys())}
 
         return grid_pics
+
+    def large_center_place_in_grid(self):
+        """Place pics in random grid indicies but with larger ones roughly towards center.
+
+        Returns a dict of tuple keys of grid indicies with pic id values
+        {(i,j): pic}
+        """
+
+        n_grid = int(math.ceil(math.sqrt(self.ws.len)))
+        min_grid = -n_grid/2
+        max_grid = min_grid + n_grid
+
+        grid_pairs = [(i, j) for i in range(min_grid, max_grid)
+                             for j in range(min_grid, max_grid)]
+
+        grid_sample = set(random.sample(grid_pairs, self.ws.len))
+
+        cols, rows = zip(*grid_sample)
+        mag_sort_j = sorted(set(cols), key=abs)
+        mag_sort_i = sorted(set(rows), key=abs)
+
+        grid_pics = {}
+
+        for i in mag_sort_i:
+            for j in mag_sort_j:
+                if (i, j) in grid_sample:
+                    grid_pics[(i, j)] = self.pop_large()
+                    # print( grid_pics[(i, j)] )
+                    # print( (i, j) )
+                if not self.pics_remaining:
+                    return grid_pics
 
     def expand_grid_to_arrangment(self, pics_in_grid):
         """From a set of grid indicies produce geometrically valid placements.
@@ -498,8 +530,8 @@ class GridArranger(Arranger):
         pic = self.ws.pics[pic_id]
         i, j = grid
 
-        print 'placing pic '
-        print pic.picture.display_name
+        # print 'placing pic '
+        # print pic.picture.display_name
 
         pic.x1 = j
         pic.x2 = j + pic.w
