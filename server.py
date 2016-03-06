@@ -290,7 +290,7 @@ def get_arranged_data():
         arr = ar.LinearArranger(wkspc)
     elif algorithm_type == 'column':
         arr = ar.ColumnArranger(wkspc)
-    elif algorithm_type == 'expand':
+    elif algorithm_type == 'grid':
         arr = ar.GridArranger(wkspc)
     else:
         # Default to column arrangement
