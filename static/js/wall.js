@@ -1,7 +1,5 @@
 // Parameters to use in rescalling walls
-// TODO: decide where to store these or get them from screen size infromation
-maxCanvasHeight = 300;
-maxCanvasWidth = 900;
+// // TODO: decide where to store these or get them from screen size infromation
 
 // Get the wall_ids that I'm going to need to fill into canvases
 // Note to self, this is some hard won synthax... each()
@@ -190,7 +188,7 @@ function hangWall(wallToHang){
     var canvas = document.getElementById('canvas'+wallToHang.id);
     var context = canvas.getContext('2d');
 
-    var wallToCanvas = getWallDisplayScale(wallToHang);
+    var wallToCanvas = getWallDisplayScale(wallToHang, canvas);
 
     var picturesToHangOrdered = getHangOrder(wallToHang.pictures_to_hang);
 
@@ -236,9 +234,12 @@ function hangPicture(context, picture, wallToCanvas){
     }
 }
 
-function getWallDisplayScale(wallToHang){
+function getWallDisplayScale(wallToHang, canvas){
     // Get the scale so that the wall can be displayed as large as possible 
     // within limit parameters for maximum canvas width or height.
+
+    var maxCanvasWidth = canvas.width;
+    var maxCanvasHeight = canvas.height;
 
     var widthRatio = maxCanvasWidth / wallToHang.width;
     var heightRatio = maxCanvasHeight / wallToHang.height;

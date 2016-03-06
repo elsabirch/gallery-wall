@@ -11,15 +11,19 @@
 <!-- The user has permission to access the gallery, show it and options -->
 
 <div class='row'>
-    <div class='col-xs-12 col-md-12'>
+    <div class='col-sm-12 col-md-11'>
         <div class='arrange-display wall-display'
              data-wallid='{{gallery.display_wall_id}}' 
              data-galleryid='{{gallery.gallery_id}}'>
             <canvas class='canvas-arrange' 
-                    id='canvas{{gallery.display_wall_id}}' height='300' width='900'> 
+                    id='canvas{{gallery.display_wall_id}}' height='300' width='700'> 
                 If you dont have HTML5 canvas, you're gonna have a bad time.
             </canvas>
         </div>
+    </div>   
+
+    <div class='col-sm-12 col-md-1'>
+
             <div id='save-div' style="display:none">
                 {% if 'user_id' in session %}
                     <button type="button" class="btn btn-default" 
