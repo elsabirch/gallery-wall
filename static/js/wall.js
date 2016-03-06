@@ -28,20 +28,16 @@ var canvasArrange = $('.canvas-arrange');
 var galleryId = $('.arrange-display').data('galleryid');
 
 // save state of which walls have been generated most recently for each method
-var recentWalls = {
-                   'linear': null,
-                   'column': null,
-                   'grid': null,
-                   };
 var recentCall = null;
 var recentSaves = [];
-
-// Temporary patch for my naming mistakes
-var algorithmServerTranslation = {
-                   'linear': 'linear',
-                   'column': 'column',
-                   'grid': 'expand',
-                   };
+var algorithmTypes = $('.arrange-select').map( function(){
+    return $(this).data('algorithmtype');
+}
+);
+var recentWalls = {};
+for (i=0; i < algorithmTypes.length; i++){
+    recentWalls[algorithmTypes[i]] = null;
+}
 
 // Listen for click on one of the arrangment icons
 $('.arrange-select').click( function(){
@@ -79,10 +75,8 @@ function handleArrangeAlgorithmSelect(arrangeAlgorithm){
 
 function requestArrange(arrangeAlgorithm){
 
-    var algorithmTypeForServer = algorithmServerTranslation[arrangeAlgorithm];
-
     var postData = {'gallery_id': galleryId,
-                    'algorithm_type': algorithmTypeForServer};
+                    'algorithm_type': arrangeAlgorithm};
 
     recentCall = arrangeAlgorithm;
 
