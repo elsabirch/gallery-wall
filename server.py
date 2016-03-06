@@ -172,18 +172,21 @@ def prompt_arrangment():
 
     gallery_id = request.args.get('gallery_id')
     gallery = Gallery.query.get(gallery_id)
-    curator_id = gallery.curator_id
-    wall_id = gallery.display_wall_id
+    # curator_id = gallery.curator_id
+    # wall_id = gallery.display_wall_id
 
     # This is a get request because it does not have side effects, but check
     # they are the curator of this gallery or that it is site sample.
-    if curator_id not in [session.get('user_id'), DEFAULT_USER_ID]:
-        gallery_id = None
-        wall_id = None
+    if gallery.curator_id not in [session.get('user_id'), DEFAULT_USER_ID]:
+        flash("That gallery doesnt exist or you don't have permission to view it.")
+        return redirect('/galleries')
+
+    arrange_options = ut.get_arrange_options_for_display()
 
     return render_template("arrange.html",
-                           gallery_id=gallery_id,
-                           wall_id=wall_id)
+                           gallery=gallery,
+                           arrange_options=arrange_options,
+                           )
 
 
 @app.route('/walls')

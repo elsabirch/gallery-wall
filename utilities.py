@@ -119,6 +119,39 @@ def attempt_curation():
     else:
         return False
 
+def get_arrange_options_for_display():
+    """Returns a list of dicts with display information for the arrange page.
+
+    This interface may be expanded into it's own class when more options exist.
+    """
+
+    arrange_options = [
+
+        {
+            'algorithm_type': 'linear',
+            'display_name': 'Linear',
+            'image': "/static/img/linear_icon.jpg",
+            'description': "Scatter & center!",
+        },
+
+        {
+            'algorithm_type': 'column',
+            'display_name': 'Columner',
+            'image': "/static/img/column_icon.jpg",
+            'description': "Heuristics FTW!",
+        },
+
+        {
+            'algorithm_type': 'grid',
+            'display_name': 'Cloud-Like',
+            'image': "/static/img/cloud_icon.jpg",
+            'description': "Oh look a random walk!",
+        },
+    ]
+
+    return arrange_options
+
+
 def rename_picture_on_server(filename_provided, picture_id):
     """Rename picture using id and random number, returns new name."""
 
