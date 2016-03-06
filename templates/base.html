@@ -22,7 +22,7 @@
     
     <!-- Basic setup of navbar taken from (http://getbootstrap.com/examples/navbar-fixed-top/) Jinja logic added by me. -->
     <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
+    <nav class="navbar navbar-custom navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -32,7 +32,7 @@
             <span class="icon-bar"></span>
           </button>
           <!-- <a class="navbar-brand" href="/">Gallery Wall</a> -->
-          <a href='/navigation'><img id="navlogo" src="/static/img/LogoFramesSketch.jpg" height="50"></a>
+          <a href='/navigation'><img id="navlogo" src="/static/img/gw_logo_peach.png" height="50"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           
@@ -77,8 +77,16 @@
     {% block content %} Content goes in here! {% endblock %}
 
 
-<script src='{{ config.BOOSTRAP_JS_PATH }}'></script>
+    <footer class="footer">
+    <div class="container">
+    <hr>
+    <small> This site was made by Elsa Birch at Hackbright in Winter 2016 (Oh look! <a href="/time"> Time </a> )</small>
+    </div> <!-- /container -->
+    </footer>
+    
 
+
+<script src='{{ config.BOOSTRAP_JS_PATH }}'></script>
 
 </body>
 </html>
