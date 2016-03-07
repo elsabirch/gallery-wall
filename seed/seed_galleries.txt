@@ -6,3 +6,4 @@
 7 | small family | 1
 8 | bw sample | 2
 9 | many samples | 2
+11 | test 3 | 4

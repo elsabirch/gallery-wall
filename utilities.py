@@ -118,7 +118,7 @@ def attempt_curation():
         gallery = Gallery.make_from_pictures(curator_id=user_id,
                                              picture_list=picture_ids,
                                              gallery_name=gallery_name)
-        # gallery.print_seed()
+        gallery.print_seed()
         return True
     else:
         return False

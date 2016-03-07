@@ -203,8 +203,7 @@ def load_placements():
 
         db.session.commit()
 
-
-if __name__ == "__main__":
+def prepare_all():
     connect_to_db(app)
 
     # In case tables haven't been created, create them
@@ -218,4 +217,9 @@ if __name__ == "__main__":
     load_galleries()
     load_memberships()
     load_walls()
-    load_placements()
+    load_placements()    
+
+if __name__ == "__main__":
+    
+    prepare_all()
+

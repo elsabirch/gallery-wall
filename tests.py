@@ -2,8 +2,9 @@ import unittest
 import server
 import utilities
 import doctest
-import arrange
-from flask import session
+import seed_database as sd
+import arrange as ar
+# from flask import session
 
 def load_tests(loader, tests, ignore):
     """Also run our doctests and file-based doctests."""
@@ -146,13 +147,32 @@ class LoginServerRoutesTestCase(unittest.TestCase):
         self.assertIn('Password', result.data)
 
 
-class WorkspaceTestCase(unittest.TestCase):
-    """ """
+class WorkspaceInitTestCase(unittest.TestCase):
+
+    # Test Gallery (11)
+    # 11 | 49, 42, 41
+    # 41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
+    # 42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
+    # 49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
 
     def setUp(self):
 
-    # def tearDown(self):
+        sd.prepare_all()
 
+    def test_init(self):
+
+        wkspc = ar.Workspace(11)
+
+        self.assertEqual(wkspc.gallery_id, 11)
+        self.assertEqual(wkspc.len, 3)
+        self.assertEqual(wkspc.margin, 2)
+
+        self.assertIn(41, wkspc.pics)
+        self.assertIn(42, wkspc.pics)
+        self.assertIn(49, wkspc.pics)
+
+        for p in wkspc.pics:
+            self.assertTrue(isinstance(wkspc.pics[p], ar.Pic))
 
 if __name__ == "__main__":
     unittest.main()
