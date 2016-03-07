@@ -317,7 +317,7 @@ class User(db.Model):
     email = db.Column(db.String(25), nullable=False, unique=True)
     password = db.Column(db.String(25), nullable=False, unique=True)
 
-    galleries = db.relationship("Gallery", order_by="Gallery.gallery_id")
+    galleries = db.relationship("Gallery", order_by="desc(Gallery.gallery_id)")
     pictures = db.relationship("Picture", order_by="Picture.picture_id")
     walls = db.relationship("Wall", secondary='galleries', order_by="Wall.wall_id")
 

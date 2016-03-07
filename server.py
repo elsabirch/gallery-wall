@@ -234,6 +234,7 @@ def save_wall():
 
     wall_id = int(request.form.get('wall_id'))
     Wall.query.get(wall_id).save()
+    Wall.query.get(wall_id).print_seed()
 
     return jsonify({'wall_id': wall_id})
 
