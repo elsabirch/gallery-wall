@@ -262,9 +262,9 @@ class Wall(db.Model):
         # wall_id | gallery_id | wall_width | wall_height | saved
         print ' | '.join(['{:d}'.format(self.wall_id),
                           '{:d}'.format(self.gallery.gallery_id),
-                          '{:0.2f}'.format(self.wall_width),
-                          '{:0.2f}'.format(self.wall_height),
-                          'True',
+                          '{:d}'.format(int(self.wall_width)),
+                          '{:d}'.format(int(self.wall_height)),
+                          'Saved',
                           ])
 
         print '-'*20 + 'Placement Entries' + '-'*20
