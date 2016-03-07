@@ -37,6 +37,10 @@ def attempt_login():
         # Password was invalid
         return False
 
+# def login(username, user_id):
+#     session['user_id'] = user_id
+#     session['username'] = username
+#     return
 
 def attempt_signup():
     """Adds user into database and returns True if POST credentials valid.

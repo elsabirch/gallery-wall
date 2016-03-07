@@ -2,7 +2,8 @@ import unittest
 import server
 import utilities
 import doctest
-
+import arrange
+from flask import session
 
 def load_tests(loader, tests, ignore):
     """Also run our doctests and file-based doctests."""
@@ -100,6 +101,13 @@ class NavigationServerRoutesTestCase(unittest.TestCase):
     def setUp(self):
         self.client = server.app.test_client()
         server.app.config['TESTING'] = True
+        server.app.config['SECRET_KEY'] = 'notforyou'
+
+        # utilities.login('eb', 5)
+
+        # with server.app.app_context():
+        #     session['user_id'] = 13
+        #     session['username'] = 'foo'
 
     def test_navigation_logged_out(self):
 
@@ -111,19 +119,19 @@ class NavigationServerRoutesTestCase(unittest.TestCase):
 
     # def test_navigation_logged_in(self):
 
-    #     server.app.session['user_id'] = 13
-    #     server.app.session['username'] = 'foo'
-
     #     result = self.client.get('/navigation')
     #     self.assertIn('Galleries', result.data)
     #     self.assertIn('Walls', result.data)
-    #     self.assertNotIn('Curate', result.data)
-    #     self.assertNotIn('Upload', result.data)
-
+    #     self.assertIn('Curate', result.data)
+    #     self.assertIn('Upload', result.data)
 
     # def navigations while not logged in
 
     # tear down by logging out
+    # def tearDown(self):
+    #     session.pop('user_id')
+    #     session.pop('username')
+
 
 class LoginServerRoutesTestCase(unittest.TestCase):
 
@@ -136,6 +144,15 @@ class LoginServerRoutesTestCase(unittest.TestCase):
         self.assertIn('Username', result.data)
         self.assertIn('Email', result.data)
         self.assertIn('Password', result.data)
+
+
+class WorkspaceTestCase(unittest.TestCase):
+    """ """
+
+    def setUp(self):
+
+    # def tearDown(self):
+
 
 if __name__ == "__main__":
     unittest.main()
