@@ -397,7 +397,7 @@ class LinearArranger(Arranger):
         row_width = 0
 
         for i in range(len(self.ws.pics)):
-            p = self.pop_large() if (i % 2 == 0) else self.pop_small()
+            p = self.pop_large() if (i % 2 == 0) else self.pop_any_n(1)[0]
             self.ws.pics[p].x1 = row_width
             self.ws.pics[p].x2 = row_width + self.ws.pics[p].w
             self.ws.pics[p].y1 = -self.ws.pics[p].h / 2.0
