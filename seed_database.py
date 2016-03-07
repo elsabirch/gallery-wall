@@ -102,12 +102,21 @@ def load_galleries():
             gallery_name = gallery_name.strip()
             curator_id = int(curator_id)
 
-            gallery = Gallery(gallery_name=gallery_name, curator_id=curator_id)
+            gallery = Gallery(
+                gallery_id=gallery_id,
+                gallery_name=gallery_name,
+                curator_id=curator_id,
+                )
 
             db.session.add(gallery)
 
         db.session.commit()
 
+    result = db.session.query(func.max(Gallery.gallery_id)).one()
+    max_id = int(result[0])
+    query = "ALTER SEQUENCE galleries_gallery_id_seq RESTART WITH :next_id"
+    db.session.execute(query, {'next_id': max_id+1})
+    db.session.commit()
 
 def load_memberships():
     """Add sample pictures to galleries in database from text file.

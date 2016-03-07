@@ -6,7 +6,7 @@
 6|2 | 15 | 12 | image_sample_torso.jpg | torso | elsa | 
 7|2 | 19.5 | 15.5 | image_sample_tree.jpg | tree | elsa | 
 8|2 | 13 | 15 | image_sample_vase.jpg | vase | elsa | 
-9|3 | 4.5 | 4.25 | image_sample_frodo_balloonicorn.jpg | hb-baloonicrn | http://fellowship.hackbrightacademy.com/ | public
+9|3 | 4.5 | 4.25 | image_sample_frodo_balloonicorn.jpg | hb-baloonicrn | http://fellowship.hackbrightacademy.com/ | 
 10|2 | 8 | 10 | | empty_brain | elsa | 
 11|2 | 12 | 15 | | empty_columns | elsa | 
 12|2 | 7.5 | 9.5 | | empty_fashion | elsa | 
