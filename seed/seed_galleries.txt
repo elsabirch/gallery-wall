@@ -1,9 +1,9 @@
-1 | elsa's wall | 2 
-3 | elsa's wall empty frames | 2
-4 | bw sample | 1
+1 | elsas wall | 2 
+3 | elsas wall (empty images) | 2
+4 | bw samples | 1
 5 | mix classics | 1
-6 | many samples | 1
+6 | large mix of samples | 1
 7 | small family | 1
-8 | bw sample | 2
-9 | many samples | 2
+8 | bw samples | 2
+9 | large mix of samples | 2
 11 | test 3 | 4
