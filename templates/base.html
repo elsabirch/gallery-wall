@@ -1,74 +1,74 @@
 {% extends 'base_head.html' %}
 {% block body %} 
     
-    <!-- Basic setup of navbar taken from (http://getbootstrap.com/examples/navbar-fixed-top/) Jinja logic added by me. -->
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-custom navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <!-- <a class="navbar-brand" href="/">Gallery Wall</a> -->
-          <a href='/navigation'><img id="navlogo" src="/static/img/gw_logo_white.png" height="50"></a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          
-          <ul class="nav navbar-nav">
-            <!-- <li class="active"><a href="#">Home</a></li> -->
-            <li><a href='/galleries'>Galleries</a></li>
-            <li><a href='/walls'>Walls</a></li>
-            {% if 'user_id' in session %}
-            <li><a href="/curate">Curate</a></li>
-            <li><a href="/upload">Upload</a></li>
-            {% endif %}
-          </ul>
+<!-- Basic setup of navbar taken from (http://getbootstrap.com/examples/navbar-fixed-top/) Jinja logic added by me. -->
+<!-- Fixed navbar -->
+<nav class="navbar navbar-custom navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <!-- <a class="navbar-brand" href="/">Gallery Wall</a> -->
+      <a href='/navigation'><img id="navlogo" src="/static/img/gw_logo_white.png" height="50"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      
+      <ul class="nav navbar-nav">
+        <!-- <li class="active"><a href="#">Home</a></li> -->
+        <li><a href='/galleries'>Galleries</a></li>
+        <li><a href='/walls'>Walls</a></li>
+        {% if 'user_id' in session %}
+        <li><a href="/curate">Curate</a></li>
+        <li><a href="/upload">Upload</a></li>
+        {% endif %}
+      </ul>
 
-          <ul class="nav navbar-nav navbar-right">
-            {% if 'user_id' in session %}
-            <li><a href='/logout-process'>Log out</a></li>
-            <li><a href="/navigation">{{session.username.title()}}</a></li>
-            {% else %} 
-            <li><a href="/login">Log in</a></li>
-            {% endif %}
-          </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {% if 'user_id' in session %}
+        <li><a href='/logout-process'>Log out</a></li>
+        <li><a href="/navigation">{{session.username.title()}}</a></li>
+        {% else %} 
+        <li><a href="/login">Log in</a></li>
+        {% endif %}
+      </ul>
 
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
+    </div><!--/.nav-collapse -->
+  </div>
+</nav>
 
-
-    <div class="container">
-
+<!-- Message flashing -->
+<div class="container">
 <div class='row'>
     <div class='col-sm-12 col-md-12 text-center'>
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-        <ul class='flash-display'>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
+          <ul class='flash-display'>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
         {% endif %}
         {% endwith %}
     </div> <!-- column -->
 </div> <!-- row -->
-
 </div> <!-- /container -->
 
 {% block content %} Content goes in here! {% endblock %}
 
-
+<!-- Footer -->
 <footer class="footer">
 <div class="container">
 
 <div class='row'>
     <div class='col-sm-12 col-md-12 text-center'>
         <hr>
-        <small>This site was made by Elsa Birch at Hackbright in Winter 2016 (<a href="/time">Time</a>)</small>
+        <small>
+          This site was made by Elsa Birch at Hackbright in Winter 2016 (<a href="/time">Time</a>)
+        </small>
     </div> <!-- column -->
 </div> <!-- row -->
 

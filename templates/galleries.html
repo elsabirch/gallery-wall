@@ -5,7 +5,7 @@
 
 <div class='row'>
     <div class='col-sm-12 col-md-8 col-md-offset-2 text-center'>
-        <p>These galleries are ready for arrangment.  You will select options for arrangment on the next page!</p>
+        <p>These galleries are ready for arrangement.  You will select options for arrangement on the next page!</p>
     </div> <!-- column -->
 </div> <!-- row -->
 
@@ -20,32 +20,33 @@
     <div class='wall-display text-center' 
          data-wallid='{{gallery.display_wall_id}}' 
          id='wall{{gallery.display_wall_id}}'>
+
         <canvas id='canvas{{gallery.display_wall_id}}' height='300' width='900'> 
             HTML5 canvas is required for display.
         </canvas>
+        
     </div>
     </div> <!-- column -->
 
-
+    <!-- The label and button for arrangement beneath each gallery -->
     <div class='col-sm-12 col-md-10 col-md-offset-1'>
     <div class='row'>
 
-    {% if gallery.gallery_name %}
-    <div class='col-sm-4'>
-    <p>  Gallery Name: {{ gallery.gallery_name.title() }}</p>
-    </div> <!-- column -->
-    {% endif %}
+        {% if gallery.gallery_name %}
+        <div class='col-sm-4'>
+        <p>  Gallery Name: {{ gallery.gallery_name.title() }}</p>
+        </div> <!-- column -->
+        {% endif %}
 
-    <div class='col-sm-3 col-md-2 pull-right'>
-    <form action='/arrange' method='GET' class='text-right'>
-        <input type='hidden' name='gallery_id' 
-               value='{{ gallery.gallery_id }}'>
-        <input type='submit' value='Arrange Gallery' 
-               class="btn btn-default">
-    </form> 
-    </div> <!-- column -->
+        <div class='col-sm-3 col-md-2 pull-right'>
+        <form action='/arrange' method='GET' class='text-right'>
+            <input type='hidden' name='gallery_id' 
+                   value='{{ gallery.gallery_id }}'>
+            <input type='submit' value='Arrange Gallery' 
+                   class="btn btn-default">
+        </form> 
+        </div> <!-- column -->
     
-
     </div>
     </div> <!-- column -->
 
