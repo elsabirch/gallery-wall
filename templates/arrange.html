@@ -11,18 +11,18 @@
 <!-- The user has permission to access the gallery, show it and options -->
 
 <div class='row'>
-    <div class='col-sm-12 col-md-11'>
+    <div class='col-sm-12 col-md-8 col-md-offset-2 text-center'>
         <div class='arrange-display wall-display'
              data-wallid='{{gallery.display_wall_id}}' 
              data-galleryid='{{gallery.gallery_id}}'>
             <canvas class='canvas-arrange' 
                     id='canvas{{gallery.display_wall_id}}' height='300' width='700'> 
-                If you dont have HTML5 canvas, you're gonna have a bad time.
+            HTML5 canvas is required for display.
             </canvas>
         </div>
     </div>   
 
-    <div class='col-sm-12 col-md-1'>
+    <!-- <div class='col-sm-12 col-md-2'>
 
             <div id='save-div' style="display:none">
                 {% if 'user_id' in session %}
@@ -36,34 +36,41 @@
                 {% endif %}   
             </div>
             
-    </div>   
+    </div>  -->  
 </div>
-<div class='row'>
+<div class='row center-block'>
 
         {%  for option in arrange_options %}
 
         <div class='col-sm-3'>
             <div class="text-center">
             <h5>{{ option.display_name }}</h5>
-<!--             <img src={{ option.image }} class="img-thumbnail">
-            <button type="button" class="btn btn-default arrange-select" 
-                    data-algorithmtype={{ option.algorithm_type }}>
-                {{ option.display_name }}
-            </button> -->
             <img src={{ option.image }} class="img-thumbnail arrange-select" data-algorithmtype={{ option.algorithm_type }}>
 
             <button type="button" class="btn btn-default rearrange-select" 
                 data-algorithmtype={{ option.algorithm_type }}> 
-                <!-- <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>  -->
-            Refresh
+                <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span> 
+            Regenerate
             </button>
             </div>
             <p>{{ option.description }}</p>   
-            <hr>
         </div>
 
         {% endfor %}
-
+        <div class='col-sm-3 text-center'>
+            <hr>
+            <div id='save-div' style="display:none">
+                {% if 'user_id' in session %}
+                    <button type="button" class="btn btn-default" 
+                    id='save-button' data-wallid='null'>
+                    Save This Wall
+                    </button>
+                    <span id='save-confirm'>Saved!</span>
+                {% else %}
+                    <p>You can't save things!</p>
+                {% endif %}   
+            </div>
+        </div>
 </div>
     
 

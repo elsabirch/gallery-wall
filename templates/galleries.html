@@ -3,28 +3,55 @@
 
 <div class="container">
 
-<p> Step right up! Pick a gallery! </p>
+<div class='row'>
+    <div class='col-sm-12 col-md-8 col-md-offset-2 text-center'>
+        <p>These galleries are ready for arrangment.  You will select options for arrangment on the next page!</p>
+    </div> <!-- column -->
+</div> <!-- row -->
+
 
 {% for gallery in galleries %}
 
-<p>Look gallery: {{gallery.gallery_name}}</p>
+<div class='row'>
+    <div class='col-sm-12 col-md-12'>
+    
+    <hr>
 
-    <div class='wall-display' 
+    <div class='wall-display text-center' 
          data-wallid='{{gallery.display_wall_id}}' 
          id='wall{{gallery.display_wall_id}}'>
-        <p> Wall {{gallery.display_wall_id}} Display of Gallery {{gallery.gallery_id}}: </p>
         <canvas id='canvas{{gallery.display_wall_id}}' height='300' width='900'> 
-            If you dont have HTML5 canvas, you're gonna have a bad time.
+            HTML5 canvas is required for display.
         </canvas>
-        
-        <form action='/arrange' method='GET'>
-            <input type='hidden' name='gallery_id' value='{{ gallery.gallery_id }}'>
-            <input type='submit' value='Arrange Gallery'>
-        </form> 
+    </div>
+    </div> <!-- column -->
+
+
+    <div class='col-sm-12 col-md-10 col-md-offset-1'>
+    <div class='row'>
+
+    {% if gallery.gallery_name %}
+    <div class='col-sm-4'>
+    <p>  Gallery Name: {{ gallery.gallery_name.title() }}</p>
+    </div> <!-- column -->
+    {% endif %}
+
+    <div class='col-sm-3 col-md-2 pull-right'>
+    <form action='/arrange' method='GET' class='text-right'>
+        <input type='hidden' name='gallery_id' 
+               value='{{ gallery.gallery_id }}'>
+        <input type='submit' value='Arrange Gallery' 
+               class="btn btn-default">
+    </form> 
+    </div> <!-- column -->
+    
 
     </div>
+    </div> <!-- column -->
 
-    <hr>
+
+</div> <!-- row -->
+
 {% endfor %}
 
 </div> <!-- /container -->

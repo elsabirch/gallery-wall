@@ -1,9 +1,16 @@
 
-.wall-display canvas {
+/*.wall-display canvas {
     border: 1px solid #d3d3d3;
+}*/
+
+body {
+      padding-top: 70px;
+      font-family: 'Open Sans Condensed', sans-serif;
 }
 
-body { padding-top: 70px; }
+h1 {
+      font-family: 'Sacramento', sans-serif;
+}
 
 .bar-legend li span {
     display: inline-block;
@@ -16,43 +23,71 @@ body { padding-top: 70px; }
     list-style-type: none;
 }
 
-
+.flash-display li {
+    list-style-type: none;
+}
 .center-block {
     display: block;
     margin-left: auto;
     margin-right: auto;
 }
 
+.btn {
+    margin: 0.5em;
+}
+
+/* Flush bottom but not sticky footer attempt */
+/* http://stackoverflow.com/questions/21324395/bootstrap-3-flush-footer-to-bottom-not-fixed */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+}
+ /* - - - - - - - - - - - - Flush bottom but not sticky footer attempt */
+
 /* SOME AUTO GENERATED NAVBAR RESTYLING*/
 
+
+/*----------------------------------*/
+
 .navbar-custom {
-  background-color: #ffd479;
-  border-color: #ffc958;
+  background-color: #ffffff;
+  border-color: #eeeeee;
 }
 .navbar-custom .navbar-brand {
-  color: #999999;
+  color: #000000;
 }
 .navbar-custom .navbar-brand:hover,
 .navbar-custom .navbar-brand:focus {
-  color: #808080;
+  color: #000000;
   background-color: transparent;
 }
 .navbar-custom .navbar-text {
-  color: #999999;
+  color: #000000;
 }
 .navbar-custom .navbar-nav > li > a {
-  color: #999999;
+  color: #000000;
 }
 .navbar-custom .navbar-nav > li > a:hover,
 .navbar-custom .navbar-nav > li > a:focus {
-  color: #000000;
+  color: #757575;
   background-color: transparent;
 }
 .navbar-custom .navbar-nav > .active > a,
 .navbar-custom .navbar-nav > .active > a:hover,
 .navbar-custom .navbar-nav > .active > a:focus {
-  color: #000000;
-  background-color: #ffc958;
+  color: #757575;
+  background-color: #eeeeee;
 }
 .navbar-custom .navbar-nav > .disabled > a,
 .navbar-custom .navbar-nav > .disabled > a:hover,
@@ -72,43 +107,43 @@ body { padding-top: 70px; }
 }
 .navbar-custom .navbar-collapse,
 .navbar-custom .navbar-form {
-  border-color: #ffc955;
+  border-color: #ededed;
 }
 .navbar-custom .navbar-nav > .dropdown > a:hover .caret,
 .navbar-custom .navbar-nav > .dropdown > a:focus .caret {
-  border-top-color: #000000;
-  border-bottom-color: #000000;
+  border-top-color: #757575;
+  border-bottom-color: #757575;
 }
 .navbar-custom .navbar-nav > .open > a,
 .navbar-custom .navbar-nav > .open > a:hover,
 .navbar-custom .navbar-nav > .open > a:focus {
-  background-color: #ffc958;
-  color: #000000;
+  background-color: #eeeeee;
+  color: #757575;
 }
 .navbar-custom .navbar-nav > .open > a .caret,
 .navbar-custom .navbar-nav > .open > a:hover .caret,
 .navbar-custom .navbar-nav > .open > a:focus .caret {
+  border-top-color: #757575;
+  border-bottom-color: #757575;
+}
+.navbar-custom .navbar-nav > .dropdown > a .caret {
   border-top-color: #000000;
   border-bottom-color: #000000;
 }
-.navbar-custom .navbar-nav > .dropdown > a .caret {
-  border-top-color: #999999;
-  border-bottom-color: #999999;
-}
 @media (max-width: 767) {
   .navbar-custom .navbar-nav .open .dropdown-menu > li > a {
-    color: #999999;
+    color: #000000;
   }
   .navbar-custom .navbar-nav .open .dropdown-menu > li > a:hover,
   .navbar-custom .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #000000;
+    color: #757575;
     background-color: transparent;
   }
   .navbar-custom .navbar-nav .open .dropdown-menu > .active > a,
   .navbar-custom .navbar-nav .open .dropdown-menu > .active > a:hover,
   .navbar-custom .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #000000;
-    background-color: #ffc958;
+    color: #757575;
+    background-color: #eeeeee;
   }
   .navbar-custom .navbar-nav .open .dropdown-menu > .disabled > a,
   .navbar-custom .navbar-nav .open .dropdown-menu > .disabled > a:hover,
@@ -118,8 +153,8 @@ body { padding-top: 70px; }
   }
 }
 .navbar-custom .navbar-link {
-  color: #999999;
+  color: #000000;
 }
 .navbar-custom .navbar-link:hover {
-  color: #000000;
+  color: #757575;
 }

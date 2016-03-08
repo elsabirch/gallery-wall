@@ -7,6 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Boostrap requires these (above) come first -->
 
+    <link href='https://fonts.googleapis.com/css?family=Sacramento' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+
     <link href='{{ config.BOOSTRAP_CSS_PATH }}' rel="stylesheet">
     <link rel="stylesheet" href="static/style.css"> 
 
@@ -32,7 +35,7 @@
             <span class="icon-bar"></span>
           </button>
           <!-- <a class="navbar-brand" href="/">Gallery Wall</a> -->
-          <a href='/navigation'><img id="navlogo" src="/static/img/gw_logo_peach.png" height="50"></a>
+          <a href='/navigation'><img id="navlogo" src="/static/img/gw_logo_white.png" height="50"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           
@@ -62,29 +65,31 @@
 
     <div class="container">
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class=flashes>
-    {% for message in messages %}
-      <li>{{ message }}</li>
-    {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+<div class='row'>
+    <div class='col-sm-12 col-md-12 text-center'>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul class='flash-display'>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+    </div> <!-- column -->
+</div> <!-- row -->
 
-    </div> <!-- /container -->
+</div> <!-- /container -->
 
-    {% block content %} Content goes in here! {% endblock %}
+{% block content %} Content goes in here! {% endblock %}
 
 
-    <footer class="footer">
-    <div class="container">
-    <hr>
-    <small> This site was made by Elsa Birch at Hackbright in Winter 2016 (Oh look! <a href="/time"> Time </a> )</small>
-    </div> <!-- /container -->
-    </footer>
-    
-
+<footer class="footer">
+<div class="container">
+<hr>
+<small> This site was made by Elsa Birch at Hackbright in Winter 2016 (<a href="/time"> Time </a> )</small>
+</div> <!-- /container -->
+</footer>
 
 <script src='{{ config.BOOSTRAP_JS_PATH }}'></script>
 

@@ -220,6 +220,6 @@ def prepare_all():
     load_placements()    
 
 if __name__ == "__main__":
-    
+
     prepare_all()
 

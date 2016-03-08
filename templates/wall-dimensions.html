@@ -3,25 +3,49 @@
 
 <div class="container">
 
-<p>How to hang you wall!</p>
 
-<div class='wall-display' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
-    <p> Wall {{wall_id}} Display: </p>
-    <canvas id='canvas{{wall_id}}' height='300' width='900'> 
-        If you dont have HTML5 canvas, you're gonna have a bad time.
+<div class='wall-display' data-wallid='{{wall.wall_id}}' id='wall{{wall.wall_id}}'>
+    <canvas id='canvas{{wall.wall_id}}' height='300' width='900'> 
+      HTML5 canvas is required for display.
     </canvas>
 
 </div>
 
 <div class='row'>
-    <div class="col-xs-12 col-md-6 col-md-offset-3">
+
+    <div class="col-xs-12 col-md-4 col-md-offset-1">
         <table class="table table-striped">
-          <tr>
-            <th>Picture</th>
-            <th>From top (inches)</th>
-            <th>From left (inches)</th>
+          <thead>
+            <tr>
+            <th>Wall Width (inches)</th>
+            <th>Wall Height (inches)</th>
             <!-- <th>Width and Height (inches)</th> -->
           </tr>
+          </thead>
+          
+          <tbody>
+              <tr>
+                <td>{{ wall.wall_width }}</td>
+                <td>{{ wall.wall_height }}</td>
+                <!-- <td> Placeholder </td> -->
+              </tr>
+          </tbody>
+        </table>
+    </div>
+
+
+    <div class="col-xs-12 col-md-6">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+            <th>Picture</th>
+            <th>From Top (inches)</th>
+            <th>From Left (inches)</th>
+            <!-- <th>Width and Height (inches)</th> -->
+          </tr>
+          </thead>
+          
+          <tbody>
           {% for placement in placements %}
               <tr>
                 <td>{{ placement.picture.display_name.title() }}</td>
@@ -30,6 +54,7 @@
                 <!-- <td> Placeholder </td> -->
               </tr>
           {% endfor %}
+          </tbody>
         </table>
     </div>
 </div>

@@ -5,18 +5,33 @@
 
 <!-- TODO: un-hardcode the canvas dimensions -->
 {% for wall_id in wall_ids %}
-    <div class='wall-display' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
-        <p> Wall {{wall_id}} Display: </p>
+<div class='row'>
+    <div class='col-sm-12 col-md-12'>
+
+    <div class='wall-display text-center' data-wallid='{{wall_id}}' id='wall{{wall_id}}'>
         <canvas id='canvas{{wall_id}}' height='300' width='900'> 
-            If you dont have HTML5 canvas, you're gonna have a bad time.
+            HTML5 canvas is required for display.
         </canvas>
-
-    <form action='/wall-dimensions' method='GET'>
-    <input type='hidden' name='wall_id' value='{{ wall_id }}'>
-    <input type='submit' value='See wall dimensions'>
-    </form>
-
     </div>
+
+    <div class='col-sm-12 col-md-10 col-md-offset-1'>
+        <div class='row'>
+
+            <div class='col-sm-3 col-md-2 pull-right'>
+                 <form action='/wall-dimensions' method='GET' class='text-right'>
+                <input type='hidden' name='wall_id' value='{{ wall_id }}'>
+                <input type='submit' value='See Wall Dimensions for Hanging' 
+                   class="btn btn-default">
+            </form>
+            </div> <!-- column -->        
+        </div>
+    </div> <!-- column -->
+
+    </div> <!-- column -->
+
+</div> <!-- row -->
+<hr>
+  
 {% endfor %}
 
 </div> <!-- /container -->

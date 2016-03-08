@@ -212,11 +212,11 @@ def show_wall_dimensions():
     """Shows page with wall and table of hanging demensions."""
 
     wall_id = int(request.args.get('wall_id'))
-
-    placements = Wall.query.get(wall_id).placements
+    wall = Wall.query.get(wall_id)
+    placements = wall.placements
 
     return render_template('wall-dimensions.html',
-                           wall_id=wall_id,
+                           wall=wall,
                            placements=placements)
 
 
