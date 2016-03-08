@@ -6,6 +6,26 @@
 body {
       padding-top: 70px;
       font-family: 'Open Sans Condensed', sans-serif;
+
+}
+
+a {
+  color: #85726A; /*#A84F39;*/ /*#808080;*/ /*#8D5F43;*/ /*#5A240D;*/
+}
+
+/* visited link */
+a:visited {
+    color: #85726A;
+}
+
+/* mouse over link */
+a:hover {
+    color: #9F887E;
+}
+
+/* selected link */
+a:active {
+    color: #9F887E;
 }
 
 h1 {

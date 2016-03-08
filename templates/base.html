@@ -1,27 +1,5 @@
-<!doctype html>
-<html>
-<head>
-    <!-- Boostrap requires these (below) come first -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Boostrap requires these (above) come first -->
-
-    <link href='https://fonts.googleapis.com/css?family=Sacramento' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
-
-    <link href='{{ config.BOOSTRAP_CSS_PATH }}' rel="stylesheet">
-    <link rel="stylesheet" href="static/style.css"> 
-
-    <script src='{{ config.JQUERY_PATH }}'></script>
-
-    <script src='{{ config.CHARTJS_PATH }}'></script>
-
-    <title>Gallery Wall</title>
-
-</head>
-
-<body>  
+{% extends 'base_head.html' %}
+{% block body %} 
     
     <!-- Basic setup of navbar taken from (http://getbootstrap.com/examples/navbar-fixed-top/) Jinja logic added by me. -->
     <!-- Fixed navbar -->
@@ -52,7 +30,7 @@
           <ul class="nav navbar-nav navbar-right">
             {% if 'user_id' in session %}
             <li><a href='/logout-process'>Log out</a></li>
-            <li class="active"><a href="/navigation">{{session.username}}</a></li>
+            <li><a href="/navigation">{{session.username.title()}}</a></li>
             {% else %} 
             <li><a href="/login">Log in</a></li>
             {% endif %}
@@ -86,12 +64,15 @@
 
 <footer class="footer">
 <div class="container">
-<hr>
-<small> This site was made by Elsa Birch at Hackbright in Winter 2016 (<a href="/time"> Time </a> )</small>
+
+<div class='row'>
+    <div class='col-sm-12 col-md-12 text-center'>
+        <hr>
+        <small>This site was made by Elsa Birch at Hackbright in Winter 2016 (<a href="/time">Time</a>)</small>
+    </div> <!-- column -->
+</div> <!-- row -->
+
 </div> <!-- /container -->
 </footer>
 
-<script src='{{ config.BOOSTRAP_JS_PATH }}'></script>
-
-</body>
-</html>
+{% endblock %}

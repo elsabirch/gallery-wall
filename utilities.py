@@ -140,7 +140,7 @@ def get_arrange_options_for_display():
 
         {
             'algorithm_type': 'column',
-            'display_name': 'Columner',
+            'display_name': 'Columnar',
             'image': "/static/img/column_icon.jpg",
             'description': "Heuristics FTW!",
         },
