@@ -17,7 +17,7 @@ import utilities as ut
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "^*V6Er$&!DN9dzMrpP994*Mx2"
+app.secret_key = "notforyou"
 
 # Jinja should not fail silently
 app.jinja_env.undefined = StrictUndefined

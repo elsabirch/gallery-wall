@@ -104,12 +104,6 @@ class NavigationServerRoutesTestCase(unittest.TestCase):
         server.app.config['TESTING'] = True
         server.app.config['SECRET_KEY'] = 'notforyou'
 
-        # utilities.login('eb', 5)
-
-        # with server.app.app_context():
-        #     session['user_id'] = 13
-        #     session['username'] = 'foo'
-
     def test_navigation_logged_out(self):
 
         result = self.client.get('/navigation')
@@ -118,20 +112,33 @@ class NavigationServerRoutesTestCase(unittest.TestCase):
         self.assertNotIn('Curate', result.data)
         self.assertNotIn('Upload', result.data)
 
-    # def test_navigation_logged_in(self):
+class NavigationServerRoutesLoggedInTestCase(unittest.TestCase):
 
-    #     result = self.client.get('/navigation')
-    #     self.assertIn('Galleries', result.data)
-    #     self.assertIn('Walls', result.data)
-    #     self.assertIn('Curate', result.data)
-    #     self.assertIn('Upload', result.data)
+    def setUp(self):
+        self.client = server.app.test_client()
+        server.app.config['TESTING'] = True
+        server.app.config['SECRET_KEY'] = 'notforyou'
 
-    # def navigations while not logged in
+        with self.client as c:
+            with c.session_transaction() as se:
+                se['user_id'] = 13
+                se['username'] = 'foo'
+
+    def test_navigation_logged_in(self):
+
+        result = self.client.get('/navigation')
+        self.assertIn('Galleries', result.data)
+        self.assertIn('Walls', result.data)
+        self.assertIn('Curate', result.data)
+        self.assertIn('Upload', result.data)
 
     # tear down by logging out
-    # def tearDown(self):
-    #     session.pop('user_id')
-    #     session.pop('username')
+    def tearDown(self):
+
+        with self.client as c:
+            with c.session_transaction() as se:
+                se.pop('user_id')
+                se.pop('username')
 
 
 class LoginServerRoutesTestCase(unittest.TestCase):

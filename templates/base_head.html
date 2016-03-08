@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+<head>
+    <!-- Boostrap requires these (below) come first -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Boostrap requires these (above) come first -->
+
+    <link href='https://fonts.googleapis.com/css?family=Sacramento' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+
+    <link href='{{ config.BOOSTRAP_CSS_PATH }}' rel="stylesheet">
+    <link rel="stylesheet" href="static/style.css"> 
+
+    <script src='{{ config.JQUERY_PATH }}'></script>
+
+    <script src='{{ config.CHARTJS_PATH }}'></script>
+
+    <title>Gallery Wall</title>
+
+    <link rel='shortcut icon' href='static/img/gw_favicon.ico' type='image/x-icon'/ >
+
+</head>
+
+<body>  
+    
+{% block body %} Body goes in here! {% endblock %}
+
+<script src='{{ config.BOOSTRAP_JS_PATH }}'></script>
+</body>
+</html>
