@@ -1,9 +1,9 @@
 
 #Gallery Wall 
 
-![gw_logo](http://github.com/elsabirch/gallery-wall/blob/master/static/img/gw_logo_white.png)
+![gwlogo](/static/img/gw_logo_white.png)
 
-Gallery Wall is the project of Elsa Birch while a student at Hackbright Academy in San Francisco, Winter 2016. You can reach her via <elsa.birch@gmail.com> or see more about her background [here](http://www.elsabirch.com).
+Gallery Wall is the project of Elsa Birch while a student at Hackbright Academy in San Francisco, Winter 2016. You can reach her via <elsa.birch@gmail.com> or see more about her interests and background on her [personal website](http://www.elsabirch.com).
 
 ## Overview & Features
 
