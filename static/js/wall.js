@@ -92,6 +92,9 @@ function handleArrangeNewWall(results){
 
     var newWallId = arrangeResults.id;
 
+    // Set the trigger for type of arrangment to remember this most recent wall
+    recentWalls[recentCall] = newWallId;
+
     handleArrangeWall(newWallId);
 }
 
@@ -114,9 +117,6 @@ function setArrangeWallDisplayed(wallId){
     // Set the display area to recieve the new wall via wall hanging functions
     divArrange.data('wallid', wallId);
     canvasArrange.attr('id', 'canvas' + wallId);
-
-    // Set the trigger for type of arrangment to remember this most recent wall
-    recentWalls[recentCall] = wallId;
 
     //Set save button to know which wall is displayed
     $('#save-div').show();
