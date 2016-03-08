@@ -1,16 +1,11 @@
 
-/*.wall-display canvas {
-    border: 1px solid #d3d3d3;
-}*/
-
 body {
       padding-top: 70px;
       font-family: 'Open Sans Condensed', sans-serif;
-
 }
 
 a {
-  color: #85726A; /*#A84F39;*/ /*#808080;*/ /*#8D5F43;*/ /*#5A240D;*/
+  color: #85726A; 
 }
 
 /* visited link */
@@ -30,17 +25,6 @@ a:active {
 
 h1 {
       font-family: 'Sacramento', sans-serif;
-}
-
-.bar-legend li span {
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    margin-right: 0.5em;
-}
-
-.bar-legend ul {
-    list-style-type: none;
 }
 
 .flash-display li {
