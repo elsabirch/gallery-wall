@@ -29,21 +29,22 @@ Sample sets of pictures are also available for users to try the layout algorithm
 
 ### Screenshots
 
-![navhome](/docs/navigation-screenshot.png)
-
 Navigation homepage for a logged in user.
 
-![arrange](/docs/galleries-screenshot.png)
+![navhome](/docs/navigation-screenshot.png)
 
 Gallery selection.
 
-![arrange](/docs/arrange-screenshot.png)
+![arrange](/docs/galleries-screenshot.png)
 
 Arrangement interface.
 
-![dimensions](/docs/dimensions-screenshot.png)
+![arrange](/docs/arrange-screenshot.png)
 
 Wall dimensions for hanging.
+
+![dimensions](/docs/dimensions-screenshot.png)
+
 
 ### Component Files of Note
 
