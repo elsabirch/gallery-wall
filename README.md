@@ -1,7 +1,7 @@
 
 #Gallery Wall 
 
-![gwlogo](/static/img/gw_logo_white.png)
+![gwlogo](/docs/gw_logo.png)
 
 Gallery Wall is the project of Elsa Birch while a student at Hackbright Academy in San Francisco, Winter 2016. You can reach her via <elsa.birch@gmail.com> or see more about her interests and background on her [personal website](http://www.elsabirch.com).
 
@@ -26,6 +26,24 @@ Sample sets of pictures are also available for users to try the layout algorithm
 **Static Resources**: User upload file storage Amazon Web Services S3 cloud storage via Boto3
 
 **Testing**: Doctests and Unittest
+
+### Screenshots
+
+![navhome](/docs/navigation-screenshot.png)
+
+Navigation homepage for a logged in user.
+
+![arrange](/docs/galleries-screenshot.png)
+
+Gallery selection.
+
+![arrange](/docs/arrange-screenshot.png)
+
+Arrangement interface.
+
+![dimensions](/docs/dimensions-screenshot.png)
+
+Wall dimensions for hanging.
 
 ### Component Files of Note
 
