@@ -43,10 +43,10 @@ DEFAULT_USER_ID = 1
 def index():
     """Homepage."""
 
-    if 'user_id' in session:
-        return redirect('/navigation')
-    else:
-        return render_template("homepage.html")
+    # if 'user_id' in session:
+    #     return redirect('/navigation')
+    # else:
+    return render_template("homepage.html")
 
 
 @app.route('/navigation')
