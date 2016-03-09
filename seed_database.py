@@ -14,13 +14,6 @@ def load_users():
     username | email | password
     """
 
-    # If seeding database clear previous data out
-    # User.query.delete()
-
-    # query = "ALTER SEQUENCE users_user_id_seq RESTART"
-    # db.session.execute(query)
-    # db.session.commit()
-
     with open("seed/seed_users.txt") as seed_file:
         for line in seed_file:
             username, email, password = line.rstrip().split("|")
@@ -45,9 +38,6 @@ def load_pictures():
     picture_id | user_id | width | height | image_file |
         picture_name | image_attribution | public
     """
-
-    # If seeding database clear previous data out
-    # Picture.query.delete()
 
     seed_image_folder_path = "static/img_samples/"
 
@@ -118,6 +108,7 @@ def load_galleries():
     db.session.execute(query, {'next_id': max_id+1})
     db.session.commit()
 
+
 def load_memberships():
     """Add sample pictures to galleries in database from text file.
 
@@ -177,6 +168,7 @@ def load_walls():
     db.session.execute(query, {'next_id': max_id+1})
     db.session.commit()
 
+
 def load_placements():
     """Add sample walls to database from text file.
 
@@ -203,6 +195,7 @@ def load_placements():
 
         db.session.commit()
 
+
 def prepare_all():
     connect_to_db(app)
 
@@ -217,9 +210,8 @@ def prepare_all():
     load_galleries()
     load_memberships()
     load_walls()
-    load_placements()    
+    load_placements()
 
 if __name__ == "__main__":
 
     prepare_all()
-
