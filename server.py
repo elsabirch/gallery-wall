@@ -212,6 +212,10 @@ def show_wall_dimensions():
                            wall=wall,
                            placements=placements)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html'), 404
+
 
 @app.route('/time')
 def show_time():
