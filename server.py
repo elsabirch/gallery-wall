@@ -12,8 +12,6 @@ import secrets
 import arrange as ar
 import utilities as ut
 
-# from flask_debugtoolbar import DebugToolbarExtension
-
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -21,7 +19,6 @@ app.secret_key = "notforyou"
 
 # Jinja should not fail silently
 app.jinja_env.undefined = StrictUndefined
-
 
 # Configurations for flask-uploads
 # These are required
@@ -38,7 +35,7 @@ app.config['BOOSTRAP_CSS_PATH'] = settings.boostrap_css_path
 app.config['BOOSTRAP_JS_PATH'] = settings.boostrap_js_path
 app.config['CHARTJS_PATH'] = settings.chartjs_path
 
-
+# Default user ID used to display sample images when no other user logged in
 DEFAULT_USER_ID = 1
 
 
@@ -160,8 +157,6 @@ def show_galleries():
     user_id = session.get('user_id', DEFAULT_USER_ID)
     galleries = User.query.get(user_id).galleries
 
-    # db.session.flush()
-
     return render_template("galleries.html",
                            galleries=galleries)
 
@@ -172,8 +167,6 @@ def prompt_arrangment():
 
     gallery_id = request.args.get('gallery_id')
     gallery = Gallery.query.get(gallery_id)
-    # curator_id = gallery.curator_id
-    # wall_id = gallery.display_wall_id
 
     # This is a get request because it does not have side effects, but check
     # they are the curator of this gallery or that it is site sample.
@@ -228,6 +221,7 @@ def show_time():
 
 # Routes returning json data
 
+
 @app.route('/save-wall.json', methods=["POST"])
 def save_wall():
     """Changes the state of the wall in the database to saved."""
@@ -274,6 +268,7 @@ def get_gallery_data():
 
     return jsonify(gallery_to_hang)
 
+
 @app.route('/arrange.json', methods=['POST'])
 def get_arranged_data():
     """Get the information needed for displaying a gallery.
@@ -301,9 +296,10 @@ def get_arranged_data():
 
     wall_id = Wall.init_from_workspace(wkspc)
 
-    new_wall_data = {'id':wall_id}
+    new_wall_data = {'id': wall_id}
 
     return jsonify(new_wall_data)
+
 
 @app.route('/gettime.json')
 def get_time_data():
