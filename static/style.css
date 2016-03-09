@@ -1,3 +1,16 @@
+@font-face {
+  font-family: 'Open Sans Condensed';
+  font-weight: 300;
+  font-style: normal;
+  src: url('/static/fonts/Open-Sans-Condensed-300/Open-Sans-Condensed-300.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Sacramento';
+  font-weight: 400;
+  font-style: normal;
+  src: url('/fonts/Sacramento-regular/Sacramento-regular.ttf') format('truetype');
+}
 
 body {
       padding-top: 70px;
@@ -30,6 +43,7 @@ h1 {
 .flash-display li {
     list-style-type: none;
 }
+
 .center-block {
     display: block;
     margin-left: auto;
@@ -60,9 +74,6 @@ body {
  /* - - - - - - - - - - - - Flush bottom but not sticky footer attempt */
 
 /* SOME AUTO GENERATED NAVBAR RESTYLING*/
-
-
-/*----------------------------------*/
 
 .navbar-custom {
   background-color: #ffffff;
