@@ -61,17 +61,32 @@ Wall dimensions for hanging.
 `time_track.py` and `timeplot-spark.js` exist for my own personal tracking of how I have spent my time on the project, and are not intended to be used by others (the text file with the data for these functions is not provided.)
 
 
-
+<!--
 ### Try it Locally
 
-Still very much a work in progress! But if you'd like to try running the app locally, these steps may help.  This is not meant to be a step-by-step guide, but just a quick to-do list for users already familiar with the required tasks.
+Still very much a work in progress! But if you'd like to try running the app locally, these steps may help.  This is not meant to be a full step-by-step guide yet, but just a quick to-do list for users already familiar with the required tasks.
 
 1. Create virtualenv using requirements.txt and activate it
 
-2. create a psql database called gallerywall
+2. Install Postgres and create a psql database called gallerywall
 
-3. Run seed_database.py
+3. You can use the sample images provided in this repo locally without any changes. (Updates here and to the code itself are on their way to allow this without any modifications to imports etc)
 
-4. Run server.py
+4. Run seed_database.py
 
-5. Head to "http://localhost:5000/" in your browser!
+5. Run server.py
+
+6. Head to "http://localhost:5000/" in your browser!
+
+### Setup for Upload to AWS S3
+
+If upload to AWS S3 is desired, you will need to create an account and an S3 bucket with a folder that is publically readable, then create a secrets.py or otherwise source these to your environment:
+	
+	import os
+
+	# Parameters needed by boto3 to access your S3 bucket
+	os.environ['AWS_ACCESS_KEY_ID'] = "SECRET-STUFF-GOES-HERE"
+	os.environ['AWS_SECRET_ACCESS_KEY'] = "NOT-FOR-SHARING"
+	os.environ['AWS_DEFAULT_REGION'] = "MORE-STUFF"
+
+	-->
