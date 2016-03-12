@@ -10,7 +10,7 @@ import settings
 import secrets
 
 import arrange as ar
-import utilities as ut
+import utilities as utils
 
 app = Flask(__name__)
 
@@ -67,7 +67,7 @@ def prompt_login():
 def process_login():
     """Handle form submission for login process."""
 
-    login_success = ut.attempt_login()
+    login_success = utils.attempt_login()
 
     if login_success:
         flash('Welcome {}!'.format(session['username']))
@@ -82,7 +82,7 @@ def process_login():
 def process_signup():
     """Handle form submission for signup process."""
 
-    signup_success = ut.attempt_signup()
+    signup_success = utils.attempt_signup()
 
     if signup_success:
         flash("Sign up successful! Now log in.")
@@ -114,7 +114,7 @@ def input_upload():
 @app.route('/upload-process', methods=["POST"])
 def process_upload():
 
-    upload_success = ut.attempt_upload()
+    upload_success = utils.attempt_upload()
 
     if upload_success:
         flash('Image sucsessfully uploaded!')
@@ -141,7 +141,7 @@ def show_pictures():
 @app.route('/process-curation', methods=["POST"])
 def process_curation():
 
-    curate_success = ut.attempt_curation()
+    curate_success = utils.attempt_curation()
 
     if curate_success:
         return redirect('/galleries')
@@ -174,7 +174,7 @@ def prompt_arrangment():
         flash("That gallery doesnt exist or you don't have permission to view it.")
         return redirect('/galleries')
 
-    arrange_options = ut.get_arrange_options_for_display()
+    arrange_options = utils.get_arrange_options_for_display()
 
     return render_template("arrange.html",
                            gallery=gallery,
