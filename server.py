@@ -6,16 +6,18 @@ from flask.ext.uploads import UploadSet, IMAGES, configure_uploads
 
 from model import User, Picture, Gallery, Wall, Placement, connect_to_db, db
 
-import settings
+from settings import ResourcePaths
 import secrets
 
 import arrange as ar
 import utilities as utils
 
+import os
+
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "notforyou"
+app.secret_key = os.environ['FLASK_APP_SECRET_KEY']
 
 # Jinja should not fail silently
 app.jinja_env.undefined = StrictUndefined
@@ -25,15 +27,17 @@ app.jinja_env.undefined = StrictUndefined
 app.config['UPLOADED_PICTURES_DEST'] = 'upload_temp'
 pictures = UploadSet('pictures', IMAGES)
 configure_uploads(app, (pictures,))
+
 # These are a handy place to pass the info
-app.config['S3_FOLDER'] = 'pictures'
-app.config['S3_BUCKET'] = 'gallerywallshakedown'
+app.config['S3_FOLDER'] = os.environ['AWS_S3_FOLDER']
+app.config['S3_BUCKET'] = os.environ['AWS_S3_BUCKET']
 
 # Configure paths for online resources
-app.config['JQUERY_PATH'] = settings.jquery_path
-app.config['BOOSTRAP_CSS_PATH'] = settings.boostrap_css_path
-app.config['BOOSTRAP_JS_PATH'] = settings.boostrap_js_path
-app.config['CHARTJS_PATH'] = settings.chartjs_path
+resources = ResourcePaths(online=False)
+app.config['JQUERY_PATH'] = resources.jquery_path
+app.config['BOOSTRAP_CSS_PATH'] = resources.boostrap_css_path
+app.config['BOOSTRAP_JS_PATH'] = resources.boostrap_js_path
+app.config['CHARTJS_PATH'] = resources.chartjs_path
 
 # Default user ID used to display sample images when no other user logged in
 DEFAULT_USER_ID = 1
