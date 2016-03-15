@@ -83,10 +83,17 @@ Still very much a work in progress! But if you'd like to try running the app loc
 If upload to AWS S3 is desired, you will need to create an account and an S3 bucket with a folder that is publically readable, then create a secrets.py or otherwise source these to your environment:
 	
 	import os
+	
+	# Flask app secret key
+	os.environ['FLASK_APP_SECRET_KEY'] = "notforyou"
 
 	# Parameters needed by boto3 to access your S3 bucket
+	# Required by boto3 as the variable names below
 	os.environ['AWS_ACCESS_KEY_ID'] = "SECRET-STUFF-GOES-HERE"
 	os.environ['AWS_SECRET_ACCESS_KEY'] = "NOT-FOR-SHARING"
 	os.environ['AWS_DEFAULT_REGION'] = "MORE-STUFF"
+	# Used by server as settings, these names not directly required by boto
+	os.environ['AWS_S3_BUCKET'] = 'yourbucket'
+	os.environ['AWS_S3_FOLDER'] = 'yourfolder'
 
 	-->
