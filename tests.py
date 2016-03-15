@@ -102,7 +102,7 @@ class NavigationServerRoutesTestCase(unittest.TestCase):
     def setUp(self):
         self.client = server.app.test_client()
         server.app.config['TESTING'] = True
-        server.app.config['SECRET_KEY'] = 'notforyou'
+        server.app.config['SECRET_KEY'] = os.environ['FLASK_APP_SECRET_KEY']
 
     def test_navigation_logged_out(self):
 
@@ -117,7 +117,7 @@ class NavigationServerRoutesLoggedInTestCase(unittest.TestCase):
     def setUp(self):
         self.client = server.app.test_client()
         server.app.config['TESTING'] = True
-        server.app.config['SECRET_KEY'] = 'notforyou'
+        server.app.config['SECRET_KEY'] = os.environ['FLASK_APP_SECRET_KEY']
 
         with self.client as c:
             with c.session_transaction() as se:
