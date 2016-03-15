@@ -7,14 +7,14 @@ from model import connect_to_db, db
 from server import app
 
 
-def load_users():
+def load_users(seed_file_path):
     """Add users to database from text file.
 
     Data file is pipe seperated:
     username | email | password
     """
 
-    with open("seed/seed_users.txt") as seed_file:
+    with open(seed_file_path) as seed_file:
         for line in seed_file:
             username, email, password = line.rstrip().split("|")
 
@@ -31,7 +31,7 @@ def load_users():
         db.session.commit()
 
 
-def load_pictures():
+def load_pictures(seed_file_path):
     """Add sample pictures to database from text file.
 
     Data file is pipe seperated:
@@ -41,7 +41,7 @@ def load_pictures():
 
     seed_image_folder_path = "static/img_samples/"
 
-    with open("seed/seed_pictures.txt") as seed_file:
+    with open(seed_file_path) as seed_file:
         for line in seed_file:
             tokens = line.rstrip().split("|")
 
@@ -77,14 +77,14 @@ def load_pictures():
     db.session.commit()
 
 
-def load_galleries():
+def load_galleries(seed_file_path):
     """Add sample galleries to database from text file.
 
     Data file is pipe seperated:
     gallery_id | gallery_name | curator_id
     """
 
-    with open("seed/seed_galleries.txt") as seed_file:
+    with open(seed_file_path) as seed_file:
         for line in seed_file:
             gallery_id, gallery_name, curator_id = line.rstrip().split("|")
 
@@ -109,14 +109,14 @@ def load_galleries():
     db.session.commit()
 
 
-def load_memberships():
+def load_memberships(seed_file_path):
     """Add sample pictures to galleries in database from text file.
 
     Data file is pipe seperated, with comma seperated list of pictures:
     gallery_id | picture_id, picture_id, ...
     """
 
-    with open("seed/seed_memberships.txt") as seed_file:
+    with open(seed_file_path) as seed_file:
         for line in seed_file:
             gallery_id, comma_sep_pictures = line.rstrip().split("|")
 
@@ -133,14 +133,14 @@ def load_memberships():
         db.session.commit()
 
 
-def load_walls():
+def load_walls(seed_file_path):
     """Add sample walls to database from text file.
 
     Data file is pipe seperated:
     wall_id | gallery_id | wall_width | wall_height | saved
     """
 
-    with open("seed/seed_walls.txt") as seed_file:
+    with open(seed_file_path) as seed_file:
         for line in seed_file:
             wall_id, gallery_id, wall_width, wall_height, saved = line.rstrip().split("|")
 
@@ -169,14 +169,14 @@ def load_walls():
     db.session.commit()
 
 
-def load_placements():
+def load_placements(seed_file_path):
     """Add sample walls to database from text file.
 
     Data file is pipe seperated:
     wall_id | picture_id | x | y
     """
 
-    with open("seed/seed_placements.txt") as seed_file:
+    with open(seed_file_path) as seed_file:
         for line in seed_file:
             wall_id, picture_id, x_coord, y_coord = line.rstrip().split("|")
 
@@ -196,22 +196,33 @@ def load_placements():
         db.session.commit()
 
 
-def prepare_all():
+def seed_all(seed_files):
     connect_to_db(app)
 
     # In case tables haven't been created, create them
     db.drop_all()
     db.create_all()
-    print "Database droped & created!"
+    print "Database tables droped & created."
 
     # Import different types of data
-    load_users()
-    load_pictures()
-    load_galleries()
-    load_memberships()
-    load_walls()
-    load_placements()
+    load_users(seed_files['users'])
+    load_pictures(seed_files['pictures'])
+    load_galleries(seed_files['galleries'])
+    load_memberships(seed_files['memberships'])
+    load_walls(seed_files['walls'])
+    load_placements(seed_files['placements'])
+    print "Tables seeded."
+
 
 if __name__ == "__main__":
 
-    prepare_all()
+    seed_files = {
+        'users': "seed/seed_users.txt",
+        'pictures': "seed/seed_pictures.txt",
+        'galleries': "seed/seed_galleries.txt",
+        'memberships': "seed/seed_memberships.txt",
+        'walls': "seed/seed_walls.txt",
+        'placements': "seed/seed_placements.txt",
+    }
+
+    seed_all(seed_files)

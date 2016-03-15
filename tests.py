@@ -164,7 +164,16 @@ class WorkspaceInitTestCase(unittest.TestCase):
 
     def setUp(self):
 
-        sd.prepare_all()
+        seed_files = {
+            'users': "seed/seed_users.txt",
+            'pictures': "seed/seed_pictures.txt",
+            'galleries': "seed/seed_galleries.txt",
+            'memberships': "seed/seed_memberships.txt",
+            'walls': "seed/seed_walls.txt",
+            'placements': "seed/seed_placements.txt",
+        }
+
+        sd.seed_all(seed_files)
 
     def test_init(self):
 
@@ -178,8 +187,12 @@ class WorkspaceInitTestCase(unittest.TestCase):
         self.assertIn(42, wkspc.pics)
         self.assertIn(49, wkspc.pics)
 
+        # All pics are instance of correct class
         for p in wkspc.pics:
             self.assertTrue(isinstance(wkspc.pics[p], ar.Pic))
+
+        # Correct number of pics
+        self.assertEqual(len(wkspc.pics), 3)
 
 if __name__ == "__main__":
     unittest.main()
