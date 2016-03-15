@@ -165,12 +165,12 @@ class WorkspaceInitTestCase(unittest.TestCase):
     def setUp(self):
 
         seed_files = {
-            'users': "seed/seed_users.txt",
-            'pictures': "seed/seed_pictures.txt",
-            'galleries': "seed/seed_galleries.txt",
-            'memberships': "seed/seed_memberships.txt",
-            'walls': "seed/seed_walls.txt",
-            'placements': "seed/seed_placements.txt",
+            'users': "seed/seed_test_users.txt",
+            'pictures': "seed/seed_test_pictures.txt",
+            'galleries': "seed/seed_test_galleries.txt",
+            'memberships': "seed/seed_test_memberships.txt",
+            'walls': "seed/seed_test_walls.txt",
+            'placements': "seed/seed_test_placements.txt",
         }
 
         sd.seed_all(seed_files)
