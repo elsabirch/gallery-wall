@@ -11,24 +11,35 @@ def load_users(seed_file_path):
     """Add users to database from text file.
 
     Data file is pipe seperated:
-    username | email | password
+    user_id | username | email | password
     """
 
     with open(seed_file_path) as seed_file:
         for line in seed_file:
-            username, email, password = line.rstrip().split("|")
+            user_id, username, email, password = line.rstrip().split("|")
 
+            user_id = int(user_id)
             username = username.strip()
             email = email.strip()
             password = password.strip()
 
-            user = User(username=username,
-                        email=email,
-                        password=password)
+            user = User(
+                user_id=user_id,
+                username=username,
+                email=email,
+                password=password
+                )
 
             db.session.add(user)
 
         db.session.commit()
+
+    # Reset seq/counter
+    result = db.session.query(func.max(User.user_id)).one()
+    max_id = int(result[0])
+    query = "ALTER SEQUENCE users_user_id_seq RESTART WITH :next_id"
+    db.session.execute(query, {'next_id': max_id+1})
+    db.session.commit()
 
 
 def load_pictures(seed_file_path):
