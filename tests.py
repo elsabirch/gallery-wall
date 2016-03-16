@@ -2,8 +2,11 @@ import unittest
 import server
 import utilities
 import doctest
+import os
 import seed_database as sd
 import arrange as ar
+from model import Picture
+
 # from flask import session
 
 def load_tests(loader, tests, ignore):
@@ -112,6 +115,7 @@ class NavigationServerRoutesTestCase(unittest.TestCase):
         self.assertNotIn('Curate', result.data)
         self.assertNotIn('Upload', result.data)
 
+
 class NavigationServerRoutesLoggedInTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -193,6 +197,54 @@ class WorkspaceInitTestCase(unittest.TestCase):
 
         # Correct number of pics
         self.assertEqual(len(wkspc.pics), 3)
+
+class PicInitTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        seed_files = {
+            'users': "seed/seed_test_users.txt",
+            'pictures': "seed/seed_test_pictures.txt",
+            'galleries': "seed/seed_test_galleries.txt",
+            'memberships': "seed/seed_test_memberships.txt",
+            'walls': "seed/seed_test_walls.txt",
+            'placements': "seed/seed_test_placements.txt",
+        }
+
+        sd.seed_all(seed_files)
+
+    def test_init(self):
+
+        # Dimensions need rounding
+        picture = Picture(user_id=4, width=10.2, height=5.7)
+        pic = ar.Pic(picture=picture, margin=1)
+        self.assertEqual(pic.w, 12)
+        self.assertEqual(pic.h, 7)
+        self.assertIsNone(pic.x1)
+        self.assertIsNone(pic.x2)
+        self.assertIsNone(pic.y1)
+        self.assertIsNone(pic.y2)
+
+
+        # Only one dimension will be rounded
+        picture = Picture(user_id=4, width=10, height=5.7)
+        pic = ar.Pic(picture=picture, margin=1)
+        self.assertEqual(pic.w, 11)
+        self.assertEqual(pic.h, 7)
+        self.assertIsNone(pic.x1)
+        self.assertIsNone(pic.x2)
+        self.assertIsNone(pic.y1)
+        self.assertIsNone(pic.y2)
+
+        # No margin
+        picture = Picture(user_id=4, width=10, height=5.7)
+        pic = ar.Pic(picture=picture, margin=0)
+        self.assertEqual(pic.w, 10)
+        self.assertEqual(pic.h, 6)
+        self.assertIsNone(pic.x1)
+        self.assertIsNone(pic.x2)
+        self.assertIsNone(pic.y1)
+        self.assertIsNone(pic.y2)
 
 if __name__ == "__main__":
     unittest.main()
