@@ -207,13 +207,17 @@ def load_placements(seed_file_path):
         db.session.commit()
 
 
-def seed_all(seed_files):
+def connect_clean_db():
+
     connect_to_db(app)
 
     # In case tables haven't been created, create them
     db.drop_all()
     db.create_all()
     print "Database tables droped & created."
+
+
+def seed_all(seed_files):
 
     # Import different types of data
     load_users(seed_files['users'])
@@ -226,6 +230,8 @@ def seed_all(seed_files):
 
 
 if __name__ == "__main__":
+
+    connect_clean_db()
 
     seed_files = {
         'users': "seed/seed_users.txt",

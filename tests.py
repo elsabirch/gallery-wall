@@ -5,7 +5,7 @@ import doctest
 import os
 import seed_database as sd
 import arrange as ar
-from model import Picture
+from model import Picture, User
 
 # from flask import session
 
@@ -168,6 +168,8 @@ class WorkspaceInitTestCase(unittest.TestCase):
 
     def setUp(self):
 
+        sd.connect_clean_db()
+
         seed_files = {
             'users': "seed/seed_test_users.txt",
             'pictures': "seed/seed_test_pictures.txt",
@@ -202,16 +204,8 @@ class PicInitTestCase(unittest.TestCase):
 
     def setUp(self):
 
-        seed_files = {
-            'users': "seed/seed_test_users.txt",
-            'pictures': "seed/seed_test_pictures.txt",
-            'galleries': "seed/seed_test_galleries.txt",
-            'memberships': "seed/seed_test_memberships.txt",
-            'walls': "seed/seed_test_walls.txt",
-            'placements': "seed/seed_test_placements.txt",
-        }
-
-        sd.seed_all(seed_files)
+        sd.connect_clean_db()
+        User(user_id=4, username='foo', email='b@r', password='?')
 
     def test_init(self):
 
