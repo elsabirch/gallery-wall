@@ -231,8 +231,6 @@ class WorkspaceRealignTestCase(unittest.TestCase):
 
     def test_positive_quad(self):
 
-        self.assertEqual(1, 1)
-
         wkspc = ar.Workspace(11)
         arngr = ar.Arranger(wkspc)
 
@@ -241,7 +239,7 @@ class WorkspaceRealignTestCase(unittest.TestCase):
         wkspc.pics[41].x2 = wkspc.pics[41].x1 + wkspc.pics[41].w
         wkspc.pics[41].y2 = wkspc.pics[41].y1 + wkspc.pics[41].h
 
-        wkspc.pics[42].x1 = 8
+        wkspc.pics[42].x1 = 10
         wkspc.pics[42].y1 = 1
         wkspc.pics[42].x2 = wkspc.pics[42].x1 + wkspc.pics[42].w
         wkspc.pics[42].y2 = wkspc.pics[42].y1 + wkspc.pics[42].h
@@ -258,7 +256,52 @@ class WorkspaceRealignTestCase(unittest.TestCase):
         self.assertEqual(wkspc.pics[41].x2, 6)
         self.assertEqual(wkspc.pics[41].y2, 6)
 
+        self.assertEqual(wkspc.pics[42].x1, 9)
+        self.assertEqual(wkspc.pics[42].y1, 0)
+        self.assertEqual(wkspc.pics[42].x2, 17)
+        self.assertEqual(wkspc.pics[42].y2, 8)
 
+        self.assertEqual(wkspc.pics[49].x1, 0)
+        self.assertEqual(wkspc.pics[49].y1, 9)
+        self.assertEqual(wkspc.pics[49].x2, 12)
+        self.assertEqual(wkspc.pics[49].y2, 19)
+
+    def test_all_quad(self):
+
+        wkspc = ar.Workspace(11)
+        arngr = ar.Arranger(wkspc)
+
+        wkspc.pics[41].x1 = -4
+        wkspc.pics[41].y1 = -4
+        wkspc.pics[41].x2 = wkspc.pics[41].x1 + wkspc.pics[41].w
+        wkspc.pics[41].y2 = wkspc.pics[41].y1 + wkspc.pics[41].h
+
+        wkspc.pics[42].x1 = 5
+        wkspc.pics[42].y1 = -4
+        wkspc.pics[42].x2 = wkspc.pics[42].x1 + wkspc.pics[42].w
+        wkspc.pics[42].y2 = wkspc.pics[42].y1 + wkspc.pics[42].h
+
+        wkspc.pics[49].x1 = -4
+        wkspc.pics[49].y1 = 5
+        wkspc.pics[49].x2 = wkspc.pics[49].x1 + wkspc.pics[49].w
+        wkspc.pics[49].y2 = wkspc.pics[49].y1 + wkspc.pics[49].h
+
+        arngr.realign_to_origin()
+
+        self.assertEqual(wkspc.pics[41].x1, 0)
+        self.assertEqual(wkspc.pics[41].y1, 0)
+        self.assertEqual(wkspc.pics[41].x2, 6)
+        self.assertEqual(wkspc.pics[41].y2, 6)
+
+        self.assertEqual(wkspc.pics[42].x1, 9)
+        self.assertEqual(wkspc.pics[42].y1, 0)
+        self.assertEqual(wkspc.pics[42].x2, 17)
+        self.assertEqual(wkspc.pics[42].y2, 8)
+
+        self.assertEqual(wkspc.pics[49].x1, 0)
+        self.assertEqual(wkspc.pics[49].y1, 9)
+        self.assertEqual(wkspc.pics[49].x2, 12)
+        self.assertEqual(wkspc.pics[49].y2, 19)
 
 class PicInitTestCase(unittest.TestCase):
 
