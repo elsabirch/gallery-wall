@@ -3,11 +3,13 @@ import server
 import utilities
 import doctest
 import os
-import seed_database as sd
+import seed_database as seed
 import arrange as ar
-from model import Picture, User
+from model import Picture, User, connect_to_db
 
 # from flask import session
+connect_to_db(server.app)
+
 
 def load_tests(loader, tests, ignore):
     """Also run our doctests and file-based doctests."""
@@ -168,7 +170,9 @@ class WorkspaceInitTestCase(unittest.TestCase):
 
     def setUp(self):
 
-        sd.connect_clean_db()
+        server.app.config['TESTING'] = True
+
+        seed.clean_db()
 
         seed_files = {
             'users': "seed/seed_test_users.txt",
@@ -179,7 +183,7 @@ class WorkspaceInitTestCase(unittest.TestCase):
             'placements': "seed/seed_test_placements.txt",
         }
 
-        sd.seed_all(seed_files)
+        seed.seed_all(seed_files)
 
     def test_init(self):
 
@@ -200,11 +204,69 @@ class WorkspaceInitTestCase(unittest.TestCase):
         # Correct number of pics
         self.assertEqual(len(wkspc.pics), 3)
 
+
+class WorkspaceRealignTestCase(unittest.TestCase):
+
+    # Test Gallery (11)
+    # 11 | 49, 42, 41
+    # 41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
+    # 42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
+    # 49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
+
+    def setUp(self):
+
+        server.app.config['TESTING'] = True
+        seed.clean_db()
+
+        seed_files = {
+            'users': "seed/seed_test_users.txt",
+            'pictures': "seed/seed_test_pictures.txt",
+            'galleries': "seed/seed_test_galleries.txt",
+            'memberships': "seed/seed_test_memberships.txt",
+            'walls': "seed/seed_test_walls.txt",
+            'placements': "seed/seed_test_placements.txt",
+        }
+
+        seed.seed_all(seed_files)
+
+    def test_positive_quad(self):
+
+        self.assertEqual(1, 1)
+
+        wkspc = ar.Workspace(11)
+        arngr = ar.Arranger(wkspc)
+
+        wkspc.pics[41].x1 = 1
+        wkspc.pics[41].y1 = 1
+        wkspc.pics[41].x2 = wkspc.pics[41].x1 + wkspc.pics[41].w
+        wkspc.pics[41].y2 = wkspc.pics[41].y1 + wkspc.pics[41].h
+
+        wkspc.pics[42].x1 = 8
+        wkspc.pics[42].y1 = 1
+        wkspc.pics[42].x2 = wkspc.pics[42].x1 + wkspc.pics[42].w
+        wkspc.pics[42].y2 = wkspc.pics[42].y1 + wkspc.pics[42].h
+
+        wkspc.pics[49].x1 = 1
+        wkspc.pics[49].y1 = 10
+        wkspc.pics[49].x2 = wkspc.pics[49].x1 + wkspc.pics[49].w
+        wkspc.pics[49].y2 = wkspc.pics[49].y1 + wkspc.pics[49].h
+
+        arngr.realign_to_origin()
+
+        self.assertEqual(wkspc.pics[41].x1, 0)
+        self.assertEqual(wkspc.pics[41].y1, 0)
+        self.assertEqual(wkspc.pics[41].x2, 6)
+        self.assertEqual(wkspc.pics[41].y2, 6)
+
+
+
 class PicInitTestCase(unittest.TestCase):
 
     def setUp(self):
 
-        sd.connect_clean_db()
+        server.app.config['TESTING'] = True
+
+        seed.clean_db()
         User(user_id=4, username='foo', email='b@r', password='?')
 
     def test_init(self):

@@ -207,11 +207,10 @@ def load_placements(seed_file_path):
         db.session.commit()
 
 
-def connect_clean_db():
-
-    connect_to_db(app)
+def clean_db():
 
     # In case tables haven't been created, create them
+    db.session.commit()
     db.drop_all()
     db.create_all()
     print "Database tables droped & created."
@@ -231,7 +230,9 @@ def seed_all(seed_files):
 
 if __name__ == "__main__":
 
-    connect_clean_db()
+    connect_to_db(app)
+
+    clean_db()
 
     seed_files = {
         'users': "seed/seed_users.txt",
