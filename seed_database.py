@@ -213,7 +213,6 @@ def clean_db():
     db.session.commit()
     db.drop_all()
     db.create_all()
-    print "Database tables droped & created."
 
 
 def seed_all(seed_files):
@@ -225,7 +224,6 @@ def seed_all(seed_files):
     load_memberships(seed_files['memberships'])
     load_walls(seed_files['walls'])
     load_placements(seed_files['placements'])
-    print "Tables seeded."
 
 
 if __name__ == "__main__":
@@ -233,6 +231,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     clean_db()
+    print "Database tables droped & created."
 
     seed_files = {
         'users': "seed/seed_users.txt",
@@ -244,3 +243,4 @@ if __name__ == "__main__":
     }
 
     seed_all(seed_files)
+    print "Tables seeded."

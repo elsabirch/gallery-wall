@@ -7,7 +7,7 @@ import seed_database as seed
 import arrange as ar
 from model import Picture, User, connect_to_db
 
-# from flask import session
+# 
 connect_to_db(server.app)
 
 
@@ -207,12 +207,6 @@ class WorkspaceInitTestCase(unittest.TestCase):
 
 class WorkspaceRealignTestCase(unittest.TestCase):
 
-    # Test Gallery (11)
-    # 11 | 49, 42, 41
-    # 41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
-    # 42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
-    # 49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
-
     def setUp(self):
 
         server.app.config['TESTING'] = True
@@ -230,6 +224,12 @@ class WorkspaceRealignTestCase(unittest.TestCase):
         seed.seed_all(seed_files)
 
     def test_positive_quad(self):
+
+        # Test Gallery (11)
+        # 11 | 49, 42, 41
+        # 41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
+        # 42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
+        # 49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
 
         wkspc = ar.Workspace(11)
         arngr = ar.Arranger(wkspc)
@@ -268,6 +268,12 @@ class WorkspaceRealignTestCase(unittest.TestCase):
 
     def test_all_quad(self):
 
+        # Test Gallery (11)
+        # 11 | 49, 42, 41
+        # 41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
+        # 42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
+        # 49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
+
         wkspc = ar.Workspace(11)
         arngr = ar.Arranger(wkspc)
 
@@ -303,6 +309,209 @@ class WorkspaceRealignTestCase(unittest.TestCase):
         self.assertEqual(wkspc.pics[49].x2, 12)
         self.assertEqual(wkspc.pics[49].y2, 19)
 
+
+class WorkspaceWallSizeTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        server.app.config['TESTING'] = True
+        seed.clean_db()
+
+        seed_files = {
+            'users': "seed/seed_test_users.txt",
+            'pictures': "seed/seed_test_pictures.txt",
+            'galleries': "seed/seed_test_galleries.txt",
+            'memberships': "seed/seed_test_memberships.txt",
+            'walls': "seed/seed_test_walls.txt",
+            'placements': "seed/seed_test_placements.txt",
+        }
+
+        seed.seed_all(seed_files)
+
+    def test_wall_size(self):
+
+        # Test Gallery (11)
+        # 11 | 49, 42, 41
+        # 41  |   1   |   4   |   4   |   love_4x4.jpg    |   love    |   @elsabirch  |   public
+        # 42  |   1   |   6   |   6   |   banana_6x6.jpg  |   banana  |   @elsabirch  |   public
+        # 49  |   1   |   10  |   8   |   wave_10x8.jpg   |   wave    |   @elsabirch  |   public
+
+        wkspc = ar.Workspace(11)
+        arngr = ar.Arranger(wkspc)
+
+        wkspc.pics[41].x1 = 0
+        wkspc.pics[41].y1 = 0
+        wkspc.pics[41].x2 = wkspc.pics[41].x1 + wkspc.pics[41].w
+        wkspc.pics[41].y2 = wkspc.pics[41].y1 + wkspc.pics[41].h
+
+        wkspc.pics[42].x1 = 9
+        wkspc.pics[42].y1 = 0
+        wkspc.pics[42].x2 = wkspc.pics[42].x1 + wkspc.pics[42].w
+        wkspc.pics[42].y2 = wkspc.pics[42].y1 + wkspc.pics[42].h
+
+        wkspc.pics[49].x1 = 0
+        wkspc.pics[49].y1 = 9
+        wkspc.pics[49].x2 = wkspc.pics[49].x1 + wkspc.pics[49].w
+        wkspc.pics[49].y2 = wkspc.pics[49].y1 + wkspc.pics[49].h
+
+        arngr.get_wall_size()
+
+        self.assertEqual(wkspc.height, 19)
+        self.assertEqual(wkspc.width, 17)
+
+
+class WorkspaceArrangerPopTestCase(unittest.TestCase):
+
+    def setUp(self):
+
+        server.app.config['TESTING'] = True
+        seed.clean_db()
+
+        seed_files = {
+            'users': "seed/seed_test_users.txt",
+            'pictures': "seed/seed_test_pictures.txt",
+            'galleries': "seed/seed_test_galleries.txt",
+            'memberships': "seed/seed_test_memberships.txt",
+            'walls': "seed/seed_test_walls.txt",
+            'placements': "seed/seed_test_placements.txt",
+        }
+
+        seed.seed_all(seed_files)
+
+    def test_pop_any_n(self):
+
+        # 1|2 | 8 | 10.5 |  |  |  |
+        # 2|2 | 12 | 15 |  |  |  |
+        # 3|2 | 7.5 | 9.5 |  |  |  |
+        # 4|2 | 11 | 14 |  |  |  |
+        # 5|2 | 8.5 | 6.5 |  |  |  |
+        # 6|2 | 15 | 11 |  |  |  |
+        # 7|2 | 19.5 | 16.5 |  |  |  |
+        # 8|2 | 13 | 15.5 |  |  |  |
+
+        for n in range(8):
+
+            wkspc = ar.Workspace(1)
+            arngr = ar.Arranger(wkspc)
+
+            returned = arngr.pop_any_n(n)
+
+            self.assertEqual(len(returned), n)
+
+            for x in returned:
+                self.assertIn(x, range(1, 9))
+                self.assertNotIn(x, arngr.pics_remaining)
+
+    def test_pop_tallest(self):
+
+        wkspc = ar.Workspace(1)
+        arngr = ar.Arranger(wkspc)
+
+        returned = arngr.pop_tallest()
+        self.assertEqual(returned, 7)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_tallest()
+        self.assertEqual(returned, 8)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+    def test_pop_widest(self):
+
+        wkspc = ar.Workspace(1)
+        arngr = ar.Arranger(wkspc)
+
+        returned = arngr.pop_widest()
+        self.assertEqual(returned, 7)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_widest()
+        self.assertEqual(returned, 6)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+    def test_pop_narrow(self):
+
+        wkspc = ar.Workspace(1)
+        arngr = ar.Arranger(wkspc)
+
+        returned = arngr.pop_narrow()
+        self.assertIn(returned, [1, 3])
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_narrow()
+        self.assertIn(returned, [1, 3])
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_narrow()
+        self.assertEqual(returned, 5)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_narrow()
+        self.assertEqual(returned, 4)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+    def test_pop_small(self):
+
+        # Area assuming margin of 2
+        # 1 = 130
+        # 2 = 238
+        # 3 = 120
+        # 4 = 208
+        # 5 = 99
+        # 6 = 221
+        # 7 = 418
+        # 8 = 270
+
+        wkspc = ar.Workspace(1)
+        arngr = ar.Arranger(wkspc)
+
+        returned = arngr.pop_small()
+        self.assertIn(returned, [5, 3])
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_small()
+        self.assertIn(returned, [5, 3])
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_small()
+        self.assertEqual(returned, 1)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_small()
+        self.assertEqual(returned, 4)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+    def test_pop_large(self):
+
+        # Area assuming margin of 2
+        # 1 = 130
+        # 2 = 238
+        # 3 = 120
+        # 4 = 208
+        # 5 = 99
+        # 6 = 221
+        # 7 = 418
+        # 8 = 270
+
+        wkspc = ar.Workspace(1)
+        arngr = ar.Arranger(wkspc)
+
+        returned = arngr.pop_large()
+        self.assertIn(returned, [7, 8])
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_large()
+        self.assertIn(returned, [7, 8])
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_large()
+        self.assertEqual(returned, 2)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+        returned = arngr.pop_large()
+        self.assertEqual(returned, 6)
+        self.assertNotIn(returned, arngr.pics_remaining)
+
+
 class PicInitTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -323,7 +532,6 @@ class PicInitTestCase(unittest.TestCase):
         self.assertIsNone(pic.x2)
         self.assertIsNone(pic.y1)
         self.assertIsNone(pic.y2)
-
 
         # Only one dimension will be rounded
         picture = Picture(user_id=4, width=10, height=5.7)
