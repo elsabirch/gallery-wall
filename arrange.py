@@ -412,8 +412,8 @@ class GridArranger(Arranger):
     def arrange(self):
         """Arrangment via an initial placement in a grid."""
 
-        pics_in_grid = self.random_place_in_grid()
-        # pics_in_grid = self.large_center_place_in_grid()
+        # pics_in_grid = self.random_place_in_grid()
+        pics_in_grid = self.large_center_place_in_grid()
 
         self.expand_grid_to_arrangment(pics_in_grid)
 
@@ -436,7 +436,7 @@ class GridArranger(Arranger):
         grid_sample = random.sample(grid_pairs, self.ws.len)
 
         grid_pics = {grid_sample[i]:pic for i, pic in enumerate(self.ws.pics.keys())}
-
+        print grid_pics
         return grid_pics
 
     def large_center_place_in_grid(self):
@@ -446,18 +446,19 @@ class GridArranger(Arranger):
         {(i,j): pic}
         """
 
-        n_grid = int(math.ceil(math.sqrt(self.ws.len)))
-        min_grid = -n_grid/2
-        max_grid = min_grid + n_grid
+        n_grid = int(math.ceil(math.sqrt(self.ws.len))) / 2
 
-        grid_pairs = [(i, j) for i in range(min_grid, max_grid)
-                             for j in range(min_grid, max_grid)]
-
+        grid_pairs = [(i, j) for i in range(-n_grid, n_grid+1)
+                             for j in range(-n_grid, n_grid+1)]
+        print grid_pairs
         grid_sample = set(random.sample(grid_pairs, self.ws.len))
-
+        print grid_sample
         cols, rows = zip(*grid_sample)
         mag_sort_j = sorted(set(cols), key=abs)
         mag_sort_i = sorted(set(rows), key=abs)
+
+        print mag_sort_j
+        print mag_sort_i
 
         grid_pics = {}
 
@@ -466,7 +467,7 @@ class GridArranger(Arranger):
                 if (i, j) in grid_sample:
                     grid_pics[(i, j)] = self.pop_large()
                     # print( grid_pics[(i, j)] )
-                    # print( (i, j) )
+                    print self.ws.pics[grid_pics[(i, j)]], ' at ',(i, j) 
                 if not self.pics_remaining:
                     return grid_pics
 
