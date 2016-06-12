@@ -3,13 +3,17 @@
 
 ![gwlogo](/docs/gw_logo.png)
 
-Gallery Wall is the project of Elsa Birch while a student at Hackbright Academy in San Francisco, Winter 2016. You can reach me via <elsa.birch@gmail.com> or see more about my interests and background on my [personal website](http://www.elsabirch.com).  I have also posted a [video demo of this project](https://youtu.be/rxYJag2KfYA).
+Gallery Wall is the project of [Elsa Birch](http://www.elsabirch.com) while a student at Hackbright Academy in San Francisco, Winter 2016.
+
+Video Demo: [Gallery Wall on YouTube](https://youtu.be/rxYJag2KfYA)
+
+Gallery Wall Inspiration: [Pinterest Board](https://www.pinterest.com/elsa_birch/gallery-walls/)
 
 ## Overview & Features
 
 It is trendy to hang a collected gallery of pictures together as a larger composition. Gallery Wall produces visually pleasing arrangements from a set of user provided pictures. Users can select from different styles, such as columnar or cloud-like. Continually varying layouts are produced dynamically for any gallery of pictures, regardless of sizes and numbers of pictures.  Users may save and compare wall layouts for a single gallery set and handy dimensions are provided for hanging.
 
-Sample sets of pictures are also available for users to try the layout algorithms and heuristics designed specifically for this project. The Object Oriented design of the arrangement process itself also lends itself to refinement and extension!
+Sample sets of pictures are also available for users to try the layout algorithms and heuristics designed specifically for this project.
 
 *Quick note on terminology:  throughout this application, ‘gallery’ indicates an unordered collection of pictures, and ‘wall’ refers to such a collection once it has been arranged and carries physical placement information.*
 
